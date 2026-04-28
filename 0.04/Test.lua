@@ -1,3 +1,4 @@
+--!nocheck
 --[[
     NextLevel UI Library — Full Feature Example Script
     Demonstrates every element type available in the library.

@@ -1,4 +1,5 @@
 --!nocheck
+--!nolint
 
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
@@ -6,8 +7,103 @@ local UserInputService = game:GetService("UserInputService")
 local CoreGui = game:GetService("CoreGui")
 local HttpService = game:GetService("HttpService")
 local RunService = game:GetService("RunService")
+local TeleportService = game:GetService("TeleportService")
 
--- Executor function fallbacks
+export type DropdownController = {
+    Refresh: (self: DropdownController, newList: {string}) -> (),
+}
+
+export type ProgressBarController = {
+    Set: (self: ProgressBarController, value: number) -> (),
+}
+
+export type StatusIndicatorController = {
+    Set: (self: StatusIndicatorController, statusText: string, color: Color3?) -> (),
+}
+
+export type KeyValueTableController = {
+    SetValue: (self: KeyValueTableController, key: string, value: any) -> (),
+}
+
+export type ConsoleController = {
+    Print: (self: ConsoleController, msg: string, color: Color3?) -> (),
+    Clear: (self: ConsoleController) -> (),
+}
+
+export type Section = {
+    Button: (self: Section, text: string, callback: (() -> ())?) -> TextButton,
+    CreateButtonRow: (self: Section, text1: string, callback1: (() -> ())?, text2: string, callback2: (() -> ())?) -> (TextButton, TextButton),
+    Toggle: (self: Section, text: string, default: boolean?, flag: string?, callback: ((enabled: boolean) -> ())?) -> (),
+    ToggleBind: (self: Section, text: string, defaultState: boolean?, defaultKey: Enum.KeyCode?, flagState: string?, flagKey: string?, callback: ((enabled: boolean, keyName: string) -> ())?) -> (),
+    Switch: (self: Section, text: string, default: boolean?, flag: string?, callback: ((enabled: boolean) -> ())?) -> (),
+    Slider: (self: Section, text: string, min: number, max: number, default: number?, decimals: number?, flag: string?, callback: ((value: number) -> ())?) -> (),
+    Stepper: (self: Section, text: string, min: number, max: number, default: number?, step: number?, flag: string?, callback: ((value: number) -> ())?) -> (),
+    Bind: (self: Section, text: string, defaultKey: Enum.KeyCode?, flag: string?, callback: (() -> ())?) -> (),
+    Input: (self: Section, text: string, placeholder: string?, flag: string?, callback: ((text: string) -> ())?) -> (),
+    Dropdown: (self: Section, text: string, options: {string}, multi: boolean?, default: any?, flag: string?, callback: ((selected: any) -> ())?) -> DropdownController,
+    SearchableDropdown: (self: Section, text: string, options: {string}, default: string?, flag: string?, callback: ((selected: string) -> ())?) -> DropdownController,
+    PlayerDropdown: (self: Section, text: string, includeSelf: boolean?, flag: string?, callback: ((selected: string) -> ())?) -> DropdownController,
+    RadioGroup: (self: Section, label: string, options: {string}, default: string?, flag: string?, callback: ((selected: string) -> ())?) -> (),
+    ColorPicker: (self: Section, text: string, defaultColor: Color3?, defaultAlpha: number?, flag: string?, callback: ((color: Color3, alpha: number) -> ())?) -> (),
+    Label: (self: Section, text: string) -> TextLabel,
+    Paragraph: (self: Section, text: string) -> TextLabel,
+    Separator: (self: Section, label: string?) -> (),
+    Spacer: (self: Section, height: number?) -> (),
+    ProgressBar: (self: Section, text: string, min: number?, max: number?, default: number?, flag: string?) -> ProgressBarController,
+    StatusIndicator: (self: Section, label: string, initialText: string?, initialColor: Color3?) -> StatusIndicatorController,
+    Alert: (self: Section, alertText: string, alertType: ("info" | "warn" | "error" | "success")?) -> (),
+    Image: (self: Section, assetId: number | string, height: number?) -> ImageLabel,
+    KeyValueTable: (self: Section, rows: {{any}}) -> KeyValueTableController,
+    Console: (self: Section, height: number?) -> ConsoleController,
+}
+
+export type Tab = {
+    Section: (self: Tab, title: string) -> Section,
+}
+
+export type Window = {
+    Name: string,
+    Size: UDim2,
+    KeyBind: Enum.UserInputType | Enum.KeyCode,
+    Flags: {[string]: any},
+    Setters: {[string]: (any) -> ()},
+    Tab: (self: Window, text: string, iconId: (string|number)?) -> Tab,
+    Notify: (self: Window, title: string, text: string, duration: number?) -> (),
+    SetTheme: (self: Window, overrides: {[string]: any}) -> (),
+    ServerHop: (self: Window, placeId: number, jobId: string?, scriptToQueue: string?) -> (),
+    GetFlag: (self: Window, flag: string) -> any,
+    IgnoreFlag: (self: Window, flag: string) -> (),
+    AddTooltip: (self: Window, element: GuiObject, tipText: string) -> (),
+    Unload: (self: Window) -> (),
+    SetPanicKey: (self: Window, key: Enum.KeyCode) -> (),
+    SaveConfig: (self: Window, name: string) -> (),
+    LoadConfig: (self: Window, name: string) -> (),
+    ListConfigs: (self: Window) -> {string},
+
+    BuildUtilityTab: (self: Window, iconId: (string|number)?) -> (),
+    BuildSettingsTab: (self: Window, iconId: (string|number)?) -> (),
+    BuildThemeTab: (self: Window, iconId: (string|number)?) -> (),
+}
+
+export type LibraryModule = {
+    new: (Name: string?, Size: UDim2?, KeyBind: (Enum.UserInputType | Enum.KeyCode)?, Mode: string?, Icon: (string|number)?) -> Window,
+    Notify: (self: any, title: string, text: string, duration: number?) -> (),
+    SetTheme: (self: any, overrides: {[string]: any}) -> (),
+    ServerHop: (self: any, placeId: number, jobId: string?, scriptToQueue: string?) -> (),
+    GetFlag: (self: any, flag: string) -> any,
+    IgnoreFlag: (self: any, flag: string) -> (),
+    AddTooltip: (self: any, element: GuiObject, tipText: string) -> (),
+    Unload: (self: any) -> (),
+    SetPanicKey: (self: any, key: Enum.KeyCode) -> (),
+    SaveConfig: (self: any, name: string) -> (),
+    LoadConfig: (self: any, name: string) -> (),
+    ListConfigs: (self: any) -> {string},
+
+    BuildUtilityTab: (self: Window, iconId: (string|number)?) -> (),
+    BuildSettingsTab: (self: Window, iconId: (string|number)?) -> (),
+    BuildThemeTab: (self: Window, iconId: (string|number)?) -> (),
+}
+
 local isfolder = isfolder or function() return false end
 local makefolder = makefolder or function() end
 local writefile = writefile or function() end
@@ -21,8 +117,9 @@ local kpress = keypress or function() end
 local krelease = keyrelease or function() end
 local m1click = mouse1click or function() end
 local m2click = mouse2click or function() end
+local queue_on_teleport = queue_on_teleport or syn and syn.queue_on_teleport or fluxus and fluxus.queue_on_teleport or function() end
 
-local Library = {}
+local Library: LibraryModule = {} :: any
 Library.__index = Library
 
 if not getgenv()._Heartkiss_Garbage then
@@ -41,22 +138,22 @@ local function CleanID(id: string)
 end
 
 local THEMES = {
-    MainColor        = Color3.fromRGB(30, 30, 30),
-    FrameColor       = Color3.fromRGB(25, 25, 25),
-    TabColor         = Color3.fromRGB(24, 24, 24),
+    MainColor        = Color3.fromRGB(15, 15, 15),
+    FrameColor       = Color3.fromRGB(20, 20, 20),
+    TabColor         = Color3.fromRGB(18, 18, 18),
     LineColor        = Color3.fromRGB(255, 255, 255),
-    BorderColor      = Color3.fromRGB(70, 70, 70),
-    DarkColor        = Color3.fromRGB(0, 0, 0),
-    SelectedTab      = Color3.fromRGB(207, 207, 207),
-    TextColor        = Color3.fromRGB(255, 255, 255),
-    ButtonBorderColor= Color3.fromRGB(27, 27, 27),
-    SubTextColor     = Color3.fromRGB(160, 160, 160),
-    SuccessColor     = Color3.fromRGB(80, 220, 120),
-    WarningColor     = Color3.fromRGB(255, 190, 50),
-    ErrorColor       = Color3.fromRGB(255, 80, 80),
-    InfoColor        = Color3.fromRGB(80, 140, 255),
+    BorderColor      = Color3.fromRGB(40, 40, 40),
+    DarkColor        = Color3.fromRGB(10, 10, 10),
+    SelectedTab      = Color3.fromRGB(40, 40, 40),
+    TextColor        = Color3.fromRGB(245, 245, 245),
+    ButtonBorderColor= Color3.fromRGB(35, 35, 35),
+    SubTextColor     = Color3.fromRGB(150, 150, 150),
+    SuccessColor     = Color3.fromRGB(255, 255, 255),
+    WarningColor     = Color3.fromRGB(255, 175, 50),
+    ErrorColor       = Color3.fromRGB(255, 70, 90),
+    InfoColor        = Color3.fromRGB(255, 255, 255),
     TextSize         = 13,
-    BaseHeight       = 22,
+    BaseHeight       = 26,
 }
 
 local ThemeEvent = Instance.new("BindableEvent")
@@ -65,18 +162,15 @@ local function CreateGradient(Parent: any, Rotation)
     local UIGradient = Instance.new("UIGradient")
     UIGradient.Color = ColorSequence.new{
         ColorSequenceKeypoint.new(0.00, Color3.fromRGB(255, 255, 255)),
-        ColorSequenceKeypoint.new(0.19, Color3.fromRGB(203, 203, 203)),
-        ColorSequenceKeypoint.new(0.52, Color3.fromRGB(175, 175, 175)),
-        ColorSequenceKeypoint.new(0.84, Color3.fromRGB(197, 197, 197)),
-        ColorSequenceKeypoint.new(1.00, Color3.fromRGB(255, 255, 255))
+        ColorSequenceKeypoint.new(1.00, Color3.fromRGB(220, 220, 225))
     }
-    UIGradient.Rotation = Rotation or 90
+    UIGradient.Rotation = Rotation or 45
     UIGradient.Parent = Parent
 end
 
 local function RoundCorner(parent, radius)
     local c = Instance.new("UICorner")
-    c.CornerRadius = UDim.new(radius or 0, radius and 0 or 4)
+    c.CornerRadius = UDim.new(0, radius or 6)
     c.Parent = parent
     return c
 end
@@ -87,13 +181,38 @@ local function ProtectGui(gui)
 end
 
 function Library:Notify(title: string, text: string, duration: number)
+    if Library.IsSilent then return end
     duration = duration or 3
-    if not self.NotifyLayout then return end
+
+    local layout = self.NotifyLayout or Library._GlobalNotifyLayout
+
+    if not layout then
+        local NotifyGui = Instance.new("ScreenGui")
+        NotifyGui.Name = "Heartkiss_Standalone_Notifications"
+        NotifyGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
+        ProtectGui(NotifyGui)
+        NotifyGui.Parent = CoreGui
+
+        layout = Instance.new("Frame")
+        layout.Name = "Layout"
+        layout.BackgroundTransparency = 1
+        layout.Size = UDim2.new(0, 260, 1, -40)
+        layout.Position = UDim2.new(1, -270, 0, 20)
+        layout.Parent = NotifyGui
+
+        local NotifyList = Instance.new("UIListLayout")
+        NotifyList.SortOrder = Enum.SortOrder.LayoutOrder
+        NotifyList.VerticalAlignment = Enum.VerticalAlignment.Top
+        NotifyList.Padding = UDim.new(0, 10)
+        NotifyList.Parent = layout
+
+        Library._GlobalNotifyLayout = layout
+    end
 
     local Holder = Instance.new("Frame")
     Holder.BackgroundTransparency = 1
     Holder.Size = UDim2.new(1, 0, 0, 60)
-    Holder.Parent = self.NotifyLayout
+    Holder.Parent = layout
 
     local Notif = Instance.new("Frame")
     Notif.Size = UDim2.new(1, 0, 1, 0)
@@ -152,6 +271,33 @@ function Library:SetTheme(overrides: table)
     ThemeEvent:Fire() 
 end
 
+function Library:ServerHop(placeId, jobId, scriptToQueue)
+    if not self.ConfigFolder then return end
+
+    local dataToSave = {}
+    for flag, val in pairs(self.Flags) do
+        if not self.IgnoredFlags[flag] then dataToSave[flag] = val end
+    end
+    
+    pcall(function() 
+        writefile(self.ConfigFolder .. "/teleport_state.json", HttpService:JSONEncode(dataToSave)) 
+        writefile(self.ConfigFolder .. "/autoload.txt", "teleport_state")
+    end)
+
+    if scriptToQueue then
+        queue_on_teleport(scriptToQueue)
+    end
+
+    self:Notify("Teleporting...", "Saving state and moving to new server...", 5)
+    task.wait(1)
+    
+    if jobId then
+        TeleportService:TeleportToPlaceInstance(placeId, jobId, Players.LocalPlayer)
+    else
+        TeleportService:Teleport(placeId, Players.LocalPlayer)
+    end
+end
+
 function Library:GetFlag(flag: string) return self.Flags and self.Flags[flag] end
 
 function Library:IgnoreFlag(flag: string)
@@ -203,9 +349,64 @@ function Library:SetPanicKey(key: Enum.KeyCode)
     end)
 end
 
-function Library.new(Name: string, Size: UDim2, KeyBind: Enum.UserInputType | Enum.KeyCode)
-    local self = setmetatable({}, Library)
+function Library:SaveConfig(name: string)
+    if not self.ConfigFolder then return end
+    local dataToSave = {}
+    for flag, val in pairs(self.Flags) do
+        if not self.IgnoredFlags[flag] then dataToSave[flag] = val end
+    end
+    dataToSave["__WindowPosition"] = {
+        X = self.Frames.MainFrame.Position.X.Offset,
+        Y = self.Frames.MainFrame.Position.Y.Offset
+    }
+    local ok, err = pcall(function() 
+        writefile(self.ConfigFolder .. "/" .. name .. ".json", HttpService:JSONEncode(dataToSave)) 
+    end)
+    if ok then
+        self:Notify("Config Saved", "Saved profile: " .. name, 3)
+    else
+        self:Notify("Save Error", "Failed to save: " .. tostring(err), 5)
+    end
+end
+
+function Library:LoadConfig(name: string)
+    if not self.ConfigFolder then return end
+    local path = self.ConfigFolder .. "/" .. name .. ".json"
+    if isfile(path) then
+        local data = HttpService:JSONDecode(readfile(path))
+        for flag, val in pairs(data) do
+            if flag == "__WindowPosition" then
+                pcall(function()
+                    self.Frames.MainFrame.Position = UDim2.new(0.5, val.X, 0.5, val.Y)
+                end)
+            elseif self.Setters[flag] then
+                pcall(function() self.Setters[flag](val) end)
+            else
+                self.Flags[flag] = val
+            end
+        end
+        self:Notify("Config Loaded", "Loaded profile: " .. name, 3)
+    end
+end
+
+function Library:ListConfigs()
+    if not self.ConfigFolder then return {} end
+    local configs = {}
+    if isfolder(self.ConfigFolder) then
+        for _, file in ipairs(listfiles(self.ConfigFolder)) do
+            if file:sub(-5) == ".json" and not file:find("teleport_state") then
+                local filename = file:match("([^/\\]+)%.json$")
+                if filename then table.insert(configs, filename) end
+            end
+        end
+    end
+    return configs
+end
+
+function Library.new(Name: string?, Size: UDim2?, KeyBind: (Enum.UserInputType | Enum.KeyCode)?, Mode: string?, Icon: (string|number)?): Window
+    local self = setmetatable({}, Library) :: any
     local WindowRoot = self
+    local isSidebar = (Mode == "Sidebar")
 
     function self:Connect(signal, callback)
         local connection = signal:Connect(callback)
@@ -225,19 +426,38 @@ function Library.new(Name: string, Size: UDim2, KeyBind: Enum.UserInputType | En
     local function CreateButton()
         local Btn = Instance.new("TextButton")
         Btn.Size = UDim2.new(1, 0, 0, THEMES.BaseHeight)
+        Btn.AutoButtonColor = false
+        Btn.BorderSizePixel = 0
+        RoundCorner(Btn, 6)
         
         WindowRoot:Theme(Btn, "BackgroundColor3", "FrameColor")
-        WindowRoot:Theme(Btn, "BorderColor3", "ButtonBorderColor")
         WindowRoot:Theme(Btn, "TextColor3", "TextColor")
         
-        Btn.Font = Enum.Font.Code
+        local Stroke = Instance.new("UIStroke")
+        Stroke.Color = THEMES.ButtonBorderColor
+        Stroke.Thickness = 1
+        Stroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+        Stroke.Parent = Btn
+        WindowRoot:Theme(Stroke, "Color", "ButtonBorderColor")
+        
+        Btn.Font = Enum.Font.GothamMedium
         Btn.TextSize = THEMES.TextSize
         CreateGradient(Btn)
+        
+        Btn.MouseEnter:Connect(function()
+            TweenService:Create(Btn, TweenInfo.new(0.2), {BackgroundColor3 = THEMES.BorderColor}):Play()
+        end)
+        Btn.MouseLeave:Connect(function()
+            TweenService:Create(Btn, TweenInfo.new(0.2), {BackgroundColor3 = THEMES.FrameColor}):Play()
+        end)
+        
         return Btn
     end
 
     self.Name         = Name or "Heartkiss"
     self.Size         = Size or UDim2.fromOffset(520, 560)
+    self.CurrentWidth = self.Size.X.Offset
+    self.CurrentHeight= self.Size.Y.Offset
     self.Tabs         = {}
     self.KeyBind      = KeyBind or Enum.KeyCode.RightControl
     self.Flags        = {}
@@ -247,6 +467,13 @@ function Library.new(Name: string, Size: UDim2, KeyBind: Enum.UserInputType | En
     self.BoundElements= {} 
     self.ConfigFolder = self.Name .. "_Configs"
     
+    local SafeFolderName = string.gsub(self.Name, "[<>:\"/\\|?*]", "")
+    local BaseFolder = SafeFolderName .. "_Configs"
+
+    local PlaceId = tostring(game.PlaceId)
+    self.ConfigFolder = BaseFolder .. "/" .. PlaceId
+    
+    if not isfolder(BaseFolder) then makefolder(BaseFolder) end
     if not isfolder(self.ConfigFolder) then makefolder(self.ConfigFolder) end
 
     CleanID(self.Name)
@@ -257,6 +484,7 @@ function Library.new(Name: string, Size: UDim2, KeyBind: Enum.UserInputType | En
     local ScreenGui = Instance.new("ScreenGui")
     ScreenGui.Name = self.Name
     ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
+    ScreenGui.Enabled = not Library.IsSilent
     ProtectGui(ScreenGui)
     ScreenGui.Parent = CoreGui
     table.insert(garbage, ScreenGui)
@@ -287,19 +515,38 @@ function Library.new(Name: string, Size: UDim2, KeyBind: Enum.UserInputType | En
     local MainFrame = Instance.new("Frame")
     MainFrame.Name = "MainFrame"
     WindowRoot:Theme(MainFrame, "BackgroundColor3", "MainColor")
-    WindowRoot:Theme(MainFrame, "BorderColor3", "LineColor")
+    MainFrame.BorderSizePixel = 0
     MainFrame.Position = UDim2.new(0.5, -self.Size.X.Offset/2, 0.5, -self.Size.Y.Offset/2)
-    MainFrame.Size = self.Size
-    MainFrame.ClipsDescendants = true
+    MainFrame.Size = UDim2.new(0, self.CurrentWidth, 0, self.CurrentHeight)
+    MainFrame.ClipsDescendants = false
     MainFrame.ZIndex = 1
     MainFrame.Parent = ScreenGui
     CreateGradient(MainFrame)
+
+    local MainStroke = Instance.new("UIStroke")
+    MainStroke.Color = THEMES.LineColor
+    MainStroke.Thickness = 2
+    MainStroke.Parent = MainFrame
+    WindowRoot:Theme(MainStroke, "Color", "LineColor")
+    
+    local DropShadow = Instance.new("ImageLabel")
+    DropShadow.Name = "Shadow"
+    DropShadow.BackgroundTransparency = 1
+    DropShadow.Position = UDim2.new(0, -15, 0, -15)
+    DropShadow.Size = UDim2.new(1, 30, 1, 30)
+    DropShadow.ZIndex = 0
+    DropShadow.Image = "rbxassetid://5554236805"
+    DropShadow.ImageColor3 = Color3.fromRGB(0, 0, 0)
+    DropShadow.ImageTransparency = 0.5
+    DropShadow.ScaleType = Enum.ScaleType.Slice
+    DropShadow.SliceCenter = Rect.new(23, 23, 277, 277)
+    DropShadow.Parent = MainFrame
 
     local DragFrame = Instance.new("TextButton")
     DragFrame.Size = UDim2.new(1, -150, 0, 30)
     DragFrame.BackgroundTransparency = 1
     DragFrame.Text = ""
-    DragFrame.ZIndex = 5
+    DragFrame.ZIndex = 10
     DragFrame.Parent = MainFrame
 
     local dragging, dragInput, dragStart, startPos
@@ -314,16 +561,111 @@ function Library.new(Name: string, Size: UDim2, KeyBind: Enum.UserInputType | En
     self:Connect(UserInputService.InputChanged, function(input)
         if input.UserInputType == Enum.UserInputType.MouseMovement then dragInput = input end
     end)
+    
+    -- RESIZE GRIP (Bottom Right)
+    local ResizeGrip = Instance.new("TextButton")
+    ResizeGrip.Size = UDim2.new(0, 15, 0, 15)
+    ResizeGrip.Position = UDim2.new(1, -15, 1, -15)
+    ResizeGrip.BackgroundTransparency = 1
+    ResizeGrip.Text = ""
+    ResizeGrip.ZIndex = 50
+    ResizeGrip.Parent = MainFrame
+
+    local GripIcon = Instance.new("TextLabel")
+    GripIcon.Size = UDim2.new(1, 0, 1, 0)
+    GripIcon.BackgroundTransparency = 1
+    GripIcon.Text = "◢"
+    WindowRoot:Theme(GripIcon, "TextColor3", "SubTextColor")
+    GripIcon.Font = Enum.Font.Code
+    GripIcon.TextSize = 12
+    GripIcon.ZIndex = 50
+    GripIcon.Parent = ResizeGrip
+
+    local resizing = false
+    local resizeStart, startSize
+    self:Connect(ResizeGrip.InputBegan, function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            resizing = true
+            resizeStart = input.Position
+            startSize = MainFrame.AbsoluteSize
+        end
+    end)
+    self:Connect(UserInputService.InputEnded, function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then resizing = false end
+    end)
+    
     self:Connect(RunService.RenderStepped, function()
         if dragging and dragInput then
             local delta = dragInput.Position - dragStart
             MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
         end
     end)
+    
+    self:Connect(UserInputService.InputChanged, function(input)
+        if resizing and input.UserInputType == Enum.UserInputType.MouseMovement then
+            local delta = input.Position - resizeStart
+            local newWidth = math.max(400, startSize.X + delta.X)
+            local newHeight = math.max(300, startSize.Y + delta.Y)
+            self.CurrentWidth = newWidth
+            self.CurrentHeight = newHeight
+            MainFrame.Size = UDim2.new(0, newWidth, 0, newHeight)
+        end
+    end)
 
+    local Sidebar
+    local SidebarLine
+    if isSidebar then
+        Sidebar = Instance.new("Frame")
+        Sidebar.Name = "Sidebar"
+        Sidebar.Size = UDim2.new(0, 140, 1, 0)
+        WindowRoot:Theme(Sidebar, "BackgroundColor3", "MainColor")
+        Sidebar.BorderSizePixel = 0
+        Sidebar.ZIndex = 2
+        Sidebar.Parent = MainFrame
+
+        SidebarLine = Instance.new("Frame")
+        SidebarLine.Size = UDim2.new(0, 1, 1, 0)
+        SidebarLine.Position = UDim2.new(1, 0, 0, 0)
+        WindowRoot:Theme(SidebarLine, "BackgroundColor3", "BorderColor")
+        SidebarLine.BorderSizePixel = 0
+        SidebarLine.ZIndex = 3
+        SidebarLine.Parent = Sidebar
+    end
+    
     local Title = Instance.new("TextLabel")
-    Title.Size = UDim2.new(1, -10, 0, 30)
-    Title.Position = UDim2.new(0, 10, 0, 0)
+    if Icon then
+        local MainIcon = Instance.new("ImageLabel")
+        MainIcon.Size = UDim2.new(0, 16, 0, 16)
+        MainIcon.BackgroundTransparency = 1
+        MainIcon.Image = type(Icon) == "number" and "rbxassetid://" .. Icon or Icon
+        MainIcon.ZIndex = 5
+        
+        if isSidebar then
+            MainIcon.Position = UDim2.new(0, 8, 0, 8)
+            MainIcon.Parent = Sidebar
+            
+            Title.Size = UDim2.new(1, -34, 0, 32)
+            Title.Position = UDim2.new(0, 30, 0, 0)
+            Title.Parent = Sidebar
+        else
+            MainIcon.Position = UDim2.new(0, 8, 0, 7)
+            MainIcon.Parent = MainFrame
+            
+            Title.Size = UDim2.new(1, -34, 0, 30)
+            Title.Position = UDim2.new(0, 30, 0, 0)
+            Title.Parent = MainFrame
+        end
+    else
+        if isSidebar then
+            Title.Size = UDim2.new(1, -20, 0, 32)
+            Title.Position = UDim2.new(0, 10, 0, 0)
+            Title.Parent = Sidebar
+        else
+            Title.Size = UDim2.new(1, -10, 0, 30)
+            Title.Position = UDim2.new(0, 10, 0, 0)
+            Title.Parent = MainFrame
+        end
+    end
     Title.BackgroundTransparency = 1
     Title.Text = Name
     WindowRoot:Theme(Title, "TextColor3", "TextColor")
@@ -331,20 +673,18 @@ function Library.new(Name: string, Size: UDim2, KeyBind: Enum.UserInputType | En
     Title.TextSize = THEMES.TextSize + 2
     Title.TextXAlignment = Enum.TextXAlignment.Left
     Title.ZIndex = 5
-    Title.Parent = MainFrame
 
-    local EXPANDED_HEIGHT = self.Size.Y.Offset
     local minimized = false
 
     local MinBtn = Instance.new("TextButton")
     MinBtn.Size = UDim2.new(0, 20, 0, 20)
     MinBtn.Position = UDim2.new(1, -26, 0, 5)
     MinBtn.BackgroundTransparency = 1
-    MinBtn.Text = "−"
+    MinBtn.Text = "-"
     WindowRoot:Theme(MinBtn, "TextColor3", "LineColor")
     MinBtn.Font = Enum.Font.Code
     MinBtn.TextSize = 18
-    MinBtn.ZIndex = 5
+    MinBtn.ZIndex = 10
     MinBtn.Parent = MainFrame
 
     local PerfMonitor = Instance.new("TextLabel")
@@ -370,29 +710,42 @@ function Library.new(Name: string, Size: UDim2, KeyBind: Enum.UserInputType | En
     end)
 
     local Line = Instance.new("Frame")
-    Line.Size = UDim2.new(1, 0, 0, 1)
-    Line.Position = UDim2.new(0, 0, 0, 30)
+    Line.Size = isSidebar and UDim2.new(0, 140, 0, 1) or UDim2.new(1, 0, 0, 1)
+    Line.Position = isSidebar and UDim2.new(0, 0, 0, 32) or UDim2.new(0, 0, 0, 30)
     WindowRoot:Theme(Line, "BackgroundColor3", "LineColor")
     Line.BorderSizePixel = 0
     Line.ZIndex = 2
-    Line.Parent = MainFrame
+    Line.Parent = isSidebar and Sidebar or MainFrame
+    Line.Visible = not isSidebar 
 
-    local InnerBg = Instance.new("Frame")
-    InnerBg.Size = UDim2.new(1, -16, 1, -46)
-    InnerBg.Position = UDim2.new(0, 8, 0, 38)
-    WindowRoot:Theme(InnerBg, "BackgroundColor3", "FrameColor")
-    WindowRoot:Theme(InnerBg, "BorderColor3", "BorderColor")
-    InnerBg.ZIndex = 0
-    InnerBg.Parent = MainFrame
-    CreateGradient(InnerBg)
+    local InnerBg
+    if not isSidebar then
+        InnerBg = Instance.new("Frame")
+        InnerBg.Size = UDim2.new(1, -16, 1, -46)
+        InnerBg.Position = UDim2.new(0, 8, 0, 38)
+        WindowRoot:Theme(InnerBg, "BackgroundColor3", "FrameColor")
+        WindowRoot:Theme(InnerBg, "BorderColor3", "BorderColor")
+        InnerBg.ZIndex = 0
+        InnerBg.Parent = MainFrame
+        CreateGradient(InnerBg)
+    end
 
     local Tabs = Instance.new("Frame")
-    Tabs.Size = UDim2.new(1, -170, 0, 28) 
-    Tabs.Position = UDim2.new(0, 12, 0, 42)
-    WindowRoot:Theme(Tabs, "BackgroundColor3", "TabColor")
-    WindowRoot:Theme(Tabs, "BorderColor3", "BorderColor")
-    Tabs.ZIndex = 2
-    Tabs.Parent = MainFrame
+    if isSidebar then
+        Tabs.Size = UDim2.new(1, 0, 1, -40)
+        Tabs.Position = UDim2.new(0, 0, 0, 40)
+        Tabs.BackgroundTransparency = 1
+        Tabs.BorderSizePixel = 0
+        Tabs.ZIndex = 2
+        Tabs.Parent = Sidebar
+    else
+        Tabs.Size = UDim2.new(1, -170, 0, 28) 
+        Tabs.Position = UDim2.new(0, 12, 0, 42)
+        WindowRoot:Theme(Tabs, "BackgroundColor3", "TabColor")
+        WindowRoot:Theme(Tabs, "BorderColor3", "BorderColor")
+        Tabs.ZIndex = 2
+        Tabs.Parent = MainFrame
+    end
 
     local ScrollingFrame = Instance.new("ScrollingFrame")
     ScrollingFrame.Active = true
@@ -400,20 +753,26 @@ function Library.new(Name: string, Size: UDim2, KeyBind: Enum.UserInputType | En
     ScrollingFrame.BackgroundTransparency = 1
     ScrollingFrame.BorderSizePixel = 0
     ScrollingFrame.HorizontalScrollBarInset = Enum.ScrollBarInset.Always
-    ScrollingFrame.ScrollingDirection = Enum.ScrollingDirection.X
-    ScrollingFrame.AutomaticCanvasSize = Enum.AutomaticSize.X
+    ScrollingFrame.ScrollingDirection = isSidebar and Enum.ScrollingDirection.Y or Enum.ScrollingDirection.X
+    ScrollingFrame.AutomaticCanvasSize = isSidebar and Enum.AutomaticSize.Y or Enum.AutomaticSize.X
     ScrollingFrame.ScrollBarThickness = 0
     ScrollingFrame.ZIndex = 3
     ScrollingFrame.Parent = Tabs
 
     local TabListLayout = Instance.new("UIListLayout")
-    TabListLayout.FillDirection = Enum.FillDirection.Horizontal
+    TabListLayout.FillDirection = isSidebar and Enum.FillDirection.Vertical or Enum.FillDirection.Horizontal
     TabListLayout.SortOrder = Enum.SortOrder.LayoutOrder
+    if isSidebar then TabListLayout.Padding = UDim.new(0, 2) end
     TabListLayout.Parent = ScrollingFrame
 
     local SearchBox = Instance.new("TextBox")
-    SearchBox.Size = UDim2.new(0, 146, 0, 28)
-    SearchBox.Position = UDim2.new(1, -158, 0, 42)
+    if isSidebar then
+        SearchBox.Size = UDim2.new(1, -300, 0, 28)
+        SearchBox.Position = UDim2.new(0, 150, 0, 8)
+    else
+        SearchBox.Size = UDim2.new(0, 146, 0, 28)
+        SearchBox.Position = UDim2.new(1, -158, 0, 42)
+    end
     WindowRoot:Theme(SearchBox, "BackgroundColor3", "TabColor")
     WindowRoot:Theme(SearchBox, "BorderColor3", "BorderColor")
     SearchBox.Text = ""
@@ -440,13 +799,49 @@ function Library.new(Name: string, Size: UDim2, KeyBind: Enum.UserInputType | En
     end)
 
     local FrameHolder = Instance.new("Frame")
-    FrameHolder.Size = UDim2.new(1, -24, 1, -84)
-    FrameHolder.Position = UDim2.new(0, 12, 0, 74)
-    WindowRoot:Theme(FrameHolder, "BackgroundColor3", "TabColor")
-    WindowRoot:Theme(FrameHolder, "BorderColor3", "BorderColor")
+    if isSidebar then
+        FrameHolder.Size = UDim2.new(1, -160, 1, -78)
+        FrameHolder.Position = UDim2.new(0, 150, 0, 48)
+        FrameHolder.BackgroundTransparency = 1
+    else
+        FrameHolder.Size = UDim2.new(1, -24, 1, -84)
+        FrameHolder.Position = UDim2.new(0, 12, 0, 74)
+        WindowRoot:Theme(FrameHolder, "BackgroundColor3", "TabColor")
+        WindowRoot:Theme(FrameHolder, "BorderColor3", "BorderColor")
+        CreateGradient(FrameHolder)
+    end
     FrameHolder.ZIndex = 2
     FrameHolder.Parent = MainFrame
-    CreateGradient(FrameHolder)
+
+    local BottomBar
+    if isSidebar then
+        BottomBar = Instance.new("Frame")
+        BottomBar.Size = UDim2.new(1, 0, 0, 20)
+        BottomBar.Position = UDim2.new(0, 0, 1, -20)
+        WindowRoot:Theme(BottomBar, "BackgroundColor3", "FrameColor")
+        WindowRoot:Theme(BottomBar, "BorderColor3", "BorderColor")
+        BottomBar.ZIndex = 5
+        BottomBar.Parent = MainFrame
+
+        local BLine = Instance.new("Frame")
+        BLine.Size = UDim2.new(1, 0, 0, 1)
+        WindowRoot:Theme(BLine, "BackgroundColor3", "BorderColor")
+        BLine.BorderSizePixel = 0
+        BLine.ZIndex = 5
+        BLine.Parent = BottomBar
+
+        local BottomLabel = Instance.new("TextLabel")
+        BottomLabel.Size = UDim2.new(1, -20, 1, 0)
+        BottomLabel.Position = UDim2.new(0, 5, 0, 0)
+        BottomLabel.BackgroundTransparency = 1
+        BottomLabel.Text = "version: " .. (Name or "example")
+        WindowRoot:Theme(BottomLabel, "TextColor3", "SubTextColor")
+        BottomLabel.Font = Enum.Font.Code
+        BottomLabel.TextSize = THEMES.TextSize - 2
+        BottomLabel.TextXAlignment = Enum.TextXAlignment.Right
+        BottomLabel.ZIndex = 6
+        BottomLabel.Parent = BottomBar
+    end
 
     self.Frames = {
         MainFrame   = MainFrame,
@@ -456,12 +851,17 @@ function Library.new(Name: string, Size: UDim2, KeyBind: Enum.UserInputType | En
 
     self:Connect(MinBtn.MouseButton1Click, function()
         minimized = not minimized
-        InnerBg.Visible = not minimized
+        if InnerBg then InnerBg.Visible = not minimized end
         Tabs.Visible = not minimized
         FrameHolder.Visible = not minimized
+        if ResizeGrip then ResizeGrip.Visible = not minimized end
+        if isSidebar then
+            if SearchBox then SearchBox.Visible = not minimized end
+            if BottomBar then BottomBar.Visible = not minimized end
+        end
         TweenService:Create(MainFrame, TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
-            {Size = UDim2.new(0, self.Size.X.Offset, 0, minimized and 32 or EXPANDED_HEIGHT)}):Play()
-        MinBtn.Text = minimized and "+" or "−"
+            {Size = UDim2.new(0, self.CurrentWidth, 0, minimized and 32 or self.CurrentHeight)}):Play()
+        MinBtn.Text = minimized and "+" or "-"
     end)
     
     self:Connect(UserInputService.InputBegan, function(Input, GPE)
@@ -475,7 +875,7 @@ function Library.new(Name: string, Size: UDim2, KeyBind: Enum.UserInputType | En
     local WatermarkGui = Instance.new("ScreenGui")
     WatermarkGui.Name = "Heartkiss_Watermark"
     WatermarkGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
-    WatermarkGui.Enabled = true
+    WatermarkGui.Enabled = not Library.IsSilent
     ProtectGui(WatermarkGui)
     WatermarkGui.Parent = CoreGui
     table.insert(garbage, WatermarkGui)
@@ -488,7 +888,6 @@ function Library.new(Name: string, Size: UDim2, KeyBind: Enum.UserInputType | En
     WindowRoot:Theme(WMMain, "BorderColor3", "LineColor")
     WMMain.Parent = WatermarkGui
     CreateGradient(WMMain)
-    RoundCorner(WMMain, 2)
 
     local WMText = Instance.new("TextLabel")
     WMText.Size = UDim2.new(1, -10, 1, 0)
@@ -528,7 +927,7 @@ function Library.new(Name: string, Size: UDim2, KeyBind: Enum.UserInputType | En
     local KeybindGui = Instance.new("ScreenGui")
     KeybindGui.Name = "Heartkiss_Keybinds"
     KeybindGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
-    KeybindGui.Enabled = true
+    KeybindGui.Enabled = not Library.IsSilent
     ProtectGui(KeybindGui)
     KeybindGui.Parent = CoreGui
     table.insert(garbage, KeybindGui)
@@ -605,35 +1004,90 @@ function Library.new(Name: string, Size: UDim2, KeyBind: Enum.UserInputType | En
         self:UpdateKeybinds()
     end)
 
-    function self:Tab(text: string)
+    function self:Tab(text: string, iconId: (string|number)?): Tab
         local Tab = Instance.new("TextButton")
         Tab.Name = text
         WindowRoot:Theme(Tab, "BorderColor3", "BorderColor")
-        WindowRoot:Theme(Tab, "TextColor3", "TextColor")
-        WindowRoot:Theme(Tab, "BackgroundColor3", "TabColor")
-        Tab.Size = UDim2.new(0, 60, 0.5, 0)
+        
+        local TabIcon
+        if isSidebar then
+            Tab.Size = UDim2.new(1, -10, 0, 28)
+            Tab.Position = UDim2.new(0, 5, 0, 0)
+            Tab.TextXAlignment = Enum.TextXAlignment.Left
+            Tab.BackgroundTransparency = 0
+            WindowRoot:Theme(Tab, "BackgroundColor3", "TabColor")
+            WindowRoot:Theme(Tab, "TextColor3", "TextColor")
+            
+            if iconId then
+                Tab.Text = "        " .. text 
+                TabIcon = Instance.new("ImageLabel")
+                TabIcon.Name = "TabIcon"
+                TabIcon.Size = UDim2.new(0, 16, 0, 16)
+                TabIcon.Position = UDim2.new(0, 8, 0.5, -8)
+                TabIcon.BackgroundTransparency = 1
+                TabIcon.Image = type(iconId) == "number" and "rbxassetid://"..tostring(iconId) or iconId
+                WindowRoot:Theme(TabIcon, "ImageColor3", "TextColor")
+                TabIcon.ZIndex = 5
+                TabIcon.Parent = Tab
+            else
+                Tab.Text = "  " .. text
+            end
+            
+            local Highlight = Instance.new("Frame")
+            Highlight.Name = "Highlight"
+            Highlight.Size = UDim2.new(0, 2, 0.6, 0)
+            Highlight.Position = UDim2.new(0, 0, 0.2, 0)
+            WindowRoot:Theme(Highlight, "BackgroundColor3", "LineColor")
+            Highlight.BorderSizePixel = 0
+            Highlight.Visible = false
+            Highlight.ZIndex = 5
+            Highlight.Parent = Tab
+        else
+            WindowRoot:Theme(Tab, "TextColor3", "TextColor")
+            WindowRoot:Theme(Tab, "BackgroundColor3", "TabColor")
+            Tab.Size = UDim2.new(0, 60, 0.5, 0)
+            Tab.Text = " " .. text .. " "
+            CreateGradient(Tab, -90)
+        end
+        
         Tab.Font = Enum.Font.Code
-        Tab.Text = " " .. text .. " "
         Tab.TextScaled = false
         Tab.TextSize = THEMES.TextSize + 1
         Tab.ZIndex = 3
         Tab.Parent = ScrollingFrame
-        CreateGradient(Tab, -90)
 
         local Page = Instance.new("ScrollingFrame")
-        Page.Size = UDim2.new(1, -8, 1, -8)
-        Page.Position = UDim2.new(0, 4, 0, 4)
-        WindowRoot:Theme(Page, "BackgroundColor3", "FrameColor")
-        WindowRoot:Theme(Page, "BorderColor3", "BorderColor")
+        if isSidebar then
+            Page.Size = UDim2.new(1, 0, 1, 0)
+            Page.Position = UDim2.new(0, 0, 0, 0)
+            Page.BackgroundTransparency = 1
+        else
+            Page.Size = UDim2.new(1, -8, 1, -8)
+            Page.Position = UDim2.new(0, 4, 0, 4)
+            WindowRoot:Theme(Page, "BackgroundColor3", "FrameColor")
+            WindowRoot:Theme(Page, "BorderColor3", "BorderColor")
+            CreateGradient(Page)
+        end
         Page.ScrollBarThickness = 0
         Page.ScrollingDirection = Enum.ScrollingDirection.Y
         Page.Visible = false
         Page.ZIndex = 3
         Page.Parent = FrameHolder
-        CreateGradient(Page)
 
         WindowRoot:Connect(ThemeEvent.Event, function()
-            TweenService:Create(Tab, TweenInfo.new(0.2), {BackgroundColor3 = Page.Visible and THEMES.SelectedTab or THEMES.TabColor}):Play()
+            if isSidebar then
+                local color = Page.Visible and THEMES.LineColor or THEMES.TextColor
+                TweenService:Create(Tab, TweenInfo.new(0.2), {
+                    BackgroundColor3 = Page.Visible and THEMES.SelectedTab or THEMES.TabColor,
+                    TextColor3 = color
+                }):Play()
+                
+                if Tab:FindFirstChild("TabIcon") then
+                    TweenService:Create(Tab.TabIcon, TweenInfo.new(0.2), {ImageColor3 = color}):Play()
+                end
+            else
+                TweenService:Create(Tab, TweenInfo.new(0.2), {BackgroundColor3 = Page.Visible and THEMES.SelectedTab or THEMES.TabColor}):Play()
+            end
         end)
 
         local LeftColumn = Instance.new("Frame")
@@ -667,46 +1121,70 @@ function Library.new(Name: string, Size: UDim2, KeyBind: Enum.UserInputType | En
         RightList:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(UpdateCanvas)
 
         self:Connect(Tab.MouseButton1Click, function()
-            for _, tab in self.Tabs do
-                tab.Page.Visible = false
-                tab.Button.BackgroundColor3 = THEMES.TabColor
+            for _, tabObj in self.Tabs do
+                tabObj.Page.Visible = false
+                if isSidebar then
+                    tabObj.Button.TextColor3 = THEMES.TextColor
+                    tabObj.Button.BackgroundColor3 = THEMES.TabColor
+                    if tabObj.Button:FindFirstChild("TabIcon") then tabObj.Button.TabIcon.ImageColor3 = THEMES.TextColor end
+                    if tabObj.Button:FindFirstChild("Highlight") then tabObj.Button.Highlight.Visible = false end
+                else
+                    tabObj.Button.BackgroundColor3 = THEMES.TabColor
+                end
             end
             Page.Visible = true
-            Tab.BackgroundColor3 = THEMES.SelectedTab
+            if isSidebar then
+                Tab.TextColor3 = THEMES.LineColor
+                Tab.BackgroundColor3 = THEMES.SelectedTab
+                if Tab:FindFirstChild("TabIcon") then Tab.TabIcon.ImageColor3 = THEMES.LineColor end
+                if Tab:FindFirstChild("Highlight") then Tab.Highlight.Visible = true end
+            else
+                Tab.BackgroundColor3 = THEMES.SelectedTab
+            end
         end)
 
         if #self.Tabs == 0 then
             Page.Visible = true
-            Tab.BackgroundColor3 = THEMES.SelectedTab
+            if isSidebar then
+                Tab.TextColor3 = THEMES.LineColor
+                Tab.BackgroundColor3 = THEMES.SelectedTab
+                if Tab:FindFirstChild("TabIcon") then Tab.TabIcon.ImageColor3 = THEMES.LineColor end
+                if Tab:FindFirstChild("Highlight") then Tab.Highlight.Visible = true end
+            else
+                Tab.BackgroundColor3 = THEMES.SelectedTab
+            end
         end
         table.insert(self.Tabs, {Button = Tab, Page = Page})
 
-        local TabFunctions = {}
+        local TabFunctions: Tab = {} :: any
         local SectionCount = 0
 
-        function TabFunctions:Section(title: string)
+        function TabFunctions:Section(title: string): Section
             SectionCount = SectionCount + 1
             local ParentFrame = (SectionCount % 2 == 1) and LeftColumn or RightColumn
 
             local Section = Instance.new("Frame")
             Section.Name = title
             Section.Size = UDim2.new(1, 0, 0, 100)
-            WindowRoot:Theme(Section, "BackgroundColor3", "MainColor")
-            WindowRoot:Theme(Section, "BorderColor3", "BorderColor")
-            Section.BackgroundTransparency = 0.4
-            Section.BorderMode = Enum.BorderMode.Inset
+            Section.BackgroundTransparency = 1
             Section.ZIndex = 3
             Section.Parent = ParentFrame
-            CreateGradient(Section)
+
+            local SectionStroke = Instance.new("UIStroke")
+            SectionStroke.Color = THEMES.BorderColor
+            SectionStroke.Thickness = 1
+            SectionStroke.Parent = Section
+            WindowRoot:Theme(SectionStroke, "Color", "BorderColor")
 
             local Label = Instance.new("TextLabel")
-            Label.Text = " " .. title .. " "
+            Label.Text = "  " .. title .. "  "
             WindowRoot:Theme(Label, "TextColor3", "TextColor")
             WindowRoot:Theme(Label, "BackgroundColor3", "FrameColor")
             Label.BorderSizePixel = 0
-            Label.Position = UDim2.new(0, 10, 0, -10)
-            Label.AutomaticSize = Enum.AutomaticSize.XY
-            Label.Font = Enum.Font.Code
+            Label.Position = UDim2.new(0, 12, 0, -8)
+            Label.Size = UDim2.new(0, 0, 0, 16)
+            Label.AutomaticSize = Enum.AutomaticSize.X
+            Label.Font = Enum.Font.GothamMedium
             Label.TextSize = THEMES.TextSize
             Label.ZIndex = 4
             Label.Parent = Section
@@ -730,7 +1208,7 @@ function Library.new(Name: string, Size: UDim2, KeyBind: Enum.UserInputType | En
             local SectionData = { Section = Section, Elements = {} }
             table.insert(WindowRoot.SearchData, SectionData)
 
-            local SectionFunctions = {}
+            local SectionFunctions: Section = {} :: any
             local ElementCount = 0
 
             local function RegisterSearch(elem: Instance, searchText: string)
@@ -795,15 +1273,21 @@ function Library.new(Name: string, Size: UDim2, KeyBind: Enum.UserInputType | En
                 ToggleBtn.ZIndex = 4
                 ToggleBtn.Parent = Container
 
-                local boxSize = THEMES.BaseHeight - 6
+                local boxSize = 16
                 local CheckMark = Instance.new("Frame")
                 CheckMark.Size = UDim2.new(0, boxSize, 0, boxSize)
                 CheckMark.Position = UDim2.new(0, 0, 0.5, -(boxSize/2))
                 CheckMark.BackgroundColor3 = enabled and THEMES.LineColor or THEMES.FrameColor
-                CheckMark.BorderColor3 = THEMES.BorderColor
+                CheckMark.BorderSizePixel = 0
                 CheckMark.ZIndex = 4
                 CheckMark.Parent = ToggleBtn
-                CreateGradient(CheckMark)
+                RoundCorner(CheckMark, 4)
+
+                local CheckStroke = Instance.new("UIStroke")
+                CheckStroke.Color = THEMES.BorderColor
+                CheckStroke.Thickness = 1
+                CheckStroke.Parent = CheckMark
+                WindowRoot:Theme(CheckStroke, "Color", "BorderColor")
 
                 local Lbl = Instance.new("TextLabel")
                 Lbl.Size = UDim2.new(1, -(boxSize + 8), 1, 0)
@@ -834,8 +1318,10 @@ function Library.new(Name: string, Size: UDim2, KeyBind: Enum.UserInputType | En
 
                 WindowRoot:Connect(ThemeEvent.Event, function()
                     TweenService:Create(CheckMark, TweenInfo.new(0.2), {
-                        BackgroundColor3 = enabled and THEMES.LineColor or THEMES.FrameColor,
-                        BorderColor3 = THEMES.BorderColor
+                        BackgroundColor3 = enabled and THEMES.LineColor or THEMES.FrameColor
+                    }):Play()
+                    TweenService:Create(CheckStroke, TweenInfo.new(0.2), {
+                        Color = THEMES.BorderColor
                     }):Play()
                     TweenService:Create(Lbl, TweenInfo.new(0.2), {TextColor3 = THEMES.TextColor}):Play()
                 end)
@@ -867,15 +1353,21 @@ function Library.new(Name: string, Size: UDim2, KeyBind: Enum.UserInputType | En
                 ToggleBtn.ZIndex = 4
                 ToggleBtn.Parent = TBFrame
 
-                local boxSize = THEMES.BaseHeight - 6
+                local boxSize = 16
                 local CheckMark = Instance.new("Frame")
                 CheckMark.Size = UDim2.new(0, boxSize, 0, boxSize)
                 CheckMark.Position = UDim2.new(0, 0, 0.5, -(boxSize/2))
                 CheckMark.BackgroundColor3 = enabled and THEMES.LineColor or THEMES.FrameColor
-                CheckMark.BorderColor3 = THEMES.BorderColor
+                CheckMark.BorderSizePixel = 0
                 CheckMark.ZIndex = 4
                 CheckMark.Parent = ToggleBtn
-                CreateGradient(CheckMark)
+                RoundCorner(CheckMark, 4)
+
+                local CheckStroke = Instance.new("UIStroke")
+                CheckStroke.Color = THEMES.BorderColor
+                CheckStroke.Thickness = 1
+                CheckStroke.Parent = CheckMark
+                WindowRoot:Theme(CheckStroke, "Color", "BorderColor")
 
                 local Lbl = Instance.new("TextLabel")
                 Lbl.Size = UDim2.new(1, -(boxSize + 8), 1, 0)
@@ -943,8 +1435,10 @@ function Library.new(Name: string, Size: UDim2, KeyBind: Enum.UserInputType | En
 
                 WindowRoot:Connect(ThemeEvent.Event, function()
                     TweenService:Create(CheckMark, TweenInfo.new(0.2), {
-                        BackgroundColor3 = enabled and THEMES.LineColor or THEMES.FrameColor,
-                        BorderColor3 = THEMES.BorderColor
+                        BackgroundColor3 = enabled and THEMES.LineColor or THEMES.FrameColor
+                    }):Play()
+                    TweenService:Create(CheckStroke, TweenInfo.new(0.2), {
+                        Color = THEMES.BorderColor
                     }):Play()
                     TweenService:Create(Lbl, TweenInfo.new(0.2), {TextColor3 = THEMES.TextColor}):Play()
                     TweenService:Create(BindBtn, TweenInfo.new(0.2), {
@@ -1083,7 +1577,7 @@ function Library.new(Name: string, Size: UDim2, KeyBind: Enum.UserInputType | En
                 Fill.ZIndex = 4
                 Fill.Parent = SlideBar
 
-                local dragging = false
+                local draggingSlider = false
 
                 local function SetValue(val)
                     local clamped = math.clamp(val, min, max)
@@ -1103,13 +1597,13 @@ function Library.new(Name: string, Size: UDim2, KeyBind: Enum.UserInputType | En
                 if flag then WindowRoot.Setters[flag] = SetValue end
 
                 WindowRoot:Connect(SlideBar.InputBegan, function(i)
-                    if i.UserInputType == Enum.UserInputType.MouseButton1 then dragging = true; Update(i) end
+                    if i.UserInputType == Enum.UserInputType.MouseButton1 then draggingSlider = true; Update(i) end
                 end)
                 WindowRoot:Connect(UserInputService.InputEnded, function(i)
-                    if i.UserInputType == Enum.UserInputType.MouseButton1 then dragging = false end
+                    if i.UserInputType == Enum.UserInputType.MouseButton1 then draggingSlider = false end
                 end)
                 WindowRoot:Connect(UserInputService.InputChanged, function(i)
-                    if dragging and i.UserInputType == Enum.UserInputType.MouseMovement then Update(i) end
+                    if draggingSlider and i.UserInputType == Enum.UserInputType.MouseMovement then Update(i) end
                 end)
                 RegisterSearch(SliderFrame, text)
 
@@ -1157,7 +1651,7 @@ function Library.new(Name: string, Size: UDim2, KeyBind: Enum.UserInputType | En
                 WindowRoot:Theme(MinusBtn, "BackgroundColor3", "FrameColor")
                 WindowRoot:Theme(MinusBtn, "BorderColor3", "BorderColor")
                 WindowRoot:Theme(MinusBtn, "TextColor3", "LineColor")
-                MinusBtn.Text = "−"
+                MinusBtn.Text = "-"
                 MinusBtn.Font = Enum.Font.Code
                 MinusBtn.TextSize = THEMES.TextSize + 2
                 MinusBtn.ZIndex = 4
@@ -1607,7 +2101,7 @@ function Library.new(Name: string, Size: UDim2, KeyBind: Enum.UserInputType | En
 
                 WindowRoot:Connect(Header.MouseButton1Click, function()
                     isDropped = not isDropped
-                    Icon.Text = isDropped and "−" or "+"
+                    Icon.Text = isDropped and "-" or "+"
                     if isDropped then
                         DropFrame.ZIndex = 50; Header.ZIndex = 50; TitleLbl.ZIndex = 51; Icon.ZIndex = 51
                         OptionContainer.ZIndex = 51; SearchBox.ZIndex = 51
@@ -1657,7 +2151,6 @@ function Library.new(Name: string, Size: UDim2, KeyBind: Enum.UserInputType | En
                 callback = callback or function() end
                 includeSelf = includeSelf or false
                 
-                -- Create a standard searchable dropdown first (starts empty)
                 local DropdownObj = SectionFunctions:SearchableDropdown(text, {}, "", flag, callback)
                 
                 local function UpdatePlayerList()
@@ -1671,10 +2164,8 @@ function Library.new(Name: string, Size: UDim2, KeyBind: Enum.UserInputType | En
                     DropdownObj:Refresh(list)
                 end
 
-                -- Populate initially
                 UpdatePlayerList()
 
-                -- Automatically refresh when players join or leave
                 WindowRoot:Connect(Players.PlayerAdded, UpdatePlayerList)
                 WindowRoot:Connect(Players.PlayerRemoving, UpdatePlayerList)
 
@@ -2428,7 +2919,6 @@ function Library.new(Name: string, Size: UDim2, KeyBind: Enum.UserInputType | En
                 List.Padding = UDim.new(0, 2)
                 List.Parent = InnerBox
 
-                -- Padding for the text inside the box
                 local UIPadding = Instance.new("UIPadding")
                 UIPadding.PaddingTop = UDim.new(0, 4)
                 UIPadding.PaddingLeft = UDim.new(0, 6)
@@ -2459,7 +2949,6 @@ function Library.new(Name: string, Size: UDim2, KeyBind: Enum.UserInputType | En
                     Line.ZIndex = 4
                     Line.Parent = InnerBox
 
-                    -- Auto-scroll to bottom
                     task.defer(function()
                         InnerBox.CanvasPosition = Vector2.new(0, InnerBox.AbsoluteCanvasSize.Y)
                     end)
@@ -2476,134 +2965,717 @@ function Library.new(Name: string, Size: UDim2, KeyBind: Enum.UserInputType | En
                 return ConsoleObj
             end
 
+            function SectionFunctions:Grid(text, items, columns, callback)
+                ElementCount = ElementCount + 1
+                columns  = columns  or 3
+                callback = callback or function() end
+                items    = items    or {}
+        
+                local rows   = math.ceil(#items / columns)
+                local btnH   = THEMES.BaseHeight
+                local totalH = THEMES.BaseHeight + rows * (btnH + 4) + 4
+        
+                local GridFrame = Instance.new("Frame")
+                GridFrame.Size               = UDim2.new(1, 0, 0, totalH)
+                GridFrame.BackgroundTransparency = 1
+                GridFrame.LayoutOrder        = ElementCount
+                GridFrame.ZIndex             = 4
+                GridFrame.Parent             = Container
+        
+                if text and text ~= "" then
+                    local HeaderLbl = Instance.new("TextLabel")
+                    HeaderLbl.Size               = UDim2.new(1, 0, 0, THEMES.BaseHeight)
+                    HeaderLbl.BackgroundTransparency = 1
+                    HeaderLbl.Text               = text
+                    HeaderLbl.Font               = Enum.Font.Code
+                    HeaderLbl.TextSize           = THEMES.TextSize
+                    HeaderLbl.TextXAlignment     = Enum.TextXAlignment.Left
+                    HeaderLbl.ZIndex             = 4
+                    HeaderLbl.Parent             = GridFrame
+                    WindowRoot:Theme(HeaderLbl, "TextColor3", "TextColor")
+                end
+        
+                local colW = 1 / columns
+                for i, item in ipairs(items) do
+                    local itemText = type(item) == "table" and item.text or tostring(item)
+                    local itemId   = type(item) == "table" and item.id   or tostring(item)
+                    local col      = (i - 1) % columns
+                    local row      = math.floor((i - 1) / columns)
+        
+                    local B = Instance.new("TextButton")
+                    B.Size     = UDim2.new(colW, -3, 0, btnH)
+                    B.Position = UDim2.new(col * colW, 1, 0, THEMES.BaseHeight + 4 + row * (btnH + 4))
+                    B.Text     = itemText
+                    B.Font     = Enum.Font.Code
+                    B.TextSize = THEMES.TextSize - 1
+                    B.ZIndex   = 4
+                    B.Parent   = GridFrame
+                    WindowRoot:Theme(B, "BackgroundColor3", "FrameColor")
+                    WindowRoot:Theme(B, "BorderColor3",     "ButtonBorderColor")
+                    WindowRoot:Theme(B, "TextColor3",       "TextColor")
+                    CreateGradient(B)
+        
+                    local capturedId = itemId
+                    WindowRoot:Connect(B.MouseButton1Click, function() callback(capturedId) end)
+                end
+        
+                RegisterSearch(GridFrame, text or table.concat(
+                    (function()
+                        local t = {}
+                        for _, item in ipairs(items) do
+                            table.insert(t, type(item) == "table" and item.text or tostring(item))
+                        end
+                        return t
+                    end)(), " "))
+                return GridFrame
+            end
+
+
+            function SectionFunctions:MultilineInput(text, placeholder, lineCount, flag, callback)
+                ElementCount = ElementCount + 1
+                lineCount = lineCount or 3
+                callback  = callback  or function() end
+                local h   = lineCount * 18 + 10
+        
+                if flag then WindowRoot.Flags[flag] = "" end
+        
+                local MLFrame = Instance.new("Frame")
+                MLFrame.Size               = UDim2.new(1, 0, 0, THEMES.BaseHeight + h + 6)
+                MLFrame.BackgroundTransparency = 1
+                MLFrame.LayoutOrder        = ElementCount
+                MLFrame.ZIndex             = 4
+                MLFrame.Parent             = Container
+        
+                local NameLbl = Instance.new("TextLabel")
+                NameLbl.Size               = UDim2.new(1, 0, 0, THEMES.BaseHeight)
+                NameLbl.BackgroundTransparency = 1
+                NameLbl.Text               = text
+                NameLbl.Font               = Enum.Font.Code
+                NameLbl.TextSize           = THEMES.TextSize
+                NameLbl.TextXAlignment     = Enum.TextXAlignment.Left
+                NameLbl.ZIndex             = 4
+                NameLbl.Parent             = MLFrame
+                WindowRoot:Theme(NameLbl, "TextColor3", "TextColor")
+        
+                local IBox = Instance.new("TextBox")
+                IBox.Size               = UDim2.new(1, 0, 0, h)
+                IBox.Position           = UDim2.new(0, 0, 0, THEMES.BaseHeight + 2)
+                IBox.BackgroundColor3   = THEMES.FrameColor
+                IBox.BorderColor3       = THEMES.BorderColor
+                IBox.Text               = ""
+                IBox.PlaceholderText    = placeholder or "Enter text..."
+                IBox.TextColor3         = THEMES.TextColor
+                IBox.PlaceholderColor3  = THEMES.SubTextColor
+                IBox.Font               = Enum.Font.Code
+                IBox.TextSize           = THEMES.TextSize
+                IBox.MultiLine          = true
+                IBox.ClearTextOnFocus   = false
+                IBox.TextXAlignment     = Enum.TextXAlignment.Left
+                IBox.TextYAlignment     = Enum.TextYAlignment.Top
+                IBox.ZIndex             = 4
+                IBox.Parent             = MLFrame
+                CreateGradient(IBox)
+        
+                local Pad = Instance.new("UIPadding")
+                Pad.PaddingLeft = UDim.new(0, 5)
+                Pad.PaddingTop  = UDim.new(0, 4)
+                Pad.Parent      = IBox
+        
+                local function SetText(str)
+                    IBox.Text = str
+                    if flag then WindowRoot.Flags[flag] = str end
+                    callback(str)
+                end
+        
+                if flag then WindowRoot.Setters[flag] = SetText end
+                WindowRoot:Connect(IBox.FocusLost, function() SetText(IBox.Text) end)
+        
+                RegisterSearch(MLFrame, text)
+                WindowRoot:Connect(ThemeEvent.Event, function()
+                    TweenService:Create(NameLbl, TweenInfo.new(0.2), {TextColor3 = THEMES.TextColor}):Play()
+                    TweenService:Create(IBox,    TweenInfo.new(0.2), {
+                        BackgroundColor3 = THEMES.FrameColor,
+                        BorderColor3     = THEMES.BorderColor,
+                        TextColor3       = THEMES.TextColor,
+                    }):Play()
+                end)
+                return IBox
+            end
+
+                function SectionFunctions:TagInput(text, initialTags, maxTags, flag, callback)
+        ElementCount = ElementCount + 1
+        initialTags  = initialTags  or {}
+        maxTags      = maxTags      or 10
+        callback     = callback     or function() end
+        local tags   = {table.unpack(initialTags)}
+ 
+        if flag then WindowRoot.Flags[flag] = tags end
+ 
+        local TagFrame = Instance.new("Frame")
+        TagFrame.Size               = UDim2.new(1, 0, 0, THEMES.BaseHeight * 2 + 8)
+        TagFrame.BackgroundTransparency = 1
+        TagFrame.LayoutOrder        = ElementCount
+        TagFrame.ClipsDescendants   = false
+        TagFrame.ZIndex             = 4
+        TagFrame.Parent             = Container
+ 
+        local NameLbl = Instance.new("TextLabel")
+        NameLbl.Size               = UDim2.new(1, 0, 0, THEMES.BaseHeight)
+        NameLbl.BackgroundTransparency = 1
+        NameLbl.Text               = text
+        NameLbl.Font               = Enum.Font.Code
+        NameLbl.TextSize           = THEMES.TextSize
+        NameLbl.TextXAlignment     = Enum.TextXAlignment.Left
+        NameLbl.ZIndex             = 4
+        NameLbl.Parent             = TagFrame
+        WindowRoot:Theme(NameLbl, "TextColor3", "TextColor")
+ 
+        -- Input row
+        local InputRow = Instance.new("Frame")
+        InputRow.Size               = UDim2.new(1, 0, 0, THEMES.BaseHeight)
+        InputRow.Position           = UDim2.new(0, 0, 0, THEMES.BaseHeight + 4)
+        InputRow.BackgroundTransparency = 1
+        InputRow.ZIndex             = 4
+        InputRow.Parent             = TagFrame
+ 
+        local TBox = Instance.new("TextBox")
+        TBox.Size             = UDim2.new(1, -54, 1, 0)
+        TBox.BackgroundColor3 = THEMES.FrameColor
+        TBox.BorderColor3     = THEMES.BorderColor
+        TBox.Text             = ""
+        TBox.PlaceholderText  = "Add tag, press Enter..."
+        TBox.TextColor3       = THEMES.TextColor
+        TBox.PlaceholderColor3 = THEMES.SubTextColor
+        TBox.Font             = Enum.Font.Code
+        TBox.TextSize         = THEMES.TextSize
+        TBox.ZIndex           = 4
+        TBox.Parent           = InputRow
+        CreateGradient(TBox)
+ 
+        local AddBtn = Instance.new("TextButton")
+        AddBtn.Size     = UDim2.new(0, 50, 1, 0)
+        AddBtn.Position = UDim2.new(1, -50, 0, 0)
+        AddBtn.Text     = "+ Add"
+        AddBtn.Font     = Enum.Font.Code
+        AddBtn.TextSize = THEMES.TextSize - 1
+        AddBtn.ZIndex   = 4
+        AddBtn.Parent   = InputRow
+        WindowRoot:Theme(AddBtn, "BackgroundColor3", "FrameColor")
+        WindowRoot:Theme(AddBtn, "BorderColor3",     "BorderColor")
+        WindowRoot:Theme(AddBtn, "TextColor3",       "LineColor")
+        CreateGradient(AddBtn)
+ 
+        -- Tag chip display
+        local TagDisplay = Instance.new("Frame")
+        TagDisplay.Size               = UDim2.new(1, 0, 0, 0)
+        TagDisplay.Position           = UDim2.new(0, 0, 0, THEMES.BaseHeight * 2 + 8)
+        TagDisplay.BackgroundTransparency = 1
+        TagDisplay.ZIndex             = 4
+        TagDisplay.Parent             = TagFrame
+ 
+        local TagListLayout = Instance.new("UIListLayout")
+        TagListLayout.FillDirection   = Enum.FillDirection.Horizontal
+        TagListLayout.Padding         = UDim.new(0, 4)
+        TagListLayout.Wraps           = true
+        TagListLayout.SortOrder       = Enum.SortOrder.LayoutOrder
+        TagListLayout.Parent          = TagDisplay
+ 
+        TagListLayout:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(function()
+            local h = TagListLayout.AbsoluteContentSize.Y
+            TagDisplay.Size  = UDim2.new(1, 0, 0, h)
+            TagFrame.Size    = UDim2.new(1, 0, 0, THEMES.BaseHeight * 2 + 8 + h + (h > 0 and 6 or 0))
+        end)
+ 
+        local function RebuildTags()
+            for _, c in ipairs(TagDisplay:GetChildren()) do
+                if not c:IsA("UIListLayout") then c:Destroy() end
+            end
+            for i, tag in ipairs(tags) do
+                local charW   = math.max(#tag * 7, 20) + 24
+                local Pill    = Instance.new("Frame")
+                Pill.Size     = UDim2.new(0, charW, 0, THEMES.BaseHeight - 4)
+                Pill.BackgroundColor3 = THEMES.FrameColor
+                Pill.BorderColor3     = THEMES.BorderColor
+                Pill.ZIndex           = 5
+                Pill.LayoutOrder      = i
+                Pill.Parent           = TagDisplay
+ 
+                local TL = Instance.new("TextLabel")
+                TL.Size               = UDim2.new(1, -16, 1, 0)
+                TL.Position           = UDim2.new(0, 4, 0, 0)
+                TL.BackgroundTransparency = 1
+                TL.Text               = tag
+                TL.Font               = Enum.Font.Code
+                TL.TextSize           = THEMES.TextSize - 1
+                TL.TextXAlignment     = Enum.TextXAlignment.Left
+                TL.ZIndex             = 5
+                TL.Parent             = Pill
+                WindowRoot:Theme(TL, "TextColor3", "TextColor")
+ 
+                local XB = Instance.new("TextButton")
+                XB.Size               = UDim2.new(0, 14, 1, 0)
+                XB.Position           = UDim2.new(1, -14, 0, 0)
+                XB.BackgroundTransparency = 1
+                XB.Text               = "×"
+                XB.Font               = Enum.Font.Code
+                XB.TextSize           = THEMES.TextSize
+                XB.ZIndex             = 6
+                XB.Parent             = Pill
+                WindowRoot:Theme(XB, "TextColor3", "SubTextColor")
+ 
+                local capturedTag = tag
+                WindowRoot:Connect(XB.MouseButton1Click, function()
+                    local idx = table.find(tags, capturedTag)
+                    if idx then
+                        table.remove(tags, idx)
+                        if flag then WindowRoot.Flags[flag] = tags end
+                        callback(tags)
+                        RebuildTags()
+                    end
+                end)
+            end
+        end
+ 
+        local function AddTag(str)
+            str = str:match("^%s*(.-)%s*$")
+            if str == "" or #tags >= maxTags or table.find(tags, str) then return end
+            table.insert(tags, str)
+            if flag then WindowRoot.Flags[flag] = tags end
+            callback(tags)
+            RebuildTags()
+            TBox.Text = ""
+        end
+ 
+        WindowRoot:Connect(AddBtn.MouseButton1Click,              function() AddTag(TBox.Text) end)
+        WindowRoot:Connect(TBox.FocusLost, function(enter) if enter then AddTag(TBox.Text) end end)
+ 
+        RebuildTags()
+        RegisterSearch(TagFrame, text)
+        WindowRoot:Connect(ThemeEvent.Event, function()
+            TweenService:Create(NameLbl, TweenInfo.new(0.2), {TextColor3 = THEMES.TextColor}):Play()
+            TweenService:Create(TBox,    TweenInfo.new(0.2), {
+                BackgroundColor3 = THEMES.FrameColor,
+                BorderColor3     = THEMES.BorderColor,
+                TextColor3       = THEMES.TextColor,
+            }):Play()
+        end)
+ 
+        local Obj = {}
+        function Obj:GetTags()      return {table.unpack(tags)} end
+        function Obj:SetTags(list)  tags = {table.unpack(list)}; RebuildTags() end
+        function Obj:AddTag(str)    AddTag(str) end
+        return Obj
+    end
+
+        function SectionFunctions:Timer(text, seconds, autoStart, onComplete)
+        ElementCount = ElementCount + 1
+        seconds    = seconds    or 60
+        autoStart  = autoStart  or false
+        onComplete = onComplete or function() end
+ 
+        local remaining = seconds
+        local running   = false
+        local thread    = nil
+ 
+        local function FormatTime(s)
+            return string.format("%02d:%02d", math.floor(s / 60), s % 60)
+        end
+ 
+        local TimerFrame = Instance.new("Frame")
+        TimerFrame.Size               = UDim2.new(1, 0, 0, THEMES.BaseHeight * 2 + 14)
+        TimerFrame.BackgroundTransparency = 1
+        TimerFrame.LayoutOrder        = ElementCount
+        TimerFrame.ZIndex             = 4
+        TimerFrame.Parent             = Container
+ 
+        local NameLbl = Instance.new("TextLabel")
+        NameLbl.Size               = UDim2.new(0.55, 0, 0, THEMES.BaseHeight)
+        NameLbl.BackgroundTransparency = 1
+        NameLbl.Text               = text
+        NameLbl.Font               = Enum.Font.Code
+        NameLbl.TextSize           = THEMES.TextSize
+        NameLbl.TextXAlignment     = Enum.TextXAlignment.Left
+        NameLbl.ZIndex             = 4
+        NameLbl.Parent             = TimerFrame
+        WindowRoot:Theme(NameLbl, "TextColor3", "TextColor")
+ 
+        local TimeDisplay = Instance.new("TextLabel")
+        TimeDisplay.Size               = UDim2.new(0.45, 0, 0, THEMES.BaseHeight)
+        TimeDisplay.Position           = UDim2.new(0.55, 0, 0, 0)
+        TimeDisplay.BackgroundTransparency = 1
+        TimeDisplay.Text               = FormatTime(remaining)
+        TimeDisplay.Font               = Enum.Font.Code
+        TimeDisplay.TextSize           = THEMES.TextSize + 3
+        TimeDisplay.TextXAlignment     = Enum.TextXAlignment.Right
+        TimeDisplay.ZIndex             = 4
+        TimeDisplay.Parent             = TimerFrame
+        WindowRoot:Theme(TimeDisplay, "TextColor3", "LineColor")
+ 
+        local Track = Instance.new("Frame")
+        Track.Size     = UDim2.new(1, 0, 0, 4)
+        Track.Position = UDim2.new(0, 0, 0, THEMES.BaseHeight + 4)
+        Track.ZIndex   = 4
+        Track.Parent   = TimerFrame
+        WindowRoot:Theme(Track, "BackgroundColor3", "FrameColor")
+        WindowRoot:Theme(Track, "BorderColor3",     "BorderColor")
+ 
+        local Fill = Instance.new("Frame")
+        Fill.Size             = UDim2.new(1, 0, 1, 0)
+        Fill.BackgroundColor3 = THEMES.LineColor
+        Fill.BorderSizePixel  = 0
+        Fill.ZIndex           = 5
+        Fill.Parent           = Track
+ 
+        -- Three control buttons
+        local BtnY = THEMES.BaseHeight + 12
+        local function MakeBtn(label, xOffset)
+            local B = Instance.new("TextButton")
+            B.Size     = UDim2.new(0, 62, 0, THEMES.BaseHeight - 2)
+            B.Position = UDim2.new(0, xOffset, 0, BtnY)
+            B.Text     = label
+            B.Font     = Enum.Font.Code
+            B.TextSize = THEMES.TextSize - 1
+            B.ZIndex   = 4
+            B.Parent   = TimerFrame
+            WindowRoot:Theme(B, "BackgroundColor3", "FrameColor")
+            WindowRoot:Theme(B, "BorderColor3",     "BorderColor")
+            WindowRoot:Theme(B, "TextColor3",       "TextColor")
+            CreateGradient(B)
+            return B
+        end
+        local StartBtn = MakeBtn("▶ Start", 0)
+        local PauseBtn = MakeBtn("‖ Pause", 66)
+        local ResetBtn = MakeBtn("↺ Reset", 132)
+ 
+        local function UpdateVisuals()
+            local ratio = seconds > 0 and math.clamp(remaining / seconds, 0, 1) or 0
+            TimeDisplay.Text = FormatTime(remaining)
+            Fill.Size = UDim2.new(ratio, 0, 1, 0)
+            local c = ratio < 0.25 and THEMES.ErrorColor
+                   or ratio < 0.5  and THEMES.WarningColor
+                   or THEMES.LineColor
+            Fill.BackgroundColor3    = c
+            TimeDisplay.TextColor3   = c
+        end
+ 
+        local function StartTicking()
+            if thread then task.cancel(thread); thread = nil end
+            thread = task.spawn(function()
+                while running and remaining > 0 do
+                    task.wait(1)
+                    if running then
+                        remaining = remaining - 1
+                        UpdateVisuals()
+                        if remaining <= 0 then
+                            running = false
+                            onComplete()
+                        end
+                    end
+                end
+            end)
+        end
+ 
+        WindowRoot:Connect(StartBtn.MouseButton1Click, function()
+            if not running and remaining > 0 then
+                running = true; StartTicking()
+            end
+        end)
+        WindowRoot:Connect(PauseBtn.MouseButton1Click, function()
+            running = false
+            if thread then task.cancel(thread); thread = nil end
+        end)
+        WindowRoot:Connect(ResetBtn.MouseButton1Click, function()
+            running = false
+            if thread then task.cancel(thread); thread = nil end
+            remaining = seconds; UpdateVisuals()
+        end)
+ 
+        if autoStart then running = true; task.defer(StartTicking) end
+ 
+        RegisterSearch(TimerFrame, text)
+        WindowRoot:Connect(ThemeEvent.Event, function()
+            TweenService:Create(NameLbl, TweenInfo.new(0.2), {TextColor3 = THEMES.TextColor}):Play()
+            TweenService:Create(Track,   TweenInfo.new(0.2), {
+                BackgroundColor3 = THEMES.FrameColor, BorderColor3 = THEMES.BorderColor
+            }):Play()
+        end)
+ 
+        local Obj = {}
+        function Obj:Set(s)
+            running = false
+            if thread then task.cancel(thread); thread = nil end
+            seconds = s; remaining = s; UpdateVisuals()
+        end
+        function Obj:Start() if not running and remaining > 0 then running = true; StartTicking() end end
+        function Obj:Pause() running = false; if thread then task.cancel(thread); thread = nil end end
+        function Obj:Reset() remaining = seconds; UpdateVisuals(); running = false end
+        return Obj
+    end
+
+
+        function SectionFunctions:Chart(text, data, height)
+        ElementCount = ElementCount + 1
+        height = height or 90
+        data   = data   or {}
+ 
+        local maxVal = 0
+        for _, d in ipairs(data) do
+            maxVal = math.max(maxVal, d.value or 0)
+        end
+ 
+        local outerH = THEMES.BaseHeight + height + 22
+        local ChartFrame = Instance.new("Frame")
+        ChartFrame.Size               = UDim2.new(1, 0, 0, outerH)
+        ChartFrame.BackgroundTransparency = 1
+        ChartFrame.LayoutOrder        = ElementCount
+        ChartFrame.ZIndex             = 4
+        ChartFrame.Parent             = Container
+ 
+        local TitleLbl = Instance.new("TextLabel")
+        TitleLbl.Size               = UDim2.new(1, 0, 0, THEMES.BaseHeight)
+        TitleLbl.BackgroundTransparency = 1
+        TitleLbl.Text               = text
+        TitleLbl.Font               = Enum.Font.Code
+        TitleLbl.TextSize           = THEMES.TextSize
+        TitleLbl.TextXAlignment     = Enum.TextXAlignment.Left
+        TitleLbl.ZIndex             = 4
+        TitleLbl.Parent             = ChartFrame
+        WindowRoot:Theme(TitleLbl, "TextColor3", "TextColor")
+ 
+        local ChartArea = Instance.new("Frame")
+        ChartArea.Size     = UDim2.new(1, 0, 0, height)
+        ChartArea.Position = UDim2.new(0, 0, 0, THEMES.BaseHeight + 2)
+        ChartArea.ZIndex   = 4
+        ChartArea.Parent   = ChartFrame
+        WindowRoot:Theme(ChartArea, "BackgroundColor3", "FrameColor")
+        WindowRoot:Theme(ChartArea, "BorderColor3",     "BorderColor")
+        CreateGradient(ChartArea)
+ 
+        local barBars = {}
+        if #data > 0 then
+            local segW = 1 / #data
+            for i, d in ipairs(data) do
+                local ratio = maxVal > 0 and (d.value / maxVal) or 0
+ 
+                local Bar = Instance.new("Frame")
+                Bar.AnchorPoint  = Vector2.new(0, 1)
+                Bar.Size         = UDim2.new(segW * 0.65, 0, 0, 0)
+                Bar.Position     = UDim2.new((i - 1) * segW + segW * 0.175, 0, 1, 0)
+                Bar.BorderSizePixel = 0
+                Bar.ZIndex       = 5
+                Bar.Parent       = ChartArea
+                WindowRoot:Theme(Bar, "BackgroundColor3", "LineColor")
+                table.insert(barBars, Bar)
+ 
+                task.defer(function()
+                    TweenService:Create(Bar,
+                        TweenInfo.new(0.55, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+                        {Size = UDim2.new(segW * 0.65, 0, ratio * 0.90, 0)}):Play()
+                end)
+ 
+                local ValLbl = Instance.new("TextLabel")
+                ValLbl.Size               = UDim2.new(1, 0, 0, 12)
+                ValLbl.AnchorPoint        = Vector2.new(0.5, 1)
+                ValLbl.Position           = UDim2.new(0.5, 0, 0, -2)
+                ValLbl.BackgroundTransparency = 1
+                ValLbl.Text               = tostring(d.value)
+                ValLbl.Font               = Enum.Font.Code
+                ValLbl.TextSize           = 9
+                ValLbl.ZIndex             = 6
+                ValLbl.Parent             = Bar
+                WindowRoot:Theme(ValLbl, "TextColor3", "SubTextColor")
+ 
+                local LabelLbl = Instance.new("TextLabel")
+                LabelLbl.Size               = UDim2.new(segW, 0, 0, 16)
+                LabelLbl.Position           = UDim2.new((i - 1) * segW, 0, 0, THEMES.BaseHeight + 2 + height + 2)
+                LabelLbl.BackgroundTransparency = 1
+                LabelLbl.Text               = d.label or ""
+                LabelLbl.Font               = Enum.Font.Code
+                LabelLbl.TextSize           = 9
+                LabelLbl.ZIndex             = 4
+                LabelLbl.Parent             = ChartFrame
+                WindowRoot:Theme(LabelLbl, "TextColor3", "SubTextColor")
+            end
+        end
+ 
+        RegisterSearch(ChartFrame, text)
+        WindowRoot:Connect(ThemeEvent.Event, function()
+            TweenService:Create(TitleLbl, TweenInfo.new(0.2), {TextColor3 = THEMES.TextColor}):Play()
+            TweenService:Create(ChartArea, TweenInfo.new(0.2), {
+                BackgroundColor3 = THEMES.FrameColor,
+                BorderColor3     = THEMES.BorderColor,
+            }):Play()
+            for _, b in ipairs(barBars) do
+                TweenService:Create(b, TweenInfo.new(0.2), {BackgroundColor3 = THEMES.LineColor}):Play()
+            end
+        end)
+        return ChartFrame
+    end
+ 
+
+
             return SectionFunctions
         end
 
         return TabFunctions
     end
 
-    return self
-end
-
-function Library:BuildMacroTab()
-    local MacroTab = self:Tab("Macros")
-    local RecorderSection = MacroTab:Section("Macro Recorder")
-
-    local isRecording = false
-    local isPlaying = false
-    local macroEvents = {}
-    local lastEventTime = 0
-    local playbackConnection = nil
-
-    local StatusLabel = RecorderSection:Label("Status: Idle (0 events)")
-
-    local function RecordEvent(inputType, inputObj)
-        if not isRecording then return end
-        local currentTime = tick()
-        local delay = currentTime - lastEventTime
-        lastEventTime = currentTime
-
-        if inputObj.UserInputType == Enum.UserInputType.MouseButton1 then
-            table.insert(macroEvents, {Type = inputType, Key = "M1", Delay = delay})
-            StatusLabel.Text = "Status: Recording (" .. #macroEvents .. " events)"
-        elseif inputObj.UserInputType == Enum.UserInputType.MouseButton2 then
-            table.insert(macroEvents, {Type = inputType, Key = "M2", Delay = delay})
-            StatusLabel.Text = "Status: Recording (" .. #macroEvents .. " events)"
-        elseif inputObj.UserInputType == Enum.UserInputType.Keyboard then
-            if inputObj.KeyCode == self.KeyBind then return end
-            table.insert(macroEvents, {Type = inputType, Key = inputObj.KeyCode.Value, Delay = delay})
-            StatusLabel.Text = "Status: Recording (" .. #macroEvents .. " events)"
+    function self:Dialog(title, message, buttons, callback)
+        buttons  = buttons  or {"OK"}
+        callback = callback or function() end
+ 
+        local ScreenGuiRef = self.Frames.MainFrame.Parent
+ 
+        local Overlay = Instance.new("TextButton")
+        Overlay.Size                = UDim2.new(1, 0, 1, 0)
+        Overlay.BackgroundColor3    = Color3.new(0, 0, 0)
+        Overlay.BackgroundTransparency = 0.4
+        Overlay.BorderSizePixel     = 0
+        Overlay.Text                = ""
+        Overlay.AutoButtonColor     = false
+        Overlay.ZIndex              = 200
+        Overlay.Parent              = ScreenGuiRef
+ 
+        local btnTotalW = #buttons * 80 + (#buttons - 1) * 6
+        local dialogW   = math.max(280, btnTotalW + 40)
+        local dialogH   = 130
+ 
+        local DialogBox = Instance.new("Frame")
+        DialogBox.Size     = UDim2.new(0, dialogW, 0, dialogH)
+        DialogBox.Position = UDim2.new(0.5, -dialogW / 2, 0.5, -dialogH / 2)
+        DialogBox.ZIndex   = 201
+        DialogBox.Parent   = ScreenGuiRef
+        WindowRoot:Theme(DialogBox, "BackgroundColor3", "MainColor")
+        WindowRoot:Theme(DialogBox, "BorderColor3", "LineColor")
+        CreateGradient(DialogBox)
+ 
+        local Scale = Instance.new("UIScale")
+        Scale.Scale = 0.8
+        Scale.Parent = DialogBox
+        TweenService:Create(Scale,
+            TweenInfo.new(0.3, Enum.EasingStyle.Back, Enum.EasingDirection.Out),
+            {Scale = 1}):Play()
+ 
+        -- Title
+        local TitleL = Instance.new("TextLabel")
+        TitleL.Size               = UDim2.new(1, -10, 0, 28)
+        TitleL.Position           = UDim2.new(0, 8, 0, 4)
+        TitleL.BackgroundTransparency = 1
+        TitleL.Text               = title
+        TitleL.Font               = Enum.Font.SourceSansBold
+        TitleL.TextSize           = THEMES.TextSize + 2
+        TitleL.TextXAlignment     = Enum.TextXAlignment.Left
+        TitleL.ZIndex             = 202
+        TitleL.Parent             = DialogBox
+        WindowRoot:Theme(TitleL, "TextColor3", "TextColor")
+ 
+        -- Divider
+        local Sep = Instance.new("Frame")
+        Sep.Size              = UDim2.new(1, 0, 0, 1)
+        Sep.Position          = UDim2.new(0, 0, 0, 32)
+        Sep.BorderSizePixel   = 0
+        Sep.ZIndex            = 202
+        Sep.Parent            = DialogBox
+        WindowRoot:Theme(Sep, "BackgroundColor3", "BorderColor")
+ 
+        -- Message
+        local MsgL = Instance.new("TextLabel")
+        MsgL.Size                 = UDim2.new(1, -16, 0, 54)
+        MsgL.Position             = UDim2.new(0, 8, 0, 38)
+        MsgL.BackgroundTransparency = 1
+        MsgL.Text                 = message
+        MsgL.Font                 = Enum.Font.Code
+        MsgL.TextSize             = THEMES.TextSize
+        MsgL.TextWrapped          = true
+        MsgL.TextXAlignment       = Enum.TextXAlignment.Left
+        MsgL.TextYAlignment       = Enum.TextYAlignment.Top
+        MsgL.ZIndex               = 202
+        MsgL.Parent               = DialogBox
+        WindowRoot:Theme(MsgL, "TextColor3", "SubTextColor")
+ 
+        local function CloseDialog(selected)
+            TweenService:Create(Scale,
+                TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.In),
+                {Scale = 0.8}):Play()
+            TweenService:Create(Overlay, TweenInfo.new(0.2), {BackgroundTransparency = 1}):Play()
+            task.delay(0.25, function()
+                DialogBox:Destroy()
+                Overlay:Destroy()
+            end)
+            callback(selected)
+        end
+ 
+        -- Buttons
+        local startX = (dialogW - btnTotalW) / 2
+        for i, btnText in ipairs(buttons) do
+            local B = Instance.new("TextButton")
+            B.Size     = UDim2.new(0, 80, 0, THEMES.BaseHeight)
+            B.Position = UDim2.new(0, startX + (i - 1) * 86, 0, dialogH - THEMES.BaseHeight - 10)
+            B.Text     = btnText
+            B.Font     = Enum.Font.Code
+            B.TextSize = THEMES.TextSize
+            B.ZIndex   = 203
+            B.Parent   = DialogBox
+            WindowRoot:Theme(B, "BackgroundColor3", "FrameColor")
+            WindowRoot:Theme(B, "BorderColor3",     "LineColor")
+            WindowRoot:Theme(B, "TextColor3",       "TextColor")
+            CreateGradient(B)
+            WindowRoot:Connect(B.MouseButton1Click, function() CloseDialog(btnText) end)
         end
     end
 
-    self:Connect(UserInputService.InputBegan, function(input, gpe)
-        if gpe then return end
-        RecordEvent("Began", input)
+
+    return self
+end
+
+function Library:BuildUtilityTab(iconId)
+    local UtilTab = self:Tab("Utility", iconId or 11963373104) 
+
+    local ClickerSec = UtilTab:Section("Auto Clicker")
+    local acEnabled = false
+    local cps = 10
+    local isClicking = false
+
+    ClickerSec:ToggleBind("Enable Auto Clicker", false, Enum.KeyCode.V, "AC_Enabled", "AC_Key", function(state) 
+        acEnabled = state 
+    end)
+    ClickerSec:Slider("Clicks Per Second (CPS)", 1, 50, 10, 0, "AC_CPS", function(val) 
+        cps = val 
     end)
 
-    self:Connect(UserInputService.InputEnded, function(input, gpe)
-        if gpe then return end
-        RecordEvent("Ended", input)
-    end)
-
-    RecorderSection:ToggleBind("Record Macro", false, Enum.KeyCode.F3, nil, nil, function(state)
-        if isPlaying then 
-            self:Notify("Error", "Cannot record while playing a macro.", 3)
-            return false 
-        end
-        
-        isRecording = state
-        if isRecording then
-            macroEvents = {}
-            lastEventTime = tick()
-            StatusLabel.Text = "Status: Recording (0 events)"
-            StatusLabel.TextColor3 = THEMES.ErrorColor 
-        else
-            StatusLabel.Text = "Status: Idle (" .. #macroEvents .. " events)"
-            StatusLabel.TextColor3 = THEMES.SubTextColor
-            self:Notify("Macro Saved", "Recorded " .. #macroEvents .. " inputs.", 3)
-        end
-    end)
-
-    local LoopMacro = false
-    RecorderSection:Toggle("Loop Playback", false, nil, function(state) LoopMacro = state end)
-
-    RecorderSection:ToggleBind("Play Macro", false, Enum.KeyCode.F4, nil, nil, function(state)
-        if isRecording then return self:Notify("Error", "Cannot play while recording.", 3) end
-        if #macroEvents == 0 then return self:Notify("Error", "No macro recorded yet.", 3) end
-
-        isPlaying = state
-        if isPlaying then
-            StatusLabel.Text = "Status: Playing..."
-            StatusLabel.TextColor3 = THEMES.SuccessColor
-            
-            playbackConnection = task.spawn(function()
-                repeat
-                    for _, event in ipairs(macroEvents) do
-                        if not isPlaying then break end
-                        task.wait(event.Delay)
-                        if event.Key == "M1" then
-                            if event.Type == "Began" then m1click() end
-                        elseif event.Key == "M2" then
-                            if event.Type == "Began" then m2click() end
-                        else
-                            if event.Type == "Began" then kpress(event.Key)
-                            elseif event.Type == "Ended" then krelease(event.Key) end
-                        end
-                    end
-                until not LoopMacro or not isPlaying
-                
-                isPlaying = false
-                StatusLabel.Text = "Status: Idle (" .. #macroEvents .. " events)"
-                StatusLabel.TextColor3 = THEMES.SubTextColor
-            end)
-        else
-            if playbackConnection then task.cancel(playbackConnection) end
-            StatusLabel.Text = "Status: Idle (" .. #macroEvents .. " events)"
-            StatusLabel.TextColor3 = THEMES.SubTextColor
-            
-            for _, event in ipairs(macroEvents) do
-                if type(event.Key) == "number" then krelease(event.Key) end
+    task.spawn(function()
+        while true do
+            if acEnabled and UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) then
+                if m1click then pcall(m1click) end
             end
+            task.wait(1 / cps)
         end
     end)
+    
+    ClickerSec:Paragraph("Note: Auto Clicker activates while holding Left Click if enabled.")
 
-    RecorderSection:Button("Clear Macro", function()
-        if isRecording or isPlaying then return self:Notify("Error", "Stop recording/playing first.", 3) end
-        macroEvents = {}
-        StatusLabel.Text = "Status: Idle (0 events)"
-        self:Notify("Cleared", "Macro memory cleared.", 2)
+    local ServerSec = UtilTab:Section("Server Management")
+    ServerSec:CreateButtonRow("Rejoin Server", function()
+        self:Notify("Rejoining", "Attempting to rejoin the current server...", 3)
+        TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId, Players.LocalPlayer)
+    end, "Server Hop", function()
+        self:ServerHop(game.PlaceId)
+    end)
+    
+    ServerSec:Button("Copy Job ID", function()
+        setclipboard(game.JobId)
+        self:Notify("Copied", "Server Job ID copied to clipboard.", 3)
     end)
 end
 
-function Library:BuildSettingsTab()
-    local ConfigTab = self:Tab("Settings")
+function Library:BuildSettingsTab(iconId)
+    local ConfigTab = self:Tab("Settings", iconId or 3926307971)
     local SettingsSection = ConfigTab:Section("Configuration")
     local UISetupSection = ConfigTab:Section("UI Elements")
 
     local ConfigName = ""
     local SelectedConfig = ""
-    local AutoloadFile = self.Name .. "_Configs/autoload.txt"
+    local AutoloadFile = self.ConfigFolder .. "/autoload.txt"
 
     local function GetConfigs()
         local list = {}
@@ -2688,19 +3760,58 @@ function Library:BuildSettingsTab()
     SettingsSection:Button("Refresh List", function() Dropdown:Refresh(GetConfigs()); self:Notify("Refreshed", "Config list updated.", 2) end)
 
     -- PREMIUM UI TOGGLES
-    UISetupSection:Toggle("Show Watermark", true, "ShowWatermark", function(state)
+    UISetupSection:Toggle("Show Watermark", not Library.IsSilent, "ShowWatermark", function(state)
         if self.WatermarkGui then self.WatermarkGui.Enabled = state end
     end)
     
-    UISetupSection:Toggle("Show Active Keybinds", true, "ShowKeybinds", function(state)
+    UISetupSection:Toggle("Show Active Keybinds", not Library.IsSilent, "ShowKeybinds", function(state)
         if self.KeybindGui then self.KeybindGui.Enabled = state end
     end)
 
+    local rgbLoop = false
+    UISetupSection:Toggle("RGB Chroma Accents", false, "RGBMode", function(state)
+        rgbLoop = state
+        if state then
+            task.spawn(function()
+                while rgbLoop do
+                    local hue = tick() % 10 / 10 
+                    self:SetTheme({LineColor = Color3.fromHSV(hue, 1, 1)})
+                    task.wait(0.5) 
+                end
+            end)
+        else
+            self:SetTheme({LineColor = Color3.fromRGB(255, 255, 255)})
+        end
+    end)
+
+    local BlurEffect = Instance.new("BlurEffect")
+    BlurEffect.Size = 15
+    BlurEffect.Enabled = false
+    BlurEffect.Name = "Heartkiss_Blur"
+    BlurEffect.Parent = game:GetService("Lighting")
+    table.insert(getgenv()._Heartkiss_Garbage[self.Name], BlurEffect)
+
+    local ScreenGui = self.Frames.MainFrame.Parent
+    self:Connect(ScreenGui:GetPropertyChangedSignal("Enabled"), function()
+        if self.Flags["MenuBlur"] then
+            BlurEffect.Enabled = ScreenGui.Enabled
+        end
+    end)
+
+    UISetupSection:Toggle("Menu Background Blur", false, "MenuBlur", function(state)
+        BlurEffect.Enabled = state and ScreenGui.Enabled
+    end)
+
+    UISetupSection:Toggle("Silent Execution", false, "SilentExecution", function(state) end)
+
+    UISetupSection:Button("Unload Library", function()
+        self:Notify("Unloaded", "NextLevel UI has been unloaded. Re-inject to use again.", 5)
+        self:Unload()
+    end)
+
     local InfoSection = ConfigTab:Section("About")
-    InfoSection:Label("Heartkiss UI Library")
+    InfoSection:Label("NextLevel")
     InfoSection:Separator()
-    InfoSection:Label("Press keybind to toggle UI")
-    InfoSection:Separator("─────")
     InfoSection:StatusIndicator("Status", "Active", THEMES.SuccessColor)
 
     -- AUTOLOAD EXECUTION
@@ -2720,5 +3831,489 @@ function Library:BuildSettingsTab()
         end
     end
 end
+
+function Library:BuildThemeTab(iconId)
+    local ThemeTab = self:Tab("Theme", iconId or 7743869054) 
+    local ThemeSec = ThemeTab:Section("Custom Theme")
+
+    for key, defaultColor in pairs(THEMES) do
+        if type(defaultColor) == "userdata" and typeof(defaultColor) == "Color3" then
+            ThemeSec:ColorPicker(key, defaultColor, 0, "Theme_"..key, function(color)
+                self:SetTheme({[key] = color})
+            end)
+        end
+    end
+
+    ThemeSec:Button("Reset to Default", function()
+        self:SetTheme({
+            MainColor        = Color3.fromRGB(15, 15, 15),
+            FrameColor       = Color3.fromRGB(20, 20, 20),
+            TabColor         = Color3.fromRGB(18, 18, 18),
+            LineColor        = Color3.fromRGB(255, 255, 255),
+            BorderColor      = Color3.fromRGB(40, 40, 40),
+            DarkColor        = Color3.fromRGB(10, 10, 10),
+            SelectedTab      = Color3.fromRGB(40, 40, 40),
+            TextColor        = Color3.fromRGB(245, 245, 245),
+            ButtonBorderColor= Color3.fromRGB(35, 35, 35),
+            SubTextColor     = Color3.fromRGB(150, 150, 150),
+            SuccessColor     = Color3.fromRGB(255, 255, 255),
+            WarningColor     = Color3.fromRGB(255, 175, 50),
+            ErrorColor       = Color3.fromRGB(255, 70, 90),
+            InfoColor        = Color3.fromRGB(255, 255, 255),
+        })
+        self:Notify("Theme Reset", "Restored default styling.", 3)
+    end)
+end
+
+
+function Library:InitLoad(options)
+    options = options or {}
+ 
+    local Title       = options.Title           or "NEXUS HUB"
+    local SubTitle    = options.SubTitle        or ""
+    local Icon        = options.Icon            or nil
+    local Duration    = options.Duration        or 5
+    local AccentColor = options.AccentColor     or Color3.fromRGB(0, 210, 150)
+    local BgColor     = options.BackgroundColor or Color3.fromRGB(5, 8, 13)
+    local Statuses    = options.Statuses        or {
+        "Establishing secure connection...",
+        "Loading encryption modules...",
+        "Authenticating payload...",
+        "Injecting core systems...",
+        "Building interface..."
+    }
+
+    local isSilent = options.Silent or false
+
+    if not isSilent then
+        local configFolder = Title .. "_Configs/" .. tostring(game.PlaceId)
+        local autoloadFile = configFolder .. "/autoload.txt"
+        if isfile(autoloadFile) then
+            local autoName = readfile(autoloadFile)
+            local path = configFolder .. "/" .. autoName .. ".json"
+            if isfile(path) then
+                local ok, data = pcall(function() return HttpService:JSONDecode(readfile(path)) end)
+                if ok and type(data) == "table" and data["SilentExecution"] == true then
+                    isSilent = true
+                end
+            end
+        end
+    end
+
+    if isSilent then
+        Library.IsSilent = true
+        return
+    end
+ 
+    -- ── GUI root ────────────────────────────────────────────
+    local LoadGui      = Instance.new("ScreenGui")
+    LoadGui.Name       = "HK_PremiumLoader"
+    LoadGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
+    LoadGui.IgnoreGuiInset = true
+    if syn and syn.protect_gui then syn.protect_gui(LoadGui)
+    elseif protectgui then protectgui(LoadGui) end
+    LoadGui.Parent     = CoreGui
+ 
+    -- ── Full-screen backdrop ────────────────────────────────
+    local BG = Instance.new("Frame")
+    BG.Size               = UDim2.new(1, 0, 1, 0)
+    BG.BackgroundColor3   = BgColor
+    BG.BackgroundTransparency = 1
+    BG.BorderSizePixel    = 0
+    BG.ZIndex             = 1
+    BG.Parent             = LoadGui
+ 
+    -- ── Scanlines (horizontal) ──────────────────────────────
+    local ScanRoot = Instance.new("Frame")
+    ScanRoot.Size               = UDim2.new(1, 0, 1, 0)
+    ScanRoot.BackgroundTransparency = 1
+    ScanRoot.ZIndex             = 2
+    ScanRoot.Parent             = BG
+ 
+    for i = 0, 40 do
+        local sl = Instance.new("Frame")
+        sl.Size             = UDim2.new(1, 0, 0, 1)
+        sl.Position         = UDim2.new(0, 0, i / 40, 0)
+        sl.BackgroundColor3 = AccentColor
+        sl.BackgroundTransparency = 0.93
+        sl.BorderSizePixel  = 0
+        sl.ZIndex           = 2
+        sl.Parent           = ScanRoot
+    end
+ 
+    -- ── Drifting particles ──────────────────────────────────
+    local ParticleRoot = Instance.new("Frame")
+    ParticleRoot.Size               = UDim2.new(1, 0, 1, 0)
+    ParticleRoot.BackgroundTransparency = 1
+    ParticleRoot.ZIndex             = 2
+    ParticleRoot.Parent             = BG
+ 
+    local particles = {}
+    for _ = 1, 35 do
+        local size = math.random(1, 3)
+        local dot  = Instance.new("Frame")
+        dot.Size              = UDim2.new(0, size, 0, size)
+        dot.Position          = UDim2.new(math.random(), 0, math.random(), 0)
+        dot.BackgroundColor3  = AccentColor
+        dot.BackgroundTransparency = math.random(5, 9) / 10
+        dot.BorderSizePixel   = 0
+        dot.ZIndex            = 2
+        dot.Parent            = ParticleRoot
+        table.insert(particles, {
+            frame  = dot,
+            speedY = -(math.random() * 0.0004 + 0.0001),
+            speedX = (math.random() - 0.5) * 0.00015,
+        })
+    end
+ 
+    -- ── Card ────────────────────────────────────────────────
+    local hasIcon = Icon ~= nil
+    local cardH   = hasIcon and 270 or 240
+    local cardW   = 430
+ 
+    local Card = Instance.new("Frame")
+    Card.Size               = UDim2.new(0, cardW, 0, cardH)
+    Card.Position           = UDim2.new(0.5, -cardW / 2, 0.5, -cardH / 2)
+    Card.BackgroundColor3   = BgColor
+    Card.BackgroundTransparency = 1
+    Card.BorderSizePixel    = 0
+    Card.ZIndex             = 10
+    Card.Parent             = BG
+ 
+    local CardStroke = Instance.new("UIStroke")
+    CardStroke.Color       = AccentColor
+    CardStroke.Thickness   = 1
+    CardStroke.Transparency = 1
+    CardStroke.Parent      = Card
+ 
+    -- Animated corner L-brackets
+    local cornerElems = {}
+    local function MakeCorner(ax, ay)
+        local g = Instance.new("Frame")
+        g.Size          = UDim2.new(0, 20, 0, 20)
+        g.AnchorPoint   = Vector2.new(ax, ay)
+        g.Position      = UDim2.new(ax, ax == 0 and -1 or 1, ay, ay == 0 and -1 or 1)
+        g.BackgroundTransparency = 1
+        g.ZIndex        = 12
+        g.Parent        = Card
+ 
+        local hz = Instance.new("Frame")
+        hz.Size             = UDim2.new(1, 0, 0, 2)
+        hz.Position         = ay == 0 and UDim2.new(0,0,0,0) or UDim2.new(0,0,1,-2)
+        hz.BackgroundColor3 = AccentColor
+        hz.BackgroundTransparency = 1
+        hz.BorderSizePixel  = 0
+        hz.ZIndex           = 12
+        hz.Parent           = g
+ 
+        local vt = Instance.new("Frame")
+        vt.Size             = UDim2.new(0, 2, 1, 0)
+        vt.Position         = ax == 0 and UDim2.new(0,0,0,0) or UDim2.new(1,-2,0,0)
+        vt.BackgroundColor3 = AccentColor
+        vt.BackgroundTransparency = 1
+        vt.BorderSizePixel  = 0
+        vt.ZIndex           = 12
+        vt.Parent           = g
+ 
+        table.insert(cornerElems, {hz = hz, vt = vt})
+    end
+    MakeCorner(0, 0); MakeCorner(1, 0); MakeCorner(0, 1); MakeCorner(1, 1)
+ 
+    -- Header bar
+    local HeaderBar = Instance.new("Frame")
+    HeaderBar.Size             = UDim2.new(1, 0, 0, 28)
+    HeaderBar.BackgroundColor3 = AccentColor
+    HeaderBar.BackgroundTransparency = 0.82
+    HeaderBar.BorderSizePixel  = 0
+    HeaderBar.ZIndex           = 11
+    HeaderBar.Parent           = Card
+ 
+    local HeaderTxt = Instance.new("TextLabel")
+    HeaderTxt.Size               = UDim2.new(1, -12, 1, 0)
+    HeaderTxt.Position           = UDim2.new(0, 8, 0, 0)
+    HeaderTxt.BackgroundTransparency = 1
+    HeaderTxt.Text               = ">> TERMINAL  //  INITIALIZING"
+    HeaderTxt.TextColor3         = AccentColor
+    HeaderTxt.Font               = Enum.Font.Code
+    HeaderTxt.TextSize           = 11
+    HeaderTxt.TextXAlignment     = Enum.TextXAlignment.Left
+    HeaderTxt.TextTransparency   = 1
+    HeaderTxt.ZIndex             = 12
+    HeaderTxt.Parent             = HeaderBar
+ 
+    local CursorDot = Instance.new("TextLabel")
+    CursorDot.Size               = UDim2.new(0, 24, 1, 0)
+    CursorDot.Position           = UDim2.new(1, -28, 0, 0)
+    CursorDot.BackgroundTransparency = 1
+    CursorDot.Text               = "●"
+    CursorDot.TextColor3         = AccentColor
+    CursorDot.Font               = Enum.Font.Code
+    CursorDot.TextSize           = 9
+    CursorDot.TextTransparency   = 1
+    CursorDot.ZIndex             = 12
+    CursorDot.Parent             = HeaderBar
+ 
+    -- Content area
+    local yOff = 36
+    local Content = Instance.new("Frame")
+    Content.Size               = UDim2.new(1, -28, 1, -(yOff + 8))
+    Content.Position           = UDim2.new(0, 14, 0, yOff)
+    Content.BackgroundTransparency = 1
+    Content.ZIndex             = 11
+    Content.Parent             = Card
+ 
+    -- Optional icon
+    if hasIcon then
+        local IconImg = Instance.new("ImageLabel")
+        IconImg.Size              = UDim2.new(0, 42, 0, 42)
+        IconImg.Position          = UDim2.new(0.5, -21, 0, 0)
+        IconImg.BackgroundTransparency = 1
+        IconImg.Image             = type(Icon) == "number"
+            and "rbxassetid://" .. tostring(Icon) or Icon
+        IconImg.ImageColor3       = AccentColor
+        IconImg.ImageTransparency = 1
+        IconImg.ZIndex            = 13
+        IconImg.Parent            = Content
+        yOff = 52
+ 
+        TweenService:Create(IconImg,
+            TweenInfo.new(0.8, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+            {ImageTransparency = 0}):Play()
+    end
+ 
+    -- Title label (glitch-typewriter reveal)
+    local TitleLbl = Instance.new("TextLabel")
+    TitleLbl.Size               = UDim2.new(1, 0, 0, 34)
+    TitleLbl.Position           = UDim2.new(0, 0, 0, hasIcon and 50 or 4)
+    TitleLbl.BackgroundTransparency = 1
+    TitleLbl.Text               = ""
+    TitleLbl.TextColor3         = Color3.new(1, 1, 1)
+    TitleLbl.Font               = Enum.Font.GothamBold
+    TitleLbl.TextSize           = 24
+    TitleLbl.ZIndex             = 12
+    TitleLbl.Parent             = Content
+ 
+    -- Subtitle
+    local SubLbl = Instance.new("TextLabel")
+    SubLbl.Size               = UDim2.new(1, 0, 0, 18)
+    SubLbl.Position           = UDim2.new(0, 0, 0, hasIcon and 86 or 40)
+    SubLbl.BackgroundTransparency = 1
+    SubLbl.Text               = SubTitle
+    SubLbl.TextColor3         = AccentColor
+    SubLbl.Font               = Enum.Font.Code
+    SubLbl.TextSize           = 12
+    SubLbl.TextTransparency   = 1
+    SubLbl.ZIndex             = 12
+    SubLbl.Parent             = Content
+ 
+    local bodyBaseY = hasIcon and 110 or 64
+ 
+    -- Expanding divider
+    local Divider = Instance.new("Frame")
+    Divider.Size             = UDim2.new(0, 0, 0, 1)
+    Divider.Position         = UDim2.new(0, 0, 0, bodyBaseY)
+    Divider.BackgroundColor3 = AccentColor
+    Divider.BackgroundTransparency = 0.55
+    Divider.BorderSizePixel  = 0
+    Divider.ZIndex           = 12
+    Divider.Parent           = Content
+ 
+    -- Segment bar
+    local SEG_COUNT = 22
+    local SegContainer = Instance.new("Frame")
+    SegContainer.Size               = UDim2.new(1, 0, 0, 8)
+    SegContainer.Position           = UDim2.new(0, 0, 0, bodyBaseY + 12)
+    SegContainer.BackgroundTransparency = 1
+    SegContainer.ZIndex             = 12
+    SegContainer.Parent             = Content
+ 
+    local segments = {}
+    for i = 1, SEG_COUNT do
+        local seg = Instance.new("Frame")
+        seg.Size             = UDim2.new(1 / SEG_COUNT, -2, 1, 0)
+        seg.Position         = UDim2.new((i - 1) / SEG_COUNT, 1, 0, 0)
+        seg.BackgroundColor3 = AccentColor
+        seg.BackgroundTransparency = 0.86
+        seg.BorderSizePixel  = 0
+        seg.ZIndex           = 13
+        seg.Parent           = SegContainer
+        table.insert(segments, seg)
+    end
+ 
+    -- Percent label
+    local PctLbl = Instance.new("TextLabel")
+    PctLbl.Size               = UDim2.new(1, 0, 0, 16)
+    PctLbl.Position           = UDim2.new(0, 0, 0, bodyBaseY + 24)
+    PctLbl.BackgroundTransparency = 1
+    PctLbl.Text               = "[ 0% ]"
+    PctLbl.TextColor3         = AccentColor
+    PctLbl.Font               = Enum.Font.Code
+    PctLbl.TextSize           = 11
+    PctLbl.TextXAlignment     = Enum.TextXAlignment.Right
+    PctLbl.TextTransparency   = 1
+    PctLbl.ZIndex             = 12
+    PctLbl.Parent             = Content
+ 
+    -- Status label
+    local StatusLbl = Instance.new("TextLabel")
+    StatusLbl.Size               = UDim2.new(1, -60, 0, 16)
+    StatusLbl.Position           = UDim2.new(0, 0, 0, bodyBaseY + 24)
+    StatusLbl.BackgroundTransparency = 1
+    StatusLbl.Text               = "> " .. (Statuses[1] or "")
+    StatusLbl.TextColor3         = Color3.fromRGB(140, 210, 170)
+    StatusLbl.Font               = Enum.Font.Code
+    StatusLbl.TextSize           = 11
+    StatusLbl.TextXAlignment     = Enum.TextXAlignment.Left
+    StatusLbl.TextTransparency   = 1
+    StatusLbl.ZIndex             = 12
+    StatusLbl.Parent             = Content
+ 
+    -- ── Animate in ──────────────────────────────────────────
+    local animating = true
+ 
+    local inInfo = TweenInfo.new(0.9, Enum.EasingStyle.Quart, Enum.EasingDirection.Out)
+    TweenService:Create(BG,       inInfo, {BackgroundTransparency = 0}):Play()
+    TweenService:Create(Card,     inInfo, {BackgroundTransparency = 0.05}):Play()
+    TweenService:Create(CardStroke, inInfo, {Transparency = 0.5}):Play()
+ 
+    for _, ce in ipairs(cornerElems) do
+        TweenService:Create(ce.hz, inInfo, {BackgroundTransparency = 0}):Play()
+        TweenService:Create(ce.vt, inInfo, {BackgroundTransparency = 0}):Play()
+    end
+ 
+    task.wait(0.35)
+    TweenService:Create(HeaderTxt, TweenInfo.new(0.3), {TextTransparency = 0}):Play()
+    TweenService:Create(CursorDot, TweenInfo.new(0.3), {TextTransparency = 0}):Play()
+    TweenService:Create(SubLbl,    TweenInfo.new(0.4), {TextTransparency = 0}):Play()
+    TweenService:Create(Divider,   TweenInfo.new(0.6, Enum.EasingStyle.Quart),
+        {Size = UDim2.new(1, 0, 0, 1)}):Play()
+    TweenService:Create(StatusLbl, TweenInfo.new(0.3), {TextTransparency = 0}):Play()
+    TweenService:Create(PctLbl,    TweenInfo.new(0.3), {TextTransparency = 0}):Play()
+ 
+    -- Glitch-typewriter title reveal
+    task.spawn(function()
+        local glyphPool = {"0","1","X","#","@","Z","!","▓","▒","░","█","◆"}
+        task.wait(0.4)
+        for i = 1, #Title do
+            for _ = 1, 3 do
+                TitleLbl.Text = string.sub(Title, 1, i - 1)
+                    .. glyphPool[math.random(1, #glyphPool)]
+                task.wait(0.03)
+            end
+            TitleLbl.Text = string.sub(Title, 1, i)
+            task.wait(0.05)
+        end
+    end)
+ 
+    -- Cursor blink loop
+    task.spawn(function()
+        while animating do
+            task.wait(0.5)
+            if animating then
+                TweenService:Create(CursorDot, TweenInfo.new(0.1), {TextTransparency = 0.9}):Play()
+                task.wait(0.5)
+                if animating then
+                    TweenService:Create(CursorDot, TweenInfo.new(0.1), {TextTransparency = 0}):Play()
+                end
+            end
+        end
+    end)
+ 
+    -- Particle drift loop
+    task.spawn(function()
+        while animating do
+            for _, p in ipairs(particles) do
+                local pos = p.frame.Position
+                local nx = pos.X.Scale + p.speedX
+                local ny = pos.Y.Scale + p.speedY
+                if ny < -0.02 then ny = 1.02; nx = math.random() end
+                if nx < 0 then nx = 1 elseif nx > 1 then nx = 0 end
+                p.frame.Position = UDim2.new(nx, 0, ny, 0)
+            end
+            task.wait()
+        end
+    end)
+ 
+    -- Progress & status update loop
+    local startTime    = os.clock()
+    local statusIndex  = 1
+    task.spawn(function()
+        while os.clock() - startTime < Duration do
+            local elapsed  = os.clock() - startTime
+            local progress = math.clamp(elapsed / Duration, 0, 1)
+            local filled   = math.floor(progress * SEG_COUNT)
+ 
+            for i, seg in ipairs(segments) do
+                seg.BackgroundTransparency = i <= filled and 0 or 0.86
+            end
+            PctLbl.Text = string.format("[ %d%% ]", math.floor(progress * 100))
+ 
+            local expected = math.clamp(math.floor(progress * #Statuses) + 1, 1, #Statuses)
+            if expected > statusIndex then
+                statusIndex = expected
+                local fullTxt = "> " .. Statuses[statusIndex]
+                task.spawn(function()
+                    TweenService:Create(StatusLbl, TweenInfo.new(0.12), {TextTransparency = 0.85}):Play()
+                    task.wait(0.14)
+                    StatusLbl.Text = "> ▌"
+                    TweenService:Create(StatusLbl, TweenInfo.new(0.1), {TextTransparency = 0}):Play()
+                    task.wait(0.1)
+                    for k = 3, #fullTxt do
+                        StatusLbl.Text = string.sub(fullTxt, 1, k) .. (k < #fullTxt and "▌" or "")
+                        task.wait(0.018)
+                    end
+                    StatusLbl.Text = fullTxt
+                end)
+            end
+ 
+            task.wait()
+        end
+        for _, seg in ipairs(segments) do seg.BackgroundTransparency = 0 end
+        PctLbl.Text = "[ 100% ]"
+    end)
+ 
+    task.wait(Duration)
+    animating = false
+ 
+    -- ── Completion sequence ──────────────────────────────────
+    StatusLbl.Text      = "> INITIALIZATION COMPLETE"
+    StatusLbl.TextColor3 = AccentColor
+ 
+    -- Cascade-fill segments white → accent
+    for i, seg in ipairs(segments) do
+        task.delay((i - 1) * 0.025, function()
+            seg.BackgroundColor3    = Color3.new(1, 1, 1)
+            seg.BackgroundTransparency = 0
+            task.delay(0.18, function()
+                TweenService:Create(seg, TweenInfo.new(0.35),
+                    {BackgroundColor3 = AccentColor}):Play()
+            end)
+        end)
+    end
+    task.wait(0.7)
+ 
+    -- Collapse card and fade out
+    local outInfo = TweenInfo.new(0.55, Enum.EasingStyle.Quart, Enum.EasingDirection.In)
+    TweenService:Create(Card,       outInfo, {BackgroundTransparency = 1}):Play()
+    TweenService:Create(CardStroke, outInfo, {Transparency = 1}):Play()
+    TweenService:Create(BG,         outInfo, {BackgroundTransparency = 1}):Play()
+    for _, ce in ipairs(cornerElems) do
+        TweenService:Create(ce.hz, outInfo, {BackgroundTransparency = 1}):Play()
+        TweenService:Create(ce.vt, outInfo, {BackgroundTransparency = 1}):Play()
+    end
+    for _, desc in ipairs(Card:GetDescendants()) do
+        if desc:IsA("TextLabel") then
+            TweenService:Create(desc, outInfo, {TextTransparency = 1}):Play()
+        elseif desc:IsA("ImageLabel") then
+            TweenService:Create(desc, outInfo, {ImageTransparency = 1}):Play()
+        elseif desc:IsA("Frame") then
+            TweenService:Create(desc, outInfo, {BackgroundTransparency = 1}):Play()
+        end
+    end
+ 
+    task.wait(0.6)
+    LoadGui:Destroy()
+end
+
 
 return Library
