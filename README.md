@@ -1,2 +1,4 @@
 
-# A ui library for roblox written in lua by me
+# A ui library for roblox written in lua
+
+documentation: https://acidgorgon.github.io/NewLibrary/
