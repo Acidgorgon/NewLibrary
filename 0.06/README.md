@@ -5,14 +5,20 @@ A professional, minimalist, and feature-rich UI library for Roblox, inspired by 
 ## 🚀 Quick Start
 
 ```lua
-local Library = loadstring(game:HttpGet("https://your-link-here/Lib.lua"))()
+local Library = loadstring(game:HttpGet("https://gist.githubusercontent.com/Acidgorgon/2c0654b99a77b27e801ca6eb952a1e6c/raw/a887a7de559fc0fc6eb6542066f648a91f8b9e28/UILib"))()
 
 -- Optional Boot Animation
 Library:InitLoad({
     Title = "NextLevel",
     SubTitle = "v0.06",
     Icon = 89738140174311,
-    Duration = 2
+    Duration = 2,
+    AccentColor = Color3.fromRGB(255, 0, 0),
+    Statuses = {
+        "Connecting...",
+        "Loading components...",
+        "Done!"
+    }
 })
 
 -- Create Window
@@ -40,9 +46,10 @@ end)
 ## 🛠 Features & Widgets
 
 ### Window Management
-- **Draggable & Resizable:** Fully interactive windows.
+- **Draggable & Resizable:** Fully interactive windows with a custom resize grip.
 - **Minimizing:** Collapse the UI to the title bar.
-- **Panic Key:** Set a key to instantly destroy the UI and all connections.
+- **Panic Key:** `Window:SetPanicKey(KeyCode)` to instantly destroy the UI and all connections.
+- **Flag Management:** `Window:IgnoreFlag(Flag)` to exclude specific widgets from being saved to configs.
 - **Global Search:** Built-in search bar to filter every element across all tabs.
 
 ### Interactive Widgets
@@ -54,6 +61,7 @@ end)
 - **Keybinds:** Simple `Bind` widget for one-tap actions.
 - **Selection:** `RadioGroup` for exclusive selection lists.
 - **Grid:** `Grid` widget for ability icons or quick-action grids.
+- **Webhook:** `Webhook` input field for Discord logging integration.
 
 ### Display & Data Widgets
 - **Console:** Draggable log output with multi-color support and clearing.
@@ -72,11 +80,19 @@ end)
 - **Theme System:** High-contrast dark theme with customizable accent colors.
 - **Config System:** Robust JSON-based saving/loading/autoloading for all flags.
 - **Server Hop:** Built-in teleporting utility that saves your UI state across servers.
+- **Connection Helper:** `Window:Connect(signal, callback)` for automatic garbage collection of connections on unload.
+- **Unload Callback:** `Window:OnUnload(callback)` registers a function to run when the library is destroyed.
+- **Theme Presets:** `Window:ApplyPreset(name)` to quickly switch between "Cyberpunk", "Midnight", "Toxic", etc.
+- **Config Listing:** `Window:ListConfigs()` returns an array of all saved profile names.
+
 
 ## ⚙️ Automatic Tabs
-- `Window:BuildUtilityTab()`: Includes a built-in Auto-Clicker.
+- `Window:BuildUtilityTab()`: Includes a built-in Auto-Clicker and utility tools.
 - `Window:BuildSettingsTab()`: Full config manager, Watermark toggle, Keybinds toggle, Background Blur, RGB mode, and Unload button.
 - `Window:BuildThemeTab()`: Live editor for every color in the UI.
+- `Window:BuildExecutorTab()`: A built-in code executor with clear/execute functionality.
+- `Window:BuildNotificationLogTab()`: View a history of all notifications sent by the script.
+- `Window:BuildChangelogTab(Data)`: Display version history and update notes.
 
 ---
 *Developed with ❤️ for the community.*

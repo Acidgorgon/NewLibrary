@@ -1,5 +1,6 @@
 --!nocheck
 --!nolint
+
 -- ============================================================
 --  HEARTKISS  —  Complete Feature Example
 --  Demonstrates every widget, method, and utility available.
@@ -10,18 +11,18 @@
 -- Example for external executors:
 -- local Library = loadstring(game:HttpGet(".../0.06/Lib.lua"))()
 -- For local executor testing if Lib.lua is in workspace:
-local Library = loadstring(game:HttpGet("https://gist.githubusercontent.com/Acidgorgon/2c0654b99a77b27e801ca6eb952a1e6c/raw/5edf0799195847536861313965c62e2b56c71063/UILib"))()
+local Library = loadstring(game:HttpGet("https://gist.githubusercontent.com/Acidgorgon/2c0654b99a77b27e801ca6eb952a1e6c/raw/a887a7de559fc0fc6eb6542066f648a91f8b9e28/UILib"))()
 
 
 -- ──────────────────────────────────────────────────────────────
 --  INIT LOAD SCREEN  (optional premium loader)
 -- ──────────────────────────────────────────────────────────────
 Library:InitLoad({
-    Title       = "NextLevel",
+    Title       = "CurseMark",
     SubTitle    = "All-Feature Demo v0.06",
     Icon        = 89738140174311,          -- rbxassetid
     Duration    = 2,
-    AccentColor = Color3.fromRGB(255, 255, 255),
+    AccentColor = Color3.fromRGB(255, 0, 0), -- Elite Red style
     Statuses    = {
         "Establishing secure connection...",
         "Loading encryption modules...",
@@ -36,15 +37,12 @@ Library:InitLoad({
 --  CREATE WINDOW
 -- ──────────────────────────────────────────────────────────────
 local Window = Library.new(
-    "NextLevel",                    -- title
-    UDim2.fromOffset(540, 580),     -- size
-    Enum.KeyCode.RightControl,      -- toggle keybind
-    "Sidebar",                      -- mode: "Sidebar" or nil for tab-bar
-    89738140174311                      -- window icon
+    "CurseMark",                    -- title
+    UDim2.new(0, 520, 0, 560),      -- size
+    Enum.KeyCode.RightControl,      -- toggle key
+    "Sidebar",                      -- UI Mode ("Sidebar" or "Classic")
+    89738140174311
 )
-
-
--- Panic key: hold End to instantly unload everything
 Window:SetPanicKey(Enum.KeyCode.End)
 
 -- Flags that should never be saved to configs
@@ -54,7 +52,7 @@ Window:IgnoreFlag("SensitiveFlag")
 -- ══════════════════════════════════════════════════════════════
 --  TAB 1 — BASIC CONTROLS
 -- ══════════════════════════════════════════════════════════════
-local MainTab = Window:Tab("Main", 3926307971)
+local MainTab = Window:Tab("Main")
 
 
 -- ── Section: Buttons ──────────────────────────────────────────
@@ -180,7 +178,7 @@ end)
 -- ══════════════════════════════════════════════════════════════
 --  TAB 2 — INPUT & TEXT
 -- ══════════════════════════════════════════════════════════════
-local InputTab = Window:Tab("Input", 3926307971)
+local InputTab = Window:Tab("Input")
 
 
 -- ── Section: Text Inputs ──────────────────────────────────────
@@ -294,7 +292,7 @@ SelectSec:RadioGroup(
 -- ══════════════════════════════════════════════════════════════
 --  TAB 3 — VISUAL / DISPLAY
 -- ══════════════════════════════════════════════════════════════
-local VisualTab = Window:Tab("Visual", 3926307971)
+local VisualTab = Window:Tab("Visual")
 
 
 -- ── Section: Labels & Text ────────────────────────────────────
@@ -345,14 +343,14 @@ ColorSec:ColorPicker(
 -- ── Section: Image ────────────────────────────────────────────
 local ImgSec = VisualTab:Section("Image")
 
-ImgSec:Image(3926307971, 80)    -- assetId, optional height in px
-ImgSec:Label("Asset ID: 3926307971")
+ImgSec:Image(89738140174311, 80)    -- assetId, optional height in px
+ImgSec:Label("Asset ID: ")
 
 
 -- ══════════════════════════════════════════════════════════════
 --  TAB 4 — DATA WIDGETS
 -- ══════════════════════════════════════════════════════════════
-local DataTab = Window:Tab("Data", 3926307971)
+local DataTab = Window:Tab("Data")
 
 
 -- ── Section: Progress Bars ────────────────────────────────────
@@ -486,7 +484,7 @@ console:Print("[SYSTEM] NextLevel initialised.", Color3.fromRGB(0, 200, 145))
 -- ══════════════════════════════════════════════════════════════
 --  TAB 5 — GRID & DIALOG
 -- ══════════════════════════════════════════════════════════════
-local GridTab = Window:Tab("Grid", 3926307971)
+local GridTab = Window:Tab("Grid")
 
 
 -- ── Section: Button Grid ─────────────────────────────────────
@@ -566,13 +564,26 @@ DialogSec:Button("Info Dialog", function()
 end)
 
 
--- ══════════════════════════════════════════════════════════════
---  BUILT-IN TABS  (Utility + Settings)
--- ══════════════════════════════════════════════════════════════
-Window:BuildUtilityTab(3926307971)    -- optional icon id
-Window:BuildSettingsTab(3926305904)   -- optional icon id
-Window:BuildThemeTab(3926305904)      -- NEW: Built-in theme editor tab
+-- ── Section: Utility ──────────────────────────────────────────
+local UtilSec = MainTab:Section("Utility")
 
+UtilSec:Webhook("Discord Logger", "LoggerURL", function(url)
+    print("New Webhook URL:", url)
+end)
+
+
+-- ══════════════════════════════════════════════════════════════
+--  BUILT-IN TABS  (Utility + Settings + Advanced)
+-- ══════════════════════════════════════════════════════════════
+Window:BuildUtilityTab()    
+Window:BuildThemeTab(3926305904)      -- Build theme tab before settings so we can refer to it
+Window:BuildSettingsTab(3926305904)   
+Window:BuildExecutorTab()             
+Window:BuildNotificationLogTab()      
+Window:BuildChangelogTab({            
+    ["0.06"] = "• Fixed Theme Persistence in Configs\n• Integrated Keybind HUD into core\n• Added Global Search\n• Added Theme Presets\n• Added Smart Scroll Console\n• Added Silent Mode\n• Added Notification History",
+    ["0.05"] = "• Added Sidebar mode\n• Initial v0.05 release"
+})
 
 -- ══════════════════════════════════════════════════════════════
 --  POST-INIT  — flag reads, notifications, programmatic setters
@@ -586,4 +597,8 @@ task.delay(0.5, function()
         "All features loaded. Press RCtrl to toggle UI, End to panic-unload.",
         5
     )
+end)
+
+Window:OnUnload(function()
+    print("UI Unloaded! Performing cleanup...")
 end)

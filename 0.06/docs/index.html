@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NextLevel UI v0.06 Documentation</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        rel="stylesheet">
+
+    <!-- Prism Syntax Highlighting -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+
+    <style>
+        :root {
+            --bg: #030303;
+            --sidebar: #070707;
+            --accent: #ffffff;
+            --accent-glow: rgba(255, 0, 0, 0.3);
+            --text: #ffffff;
+            --subtext: #a0a0a0;
+            --card: rgba(15, 15, 15, 0.6);
+            --border: rgba(255, 255, 255, 0.05);
+            --code-bg: #000000;
+            --selection: rgba(255, 0, 0, 0.2);
+            --success: #00ff88;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 320px;
+            background-color: var(--sidebar);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+        }
+
+        .sidebar-header {
+            padding: 40px 30px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .logo {
+            font-size: 22px;
+            font-weight: 800;
+            letter-spacing: -1.5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo span {
+            background: var(--accent);
+            color: var(--bg);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 900;
+            letter-spacing: 0;
+        }
+
+        .sidebar-nav {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 30px;
+        }
+
+        .nav-group {
+            margin-bottom: 35px;
+        }
+
+        .nav-title {
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: var(--subtext);
+            letter-spacing: 1.5px;
+            margin-bottom: 15px;
+        }
+
+        .nav-link {
+            display: block;
+            padding: 8px 0;
+            color: var(--subtext);
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+
+        .nav-link:hover {
+            color: var(--text);
+            transform: translateX(5px);
+        }
+
+        .nav-link.active {
+            color: var(--accent);
+            font-weight: 700;
+        }
+
+        /* Main Content */
+        .main {
+            flex-grow: 1;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+            padding: 80px 0;
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 0 60px;
+        }
+
+        section {
+            margin-bottom: 120px;
+        }
+
+        h1 {
+            font-size: 64px;
+            font-weight: 800;
+            letter-spacing: -4px;
+            margin-bottom: 20px;
+            background: linear-gradient(to bottom, #fff, #666);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: pulse 4s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                filter: drop-shadow(0 0 0px var(--accent-glow));
+            }
+
+            50% {
+                filter: drop-shadow(0 0 15px var(--accent-glow));
+            }
+        }
+
+        h2 {
+            font-size: 36px;
+            font-weight: 700;
+            letter-spacing: -2px;
+            margin: 80px 0 30px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            color: var(--text);
+            text-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+        }
+
+        h2::after {
+            content: '';
+            flex-grow: 1;
+            height: 1px;
+            background: var(--border);
+        }
+
+        h3 {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -1px;
+            margin: 50px 0 20px;
+            color: var(--accent);
+        }
+
+        p {
+            font-size: 17px;
+            color: var(--subtext);
+            margin-bottom: 30px;
+            max-width: 800px;
+        }
+
+        .method-signature {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 15px;
+            color: var(--success);
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        /* Prism Styling Overrides */
+        pre[class*="language-"] {
+            margin: 30px 0 50px;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            background: var(--code-bg) !important;
+            padding: 30px !important;
+            font-size: 14px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 24px;
+            margin-top: 50px;
+        }
+
+        .feature-card {
+            background: var(--card);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border);
+            padding: 35px;
+            border-radius: 12px;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at top right, var(--accent-glow), transparent 70%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+        }
+
+        .feature-card:hover {
+            border-color: var(--accent);
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8), 0 0 20px var(--accent-glow);
+        }
+
+        .feature-card:hover::before {
+            opacity: 1;
+        }
+
+        .feature-card h4 {
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .badge {
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+            padding: 5px 12px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 100px;
+            margin-bottom: 20px;
+            display: inline-block;
+            letter-spacing: 0.5px;
+        }
+
+        .tutorial-step {
+            border-left: 2px solid var(--border);
+            padding-left: 30px;
+            margin-bottom: 60px;
+            position: relative;
+        }
+
+        .tutorial-step::before {
+            content: '';
+            position: absolute;
+            left: -5px;
+            top: 0;
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+        }
+
+        footer {
+            margin-top: 150px;
+            padding: 80px 0;
+            border-top: 1px solid var(--border);
+            text-align: center;
+            color: var(--subtext);
+            font-size: 15px;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--subtext);
+        }
+
+        /* Smooth scroll margin */
+        section {
+            scroll-margin-top: 100px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">NextLevel <span>0.06</span></div>
+        </div>
+        <nav class="sidebar-nav">
+            <div class="nav-group">
+                <div class="nav-title">Fundamentals</div>
+                <a href="#intro" class="nav-link active">Introduction</a>
+                <a href="#install" class="nav-link">Installation</a>
+                <a href="#init" class="nav-link">InitLoad & Silent Mode</a>
+                <a href="#window" class="nav-link">Window & Tabs</a>
+            </div>
+
+            <div class="nav-group">
+                <div class="nav-title">The Big Widget Guide</div>
+                <a href="#buttons" class="nav-link">Buttons & Multi-Rows</a>
+                <a href="#toggles" class="nav-link">Toggles & Switches</a>
+                <a href="#sliders" class="nav-link">Sliders & Steppers</a>
+                <a href="#inputs" class="nav-link">Inputs & Tag Fields</a>
+                <a href="#dropdowns" class="nav-link">Dropdowns (All Types)</a>
+                <a href="#grids" class="nav-link">Grids & Consoles</a>
+                <a href="#data" class="nav-link">Data Viz & Charts</a>
+            </div>
+
+            <div class="nav-group">
+                <div class="nav-title">Visuals</div>
+                <a href="#visuals" class="nav-link">Labels & Layout</a>
+                <a href="#alerts" class="nav-link">Alerts & Info</a>
+            </div>
+
+            <div class="nav-group">
+                <div class="nav-title">Advanced API</div>
+                <a href="#dialogs" class="nav-link">Dialogs & Popups</a>
+                <a href="#configs" class="nav-link">Configs & Settings</a>
+                <a href="#themes" class="nav-link">Theme Management</a>
+                <a href="#utils" class="nav-link">Utility Functions</a>
+            </div>
+        </nav>
+    </aside>
+
+    <main class="main">
+        <div class="container">
+            <!-- INTRODUCTION -->
+            <section id="intro">
+                <h1>NextLevel UI</h1>
+                <p>Version 0.06 is the definitive update to our framework. We've replaced every soft edge with a sharp,
+                    professional finish and expanded the widget library to cover every possible use case for high-end
+                    Roblox executors.</p>
+
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <div class="badge">Performance</div>
+                        <h4>0ms Response</h4>
+                        <p>No more input lag. Every click, drag, and scroll is handled with maximum efficiency.</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="badge">Unique</div>
+                        <h4>Smart Scroll</h4>
+                        <p>Console widget now detects if you're reading old logs and stops forced scrolling
+                            automatically.</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- INSTALLATION -->
+            <section id="install">
+                <h2>Installation</h2>
+                <p>Simply use <code>loadstring</code> to fetch the library. This ensures you always have the latest
+                    visually-beautified version.</p>
+                <pre><code class="language-lua">local Library = loadstring(game:HttpGet("https://gist.githubusercontent.com/Acidgorgon/2c0654b99a77b27e801ca6eb952a1e6c/raw/a887a7de559fc0fc6eb6542066f648a91f8b9e28/UILib"))()</code></pre>
+            </section>
+
+            <!-- INITLOAD -->
+            <section id="init">
+                <h2>The Boot Sequence</h2>
+                <p>Every professional script starts with a great loader. NextLevel's <code>InitLoad</code> is fully
+                    customizable and supports a hidden "Silent Mode".</p>
+
+                <div class="tutorial-step">
+                    <h3>Step 1: The Premium Loader</h3>
+                    <div class="method-signature">Library:InitLoad(options: table)</div>
+                    <pre><code class="language-lua">Library:InitLoad({
+    Title = "NextLevel",
+    SubTitle = "v0.06 Premium",
+    Icon = 89738140174311,          -- asset id
+    Duration = 3,                   -- seconds to stay visible
+    AccentColor = Color3.fromRGB(255, 255, 255),
+    Statuses = {
+        "Checking license...",
+        "Fetching data...",
+        "Injecting..."
+    },
+    Silent = false -- Set to true for stealth execution
+})</code></pre>
+                </div>
+
+                <div class="tutorial-step">
+                    <h3>Step 2: Silent Execution</h3>
+                    <p>If <code>Silent</code> is true (or if the user enabled "Silent Execution" in their saved config),
+                        the loader will be completely skipped and the UI will start hidden.</p>
+                </div>
+            </section>
+
+            <!-- WINDOW & TABS -->
+            <section id="window">
+                <h2>Window & Layout</h2>
+                <p>NextLevel supports a powerful Sidebar navigation system with active tab highlighting.</p>
+
+                <div class="method-signature">Library.new(Name: string, Size: UDim2, KeyBind: Enum, Mode: string, Icon:
+                    number)</div>
+                <pre><code class="language-lua">local Window = Library.new(
+    "NextLevel", 
+    UDim2.fromOffset(540, 580), 
+    Enum.KeyCode.RightControl, 
+    "Sidebar", 
+    89738140174311
+)</code></pre>
+
+                <h3>Creating Tabs & Sections</h3>
+                <pre><code class="language-lua">local Tab = Window:Tab("Combat", 3926307971) -- Tab name and Icon ID
+local Section = Tab:Section("Main Features")  -- Create a categorized group</code></pre>
+            </section>
+
+            <!-- BUTTONS -->
+            <section id="buttons">
+                <h2>Buttons & Multi-Rows</h2>
+                <p>Interactive triggers for your script's logic.</p>
+
+                <div class="method-signature">Section:Button(Text: string, Callback: function)</div>
+                <pre><code class="language-lua">Section:Button("Destroy All", function()
+    print("Action triggered!")
+end)</code></pre>
+
+                <h3>Button Rows</h3>
+                <p>Save vertical space by putting two buttons on a single row.</p>
+                <div class="method-signature">Section:CreateButtonRow(Text1: string, CB1: func, Text2: string, CB2:
+                    func)</div>
+                <pre><code class="language-lua">Section:CreateButtonRow("Accept", function() end, "Decline", function() end)</code></pre>
+            </section>
+
+            <!-- TOGGLES -->
+            <section id="toggles">
+                <h2>Toggles & Switches</h2>
+                <p>Binary state management with persistent flags.</p>
+
+                <h3>Standard Toggle</h3>
+                <pre><code class="language-lua">Section:Toggle("Kill Aura", false, "KAFG", function(state) end)</code></pre>
+
+                <h3>Toggle with Keybind</h3>
+                <p>Allows users to bind a key to toggle the state instantly.</p>
+                <div class="method-signature">Section:ToggleBind(Text, DefaultState, DefaultKey, StateFlag, KeyFlag,
+                    Callback)</div>
+                <pre><code class="language-lua">Section:ToggleBind("Fly", false, Enum.KeyCode.F, "FState", "FKey", function(s, k) end)</code></pre>
+
+                <h3>Modern Switch</h3>
+                <pre><code class="language-lua">Section:Switch("Auto Farm", true, "AFrm", function(state) end)</code></pre>
+            </section>
+
+            <!-- SLIDERS -->
+            <section id="sliders">
+                <h2>Sliders & Steppers</h2>
+                <p>Precise numeric control widgets.</p>
+
+                <h3>Slider</h3>
+                <div class="method-signature">Section:Slider(Label, Min, Max, Default, Decimals, Flag, Callback)</div>
+                <pre><code class="language-lua">Section:Slider("Speed", 16, 100, 16, 0, "SpeedFlag", function(v) end)
+-- Set Decimals to 2 for float values like 0.00</code></pre>
+
+                <h3>Stepper</h3>
+                <p>Perfect for FOV or precise increments.</p>
+                <pre><code class="language-lua">Section:Stepper("Jump Power", 50, 200, 50, 5, "JPFlag", function(v) end)</code></pre>
+            </section>
+
+            <!-- INPUTS -->
+            <section id="inputs">
+                <h2>Inputs & Tag Fields</h2>
+                <p>NextLevel features advanced text entry widgets.</p>
+
+                <h3>Tag Input (Chips)</h3>
+                <p>The <code>TagInput</code> allows users to add multiple "chips" or tags to a list. Perfect for player
+                    ignore-lists.</p>
+                <pre><code class="language-lua">local List = Section:TagInput("Ignore List", {"Admin1"}, 10, "IgnFlag", function(t) end)
+List:AddTag("User2") -- Programmatic addition</code></pre>
+
+                <h3>Multiline Input</h3>
+                <pre><code class="language-lua">Section:MultilineInput("Config Info", "Notes...", 4, "NoteFlag", function(t) end)</code></pre>
+            </section>
+
+            <!-- DROPDOWNS -->
+            <section id="dropdowns">
+                <h2>The Dropdown Suite</h2>
+                <p>Our dropdowns are fully searchable and support multi-selection.</p>
+
+                <h3>Searchable Dropdown</h3>
+                <pre><code class="language-lua">Section:SearchableDropdown("Weapons", {"Sword", "Bow", "Axe"}, "Sword", "WpFlag", function(s) end)</code></pre>
+
+                <h3>Multi-Select Dropdown</h3>
+                <pre><code class="language-lua">Section:Dropdown("Target Elements", {"Fire", "Water", "Ice"}, true, {"Fire"}, "ElFlag", function(s) end)</code></pre>
+
+                <h3>Player Dropdown</h3>
+                <p>Auto-populates with server players and updates when they join/leave.</p>
+                <pre><code class="language-lua">Section:PlayerDropdown("Select Target", false, "PlrFlag", function(name) end)</code></pre>
+            </section>
+
+            <!-- GRIDS & CONSOLES -->
+            <section id="grids">
+                <h2>Grids & Consoles</h2>
+                <p>Visual utility widgets for complex interactions.</p>
+
+                <h3>Smart Console</h3>
+                <p>Our console automatically stops auto-scrolling if you scroll up to read, but resumes if you stay at
+                    the bottom.</p>
+                <pre><code class="language-lua">local Console = Section:Console(120) -- height
+Console:Print("Success", Color3.fromRGB(0,255,100))
+Console:Clear()</code></pre>
+
+                <h3>Action Grid</h3>
+                <pre><code class="language-lua">Section:Grid("Quick Spells", {"Fire", "Frost", "Shield"}, 3, function(id) end)</code></pre>
+
+                <h3>Timer Widget</h3>
+                <p>A live countdown widget with a completion callback.</p>
+                <div class="method-signature">Section:Timer(Label, Duration, AutoStart, Callback)</div>
+                <pre><code class="language-lua">local T = Section:Timer("Round Ends In", 120, true, function() 
+    print("Time is up!")
+end)</code></pre>
+            </section>
+
+            <!-- DATA VIZ -->
+            <section id="data">
+                <h2>Data Visualization</h2>
+                <p>Track your script's performance in real-time.</p>
+
+                <h3>Bar Chart</h3>
+                <pre><code class="language-lua">Section:Chart("Wealth", {
+    {label = "Mon", value = 1500},
+    {label = "Tue", value = 3200}
+}, 90)</code></pre>
+
+                <h3>Status Indicators</h3>
+                <pre><code class="language-lua">local stat = Section:StatusIndicator("Connection", "Stable", Color3.fromRGB(0,255,0))
+stat:Set("High Ping", Color3.fromRGB(255,0,0))</code></pre>
+
+                <h3>Key-Value Table</h3>
+                <pre><code class="language-lua">local table = Section:KeyValueTable({
+    {"Version", "0.06"},
+    {"License", "Premium"}
+})</code></pre>
+            </section>
+
+            <!-- VISUALS -->
+            <section id="visuals">
+                <h2>Visuals & Layout</h2>
+                <p>Structure your UI with clean spacing and descriptive labels.</p>
+
+                <h3>Labels & Paragraphs</h3>
+                <pre><code class="language-lua">Section:Label("Stat: Active")
+Section:Paragraph("This is a longer description that automatically wraps and maintains professional padding.")</code></pre>
+
+                <h3>Dividers & Spacers</h3>
+                <div class="method-signature">Section:Separator(Text)</div>
+                <pre><code class="language-lua">Section:Separator("ACCOUNT SETTINGS") -- Labeled line
+Section:Spacer(10) -- Exact pixel padding</code></pre>
+
+                <h3>Images</h3>
+                <pre><code class="language-lua">Section:Image(89738140174311, Vector2.new(100, 100))</code></pre>
+            </section>
+
+            <!-- ALERTS -->
+            <section id="alerts">
+                <h2>Alerts & Feedback</h2>
+                <p>Communicate state changes clearly to your users.</p>
+
+                <div class="method-signature">Section:Alert(Type, Message)</div>
+                <pre><code class="language-lua">Section:Alert("info", "Your config was loaded.")
+Section:Alert("warn", "This feature is experimental.")
+Section:Alert("error", "Failed to connect to server.")
+Section:Alert("success", "Operation complete!")</code></pre>
+            </section>
+
+            <!-- DIALOGS -->
+            <section id="dialogs">
+                <h2>Dialogs & Popups</h2>
+                <p>Modal overlays for critical user interaction.</p>
+
+                <div class="method-signature">Window:Dialog(Title, Message, Buttons: table, Callback: function)</div>
+                <pre><code class="language-lua">Window:Dialog(
+    "Warning", 
+    "This will reset your data. Continue?", 
+    {"Yes", "No"}, 
+    function(choice)
+        if choice == "Yes" then print("Confirmed") end
+    end
+)</code></pre>
+            </section>
+
+            <!-- CONFIGS -->
+            <section id="configs">
+                <h2>Config System</h2>
+                <p>One line of code to give your users full profile management.</p>
+                <pre><code class="language-lua">Window:BuildSettingsTab()</code></pre>
+                <p>This automatically builds a tab with **Save, Load, Delete, Autoload, and Clipboard Import/Export**
+                    functionality.</p>
+            </section>
+
+            <!-- THEMES -->
+            <section id="themes">
+                <h2>Theme Management</h2>
+                <p>Live, real-time UI skinning for your users.</p>
+                <pre><code class="language-lua">Window:BuildThemeTab()</code></pre>
+                <p>Allows users to edit all 14 core colors of the UI library at once.</p>
+            </section>
+
+            <!-- EXTRA METHODS -->
+            <section id="utils">
+                <h2>Utility & Elite Features</h2>
+                <p>NextLevel v0.06 is designed as a standalone power-tool for players.</p>
+
+                <h3>Webhook Widget</h3>
+                <p>Built-in Discord logging with a "Test" button to verify connections instantly. The widget
+                    automatically handles long URLs by clipping them within the input box.</p>
+                <div class="method-signature">Section:Webhook(Label, Flag, Callback)</div>
+                <pre><code class="language-lua">Section:Webhook("Discord Logger", "WebhookFlag", function(url) 
+    print("User entered webhook:", url)
+end)</code></pre>
+
+                <h3>How to use Webhooks</h3>
+                <p>Webhooks are used to send data (logs, notifications, or player data) from Roblox directly to a
+                    Discord channel.</p>
+                <ol>
+                    <li><b>Create a Webhook:</b> In Discord, go to Server Settings > Integrations > Webhooks > New
+                        Webhook.</li>
+                    <li><b>Copy URL:</b> Copy the Webhook URL and paste it into the UI's Webhook widget.</li>
+                    <li><b>Send Data:</b> Use the following snippet to send logs manually:</li>
+                </ol>
+                <pre><code class="language-lua">local function SendLog(msg)
+    local url = Window.Flags["WebhookFlag"] -- The flag you used in Section:Webhook
+    if url and url ~= "" then
+        request({
+            Url = url,
+            Method = "POST",
+            Headers = { ["Content-Type"] = "application/json" },
+            Body = game:GetService("HttpService"):JSONEncode({
+                content = msg,
+                username = "NextLevel Logs"
+            })
+        })
+    end
+end
+
+-- Example usage:
+SendLog("Player " .. game.Players.LocalPlayer.Name .. " has injected the script!")</code></pre>
+
+                <h3>Notification Log</h3>
+                <p>Never miss a drop. Access every notification sent during your session.</p>
+                <pre><code class="language-lua">Window:BuildNotificationLogTab()</code></pre>
+
+                <h3>Internal Executor</h3>
+                <p>Run Lua code directly inside your UI without opening external windows.</p>
+                <pre><code class="language-lua">Window:BuildExecutorTab()</code></pre>
+
+                <h3>Changelog UI</h3>
+                <p>Professional version tracking for your community.</p>
+                <pre><code class="language-lua">Window:BuildChangelogTab({
+    ["1.0"] = "Initial release",
+    ["1.1"] = "Added Fly"
+})</code></pre>
+
+                <h3>Global Search Engine</h3>
+                <p>The search bar now looks through <b>every tab</b> simultaneously. When you type, tabs containing
+                    matches are highlighted, allowing you to find features across complex setups instantly.</p>
+
+                <h3>Theme Presets</h3>
+                <p>One-click professional aesthetics. Choose from <b>Cyberpunk, Midnight, Toxic, Ocean</b>, and more in
+                    the Theme tab.</p>
+                <div class="method-signature">Library:ApplyPreset(Name: string)</div>
+                <pre><code class="language-lua">Library:ApplyPreset("Cyberpunk")</code></pre>
+
+                <h3>Keybind HUD</h3>
+                <p>A draggable on-screen display showing all your active toggles. Perfect for tracking what cheats are
+                    enabled during gameplay.</p>
+                <div class="method-signature">Window:BuildKeybindHUD()</div>
+
+                <h3>Window Utilities</h3>
+                <p>Advanced methods for managing connections, tooltips, and window state.</p>
+                <div class="method-signature">Window:Connect(signal, callback)</div>
+                <p>Connects a signal and automatically disconnects it when the UI is unloaded.</p>
+
+                <div class="method-signature">Window:OnUnload(callback)</div>
+                <p>Registers a function to be executed when the library is unloaded (via Panic Key or Unload button).
+                    Perfect for stopping loops or resetting player properties.</p>
+
+                <div class="method-signature">Window:AddTooltip(element, text)</div>
+                <p>Adds a hover-to-view description to any UI element.</p>
+
+                <div class="method-signature">Window:SetPanicKey(KeyCode)</div>
+                <p>Set a key that instantly unloads the library when pressed.</p>
+
+                <div class="method-signature">Window:IgnoreFlag(Flag)</div>
+                <p>Excludes a specific flag from being saved in configurations.</p>
+
+                <div class="method-signature">Window:ListConfigs()</div>
+                <p>Returns an array of strings containing all saved configuration names.</p>
+
+                <h3>Audio-Visual Polish</h3>
+                <p>The UI now features <b>Mechanical Click Sounds</b> for every interaction, providing high-quality
+                    tactical feedback.</p>
+            </section>
+
+            <footer>
+                <p>&copy; 2026 NextLevel UI Library. Designed for the NextLevel community.</p>
+            </footer>
+        </div>
+    </main>
+
+    <!-- Prism JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-lua.min.js"></script>
+
+    <script>
+        const sections = document.querySelectorAll('section');
+        const navLinks = document.querySelectorAll('.nav-link');
+        const main = document.querySelector('.main');
+
+        main.addEventListener('scroll', () => {
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (main.scrollTop >= sectionTop - 150) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').includes(current)) {
+                    link.classList.add('active');
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

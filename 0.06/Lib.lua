@@ -122,19 +122,19 @@ local queue_on_teleport = queue_on_teleport or syn and syn.queue_on_teleport or 
 local Library: LibraryModule = {} :: any
 Library.__index = Library
 
-if not getgenv()._Heartkiss_Garbage then
-    getgenv()._Heartkiss_Garbage = {}
+if not getgenv()._NextLevel_Garbage then
+    getgenv()._NextLevel_Garbage = {}
 end
 
 local function CleanID(id: string)
-    if not getgenv()._Heartkiss_Garbage[id] then return end
-    for _, item in ipairs(getgenv()._Heartkiss_Garbage[id]) do
+    if not getgenv()._NextLevel_Garbage[id] then return end
+    for _, item in getgenv()._NextLevel_Garbage[id] do
         if typeof(item) == "RBXScriptConnection" then item:Disconnect()
         elseif typeof(item) == "Instance" then item:Destroy()
         elseif type(item) == "function" then task.spawn(item)
         elseif type(item) == "thread" then task.cancel(item) end
     end
-    getgenv()._Heartkiss_Garbage[id] = nil
+    getgenv()._NextLevel_Garbage[id] = nil
 end
 
 local THEMES = {
@@ -142,6 +142,7 @@ local THEMES = {
     FrameColor       = Color3.fromRGB(20, 20, 20),
     TabColor         = Color3.fromRGB(18, 18, 18),
     LineColor        = Color3.fromRGB(255, 255, 255),
+    AccentColor      = Color3.fromRGB(255, 0, 0), -- Added missing property
     BorderColor      = Color3.fromRGB(40, 40, 40),
     DarkColor        = Color3.fromRGB(10, 10, 10),
     SelectedTab      = Color3.fromRGB(40, 40, 40),
@@ -181,6 +182,15 @@ local function ProtectGui(gui)
 end
 
 function Library:Notify(title: string, text: string, duration: number)
+    if self and self.NotificationHistory then
+        table.insert(self.NotificationHistory, {
+            Title = title,
+            Text = text,
+            Time = os.date("%H:%M:%S")
+        })
+        if #self.NotificationHistory > 100 then table.remove(self.NotificationHistory, 1) end
+    end
+
     if Library.IsSilent then return end
     duration = duration or 3
 
@@ -188,7 +198,7 @@ function Library:Notify(title: string, text: string, duration: number)
 
     if not layout then
         local NotifyGui = Instance.new("ScreenGui")
-        NotifyGui.Name = "Heartkiss_Standalone_Notifications"
+        NotifyGui.Name = "NextLevel_Standalone_Notifications"
         NotifyGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
         ProtectGui(NotifyGui)
         NotifyGui.Parent = CoreGui
@@ -256,16 +266,16 @@ function Library:Notify(title: string, text: string, duration: number)
     TweenService:Create(Desc, tweenIn, {TextTransparency = 0}):Play()
 
     task.delay(duration, function()
-        local tweenOut = TweenInfo.new(0.4, Enum.EasingStyle.Quart, Enum.EasingDirection.In)
-        TweenService:Create(Notif, tweenOut, {Position = UDim2.new(1, 30, 0, 0), BackgroundTransparency = 1}):Play()
+        local tweenOut = TweenInfo.new(0.25, Enum.EasingStyle.Back, Enum.EasingDirection.In)
+        TweenService:Create(Notif, tweenOut, {Position = UDim2.new(1.1, 0, 0, 0), BackgroundTransparency = 1}):Play()
         TweenService:Create(Title, tweenOut, {TextTransparency = 1}):Play()
         TweenService:Create(Desc, tweenOut, {TextTransparency = 1}):Play()
-        task.delay(0.4, function() Holder:Destroy() end)
+        task.delay(0.25, function() Holder:Destroy() end)
     end)
 end
 
 function Library:SetTheme(overrides: table)
-    for k, v in pairs(overrides) do
+    for k, v in overrides do
         if THEMES[k] ~= nil then THEMES[k] = v end
     end
     ThemeEvent:Fire() 
@@ -275,7 +285,7 @@ function Library:ServerHop(placeId, jobId, scriptToQueue)
     if not self.ConfigFolder then return end
 
     local dataToSave = {}
-    for flag, val in pairs(self.Flags) do
+    for flag, val in self.Flags do
         if not self.IgnoredFlags[flag] then dataToSave[flag] = val end
     end
     
@@ -307,7 +317,7 @@ function Library:IgnoreFlag(flag: string)
 end
 
 function Library:AddTooltip(element: GuiObject, tipText: string)
-    local garbage = getgenv()._Heartkiss_Garbage[self.Name]
+    local garbage = getgenv()._NextLevel_Garbage[self.Name]
     local TipFrame = Instance.new("Frame")
     TipFrame.Size = UDim2.new(0, 180, 0, THEMES.BaseHeight + 4)
     TipFrame.BackgroundColor3 = THEMES.MainColor
@@ -352,7 +362,7 @@ end
 function Library:SaveConfig(name: string)
     if not self.ConfigFolder then return end
     local dataToSave = {}
-    for flag, val in pairs(self.Flags) do
+    for flag, val in self.Flags do
         if not self.IgnoredFlags[flag] then dataToSave[flag] = val end
     end
     dataToSave["__WindowPosition"] = {
@@ -374,7 +384,7 @@ function Library:LoadConfig(name: string)
     local path = self.ConfigFolder .. "/" .. name .. ".json"
     if isfile(path) then
         local data = HttpService:JSONDecode(readfile(path))
-        for flag, val in pairs(data) do
+        for flag, val in data do
             if flag == "__WindowPosition" then
                 pcall(function()
                     self.Frames.MainFrame.Position = UDim2.new(0.5, val.X, 0.5, val.Y)
@@ -393,7 +403,7 @@ function Library:ListConfigs()
     if not self.ConfigFolder then return {} end
     local configs = {}
     if isfolder(self.ConfigFolder) then
-        for _, file in ipairs(listfiles(self.ConfigFolder)) do
+        for _, file in listfiles(self.ConfigFolder) do
             if file:sub(-5) == ".json" and not file:find("teleport_state") then
                 local filename = file:match("([^/\\]+)%.json$")
                 if filename then table.insert(configs, filename) end
@@ -404,14 +414,45 @@ function Library:ListConfigs()
 end
 
 function Library.new(Name: string?, Size: UDim2?, KeyBind: (Enum.UserInputType | Enum.KeyCode)?, Mode: string?, Icon: (string|number)?): Window
+    local options = (type(Name) == "table") and Name or {}
     local self = setmetatable({}, Library) :: any
     local WindowRoot = self
     local isSidebar = (Mode == "Sidebar")
 
+    self.Name         = options.Title or options.Name or Name or "NextLevel"
+    self.Size         = options.Size or Size or UDim2.fromOffset(520, 560)
+    self.CurrentWidth = self.Size.X.Offset
+    self.CurrentHeight= self.Size.Y.Offset
+    self.Tabs         = {}
+    self.KeyBind      = options.KeyBind or KeyBind or Enum.KeyCode.RightControl
+    self.Flags        = {}
+    self.Setters      = {}
+    self.SearchData     = {}
+    self.BoundElements  = {}
+    self.IgnoredFlags   = {}
+    self.IsSilent       = Library.IsSilent or false
+    
+    self.Presets = {
+        ["Cyberpunk"] = { MainColor = Color3.fromRGB(5, 5, 5), AccentColor = Color3.fromRGB(0, 255, 255), LineColor = Color3.fromRGB(255, 0, 255) },
+        ["Midnight"]  = { MainColor = Color3.fromRGB(10, 10, 15), AccentColor = Color3.fromRGB(120, 80, 255), LineColor = Color3.fromRGB(150, 100, 255) },
+        ["Toxic"]     = { MainColor = Color3.fromRGB(5, 5, 5), AccentColor = Color3.fromRGB(170, 255, 0), LineColor = Color3.fromRGB(150, 200, 0) },
+        ["Ocean"]     = { MainColor = Color3.fromRGB(10, 15, 20), AccentColor = Color3.fromRGB(0, 180, 255), LineColor = Color3.fromRGB(0, 150, 255) },
+        ["Classic"]   = { MainColor = Color3.fromRGB(10, 10, 10), AccentColor = Color3.fromRGB(255, 0, 0), LineColor = Color3.fromRGB(200, 0, 0) },
+        ["Ghost"]     = { MainColor = Color3.fromRGB(15, 15, 15), AccentColor = Color3.fromRGB(255, 255, 255), LineColor = Color3.fromRGB(180, 180, 180) }
+    }
+    self.NotificationHistory = {}
+
+    CleanID(self.Name)
+    getgenv()._NextLevel_Garbage[self.Name] = {}
+
     function self:Connect(signal, callback)
         local connection = signal:Connect(callback)
-        table.insert(getgenv()._Heartkiss_Garbage[self.Name], connection)
+        table.insert(getgenv()._NextLevel_Garbage[self.Name], connection)
         return connection
+    end
+
+    function self:OnUnload(callback: () -> ())
+        table.insert(getgenv()._NextLevel_Garbage[self.Name], callback)
     end
 
     function self:Theme(instance, prop, key)
@@ -421,6 +462,40 @@ function Library.new(Name: string?, Size: UDim2?, KeyBind: (Enum.UserInputType |
                 TweenService:Create(instance, TweenInfo.new(0.2), {[prop] = THEMES[key]}):Play()
             end
         end)
+    end
+
+    function self:SetTheme(themeData)
+        for key, value in themeData do
+            if THEMES[key] ~= nil then
+                THEMES[key] = value
+                -- Update the flag if it exists so configs can save it
+                local flag = "Theme_" .. key
+                if self.Setters[flag] then
+                    self.Setters[flag](value)
+                else
+                    self.Flags[flag] = value
+                end
+            end
+        end
+        ThemeEvent:Fire()
+    end
+
+    function self:ApplyPreset(name)
+        local colors = self.Presets[name]
+        if colors then
+            self:SetTheme(colors)
+            self:Notify("Theme Applied", "Switched to " .. name .. " preset.", 2)
+        end
+    end
+
+    local ClickSound = Instance.new("Sound")
+    ClickSound.SoundId = "rbxassetid://6895079853" -- Subtle click sound
+    ClickSound.Volume = 0.5
+    ClickSound.Parent = game:GetService("SoundService")
+    self.ClickSound = ClickSound
+
+    local function PlayClick()
+        if not Library.IsSilent then ClickSound:Play() end
     end
 
     local function CreateButton()
@@ -454,17 +529,6 @@ function Library.new(Name: string?, Size: UDim2?, KeyBind: (Enum.UserInputType |
         return Btn
     end
 
-    self.Name         = Name or "Heartkiss"
-    self.Size         = Size or UDim2.fromOffset(520, 560)
-    self.CurrentWidth = self.Size.X.Offset
-    self.CurrentHeight= self.Size.Y.Offset
-    self.Tabs         = {}
-    self.KeyBind      = KeyBind or Enum.KeyCode.RightControl
-    self.Flags        = {}
-    self.Setters      = {}
-    self.SearchData   = {} 
-    self.IgnoredFlags = {}
-    self.BoundElements= {} 
     self.ConfigFolder = self.Name .. "_Configs"
     
     local SafeFolderName = string.gsub(self.Name, "[<>:\"/\\|?*]", "")
@@ -476,9 +540,7 @@ function Library.new(Name: string?, Size: UDim2?, KeyBind: (Enum.UserInputType |
     if not isfolder(BaseFolder) then makefolder(BaseFolder) end
     if not isfolder(self.ConfigFolder) then makefolder(self.ConfigFolder) end
 
-    CleanID(self.Name)
-    getgenv()._Heartkiss_Garbage[self.Name] = {}
-    local garbage = getgenv()._Heartkiss_Garbage[self.Name]
+    local garbage = getgenv()._NextLevel_Garbage[self.Name]
 
     -- CORE GUI
     local ScreenGui = Instance.new("ScreenGui")
@@ -518,7 +580,7 @@ function Library.new(Name: string?, Size: UDim2?, KeyBind: (Enum.UserInputType |
     MainFrame.BorderSizePixel = 0
     MainFrame.Position = UDim2.new(0.5, -self.Size.X.Offset/2, 0.5, -self.Size.Y.Offset/2)
     MainFrame.Size = UDim2.new(0, self.CurrentWidth, 0, self.CurrentHeight)
-    MainFrame.ClipsDescendants = false
+    MainFrame.ClipsDescendants = true
     MainFrame.ZIndex = 1
     MainFrame.Parent = ScreenGui
     CreateGradient(MainFrame)
@@ -786,15 +848,29 @@ function Library.new(Name: string?, Size: UDim2?, KeyBind: (Enum.UserInputType |
     CreateGradient(SearchBox)
 
     self:Connect(SearchBox:GetPropertyChangedSignal("Text"), function()
-        local q = SearchBox.Text:lower()
-        for _, sectionData in ipairs(WindowRoot.SearchData) do
-            local hasVisibleElement = false
-            for _, item in ipairs(sectionData.Elements) do
-                local match = (q == "") or item.SearchText:find(q, 1, true)
-                item.Element.Visible = match
-                if match then hasVisibleElement = true end
+        local query = SearchBox.Text:lower()
+        local hasQuery = query ~= ""
+        
+        for _, tabObj in self.Tabs do
+            local tabHasMatch = false
+            for _, secData in self.SearchData do
+                local isChild = (secData.Section.Parent.Parent == tabObj.Page)
+                if isChild then
+                    local secMatches = false
+                    for _, elemData in secData.Elements do
+                        local match = elemData.SearchText:find(query)
+                        elemData.Element.Visible = (not hasQuery or match ~= nil)
+                        if match then secMatches = true end
+                    end
+                    secData.Section.Visible = (not hasQuery or secMatches)
+                    if secMatches then tabHasMatch = true end
+                end
             end
-            sectionData.Section.Visible = hasVisibleElement
+            if hasQuery then
+                tabObj.Button.BackgroundTransparency = tabHasMatch and 0 or 0.7
+            else
+                tabObj.Button.BackgroundTransparency = 0
+            end
         end
     end)
 
@@ -873,7 +949,7 @@ function Library.new(Name: string?, Size: UDim2?, KeyBind: (Enum.UserInputType |
 
     -- WATERMARK
     local WatermarkGui = Instance.new("ScreenGui")
-    WatermarkGui.Name = "Heartkiss_Watermark"
+    WatermarkGui.Name = "NextLevel_Watermark"
     WatermarkGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
     WatermarkGui.Enabled = not Library.IsSilent
     ProtectGui(WatermarkGui)
@@ -923,11 +999,9 @@ function Library.new(Name: string?, Size: UDim2?, KeyBind: (Enum.UserInputType |
         WMText.Text = string.format("%s | %d FPS | %d ms", Name, fps, ping)
     end)
 
-    -- ACTIVE KEYBINDS
     local KeybindGui = Instance.new("ScreenGui")
-    KeybindGui.Name = "Heartkiss_Keybinds"
+    KeybindGui.Name = "NextLevel_Keybinds"
     KeybindGui.ZIndexBehavior = Enum.ZIndexBehavior.Global
-    KeybindGui.Enabled = not Library.IsSilent
     ProtectGui(KeybindGui)
     KeybindGui.Parent = CoreGui
     table.insert(garbage, KeybindGui)
@@ -936,44 +1010,51 @@ function Library.new(Name: string?, Size: UDim2?, KeyBind: (Enum.UserInputType |
     local KBMain = Instance.new("Frame")
     KBMain.Size = UDim2.new(0, 180, 0, 30)
     KBMain.Position = UDim2.new(1, -200, 0.5, -100)
-    WindowRoot:Theme(KBMain, "BackgroundColor3", "MainColor")
-    WindowRoot:Theme(KBMain, "BorderColor3", "LineColor")
+    KBMain.BackgroundColor3 = THEMES.MainColor
+    KBMain.BorderColor3 = THEMES.AccentColor
+    KBMain.Visible = false
     KBMain.Parent = KeybindGui
     CreateGradient(KBMain)
+    RoundCorner(KBMain, 4)
+
+    local KBStroke = Instance.new("UIStroke")
+    KBStroke.Color = THEMES.AccentColor
+    KBStroke.Thickness = 1
+    KBStroke.Parent = KBMain
 
     local KBTitle = Instance.new("TextLabel")
     KBTitle.Size = UDim2.new(1, 0, 0, 24)
-    KBTitle.Text = " Active Keybinds "
-    WindowRoot:Theme(KBTitle, "TextColor3", "TextColor")
+    KBTitle.Text = "  Active Keybinds"
+    KBTitle.TextColor3 = THEMES.AccentColor
     KBTitle.BackgroundTransparency = 1
-    KBTitle.Font = Enum.Font.SourceSansBold
-    KBTitle.TextSize = THEMES.TextSize + 1
+    KBTitle.Font = Enum.Font.Code
+    KBTitle.TextSize = 12
+    KBTitle.TextXAlignment = Enum.TextXAlignment.Left
+    KBTitle.ZIndex = 5
     KBTitle.Parent = KBMain
 
     local KBContainer = Instance.new("Frame")
-    KBContainer.Size = UDim2.new(1, -10, 1, -30)
-    KBContainer.Position = UDim2.new(0, 5, 0, 26)
+    KBContainer.Size = UDim2.new(1, -10, 1, -26)
+    KBContainer.Position = UDim2.new(0, 5, 0, 24)
     KBContainer.BackgroundTransparency = 1
     KBContainer.Parent = KBMain
 
     local KBList = Instance.new("UIListLayout")
-    KBList.Padding = UDim.new(0, 4)
+    KBList.Padding = UDim.new(0, 2)
     KBList.Parent = KBContainer
 
     self:Connect(KBList:GetPropertyChangedSignal("AbsoluteContentSize"), function()
-        TweenService:Create(KBMain, TweenInfo.new(0.2), {Size = UDim2.new(0, 180, 0, KBList.AbsoluteContentSize.Y + 35)}):Play()
+        KBMain.Size = UDim2.new(0, 180, 0, KBList.AbsoluteContentSize.Y + 30)
     end)
 
     local kbDragging, kbDragInput, kbDragStart, kbStartPos
     self:Connect(KBMain.InputBegan, function(input)
         if input.UserInputType == Enum.UserInputType.MouseButton1 then
             kbDragging = true; kbDragStart = input.Position; kbStartPos = KBMain.Position
+            input.Changed:Connect(function() if input.UserInputState == Enum.UserInputState.End then kbDragging = false end end)
         end
     end)
-    self:Connect(KBMain.InputEnded, function(input)
-        if input.UserInputType == Enum.UserInputType.MouseButton1 then kbDragging = false end
-    end)
-    self:Connect(UserInputService.InputChanged, function(input)
+    self:Connect(KBMain.InputChanged, function(input)
         if input.UserInputType == Enum.UserInputType.MouseMovement then kbDragInput = input end
     end)
     self:Connect(RunService.RenderStepped, function()
@@ -984,79 +1065,138 @@ function Library.new(Name: string?, Size: UDim2?, KeyBind: (Enum.UserInputType |
     end)
 
     function self:UpdateKeybinds()
-        for _, child in ipairs(KBContainer:GetChildren()) do if child:IsA("TextLabel") then child:Destroy() end end
-        for name, state in pairs(self.BoundElements) do
+        for _, child in KBContainer:GetChildren() do if child:IsA("TextLabel") then child:Destroy() end end
+        local count = 0
+        for name, state in self.BoundElements do
             if state == true then
+                count = count + 1
                 local Lbl = Instance.new("TextLabel")
-                Lbl.Size = UDim2.new(1, 0, 0, 18)
+                Lbl.Size = UDim2.new(1, 0, 0, 16)
                 Lbl.BackgroundTransparency = 1
                 Lbl.Text = "[+] " .. name
-                WindowRoot:Theme(Lbl, "TextColor3", "SubTextColor")
+                Lbl.TextColor3 = THEMES.TextColor
                 Lbl.Font = Enum.Font.Code
-                Lbl.TextSize = THEMES.TextSize - 1
+                Lbl.TextSize = 11
                 Lbl.TextXAlignment = Enum.TextXAlignment.Left
+                Lbl.ZIndex = 5
                 Lbl.Parent = KBContainer
             end
         end
+        if count == 0 then
+            local Lbl = Instance.new("TextLabel")
+            Lbl.Size = UDim2.new(1, 0, 0, 16)
+            Lbl.BackgroundTransparency = 1
+            Lbl.Text = "None"
+            Lbl.TextColor3 = THEMES.SubTextColor
+            Lbl.Font = Enum.Font.Code
+            Lbl.TextSize = 11
+            Lbl.TextXAlignment = Enum.TextXAlignment.Center
+            Lbl.ZIndex = 5
+            Lbl.Parent = KBContainer
+        end
+        local show = (self.Flags["ShowKeybinds"] ~= false)
+        KBMain.Visible = show
     end
 
     self:Connect(ThemeEvent.Event, function()
         self:UpdateKeybinds()
+        -- Update HUD visuals to match theme
+        KBMain.BackgroundColor3 = THEMES.MainColor
+        KBMain.BorderColor3 = THEMES.AccentColor
+        KBStroke.Color = THEMES.AccentColor
+        KBTitle.TextColor3 = THEMES.AccentColor
     end)
 
     function self:Tab(text: string, iconId: (string|number)?): Tab
         local Tab = Instance.new("TextButton")
+        local TabIcon = nil
         Tab.Name = text
         WindowRoot:Theme(Tab, "BorderColor3", "BorderColor")
         
-        local TabIcon
+        local Page = Instance.new("ScrollingFrame")
+        local Highlight = Instance.new("Frame")
+
         if isSidebar then
-            Tab.Size = UDim2.new(1, -10, 0, 28)
+            Tab.Size = UDim2.new(1, -10, 0, 30)
             Tab.Position = UDim2.new(0, 5, 0, 0)
             Tab.TextXAlignment = Enum.TextXAlignment.Left
-            Tab.BackgroundTransparency = 0
+            Tab.BackgroundTransparency = 1
             WindowRoot:Theme(Tab, "BackgroundColor3", "TabColor")
             WindowRoot:Theme(Tab, "TextColor3", "TextColor")
+            
+            local TabBg = Instance.new("Frame")
+            TabBg.Name = "Bg"
+            TabBg.Size = UDim2.new(1, 0, 1, 0)
+            TabBg.BackgroundColor3 = THEMES.SelectedTab
+            TabBg.BackgroundTransparency = 1
+            TabBg.BorderSizePixel = 0
+            TabBg.ZIndex = Tab.ZIndex - 1
+            TabBg.Parent = Tab
+            RoundCorner(TabBg, 4)
             
             if iconId then
                 Tab.Text = "        " .. text 
                 TabIcon = Instance.new("ImageLabel")
                 TabIcon.Name = "TabIcon"
                 TabIcon.Size = UDim2.new(0, 16, 0, 16)
-                TabIcon.Position = UDim2.new(0, 8, 0.5, -8)
+                TabIcon.Position = UDim2.new(0, 10, 0.5, -8)
                 TabIcon.BackgroundTransparency = 1
                 TabIcon.Image = type(iconId) == "number" and "rbxassetid://"..tostring(iconId) or iconId
-                WindowRoot:Theme(TabIcon, "ImageColor3", "TextColor")
+                WindowRoot:Theme(TabIcon, "ImageColor3", "SubTextColor")
                 TabIcon.ZIndex = 5
                 TabIcon.Parent = Tab
             else
-                Tab.Text = "  " .. text
+                Tab.Text = "    " .. text
             end
             
-            local Highlight = Instance.new("Frame")
             Highlight.Name = "Highlight"
-            Highlight.Size = UDim2.new(0, 2, 0.6, 0)
-            Highlight.Position = UDim2.new(0, 0, 0.2, 0)
-            WindowRoot:Theme(Highlight, "BackgroundColor3", "LineColor")
+            Highlight.Size = UDim2.new(0, 3, 0, 0)
+            Highlight.Position = UDim2.new(0, 0, 0.5, 0)
+            Highlight.BackgroundColor3 = THEMES.AccentColor
             Highlight.BorderSizePixel = 0
-            Highlight.Visible = false
             Highlight.ZIndex = 5
             Highlight.Parent = Tab
+            RoundCorner(Highlight, 2)
+            WindowRoot:Theme(Highlight, "BackgroundColor3", "AccentColor")
+
+            WindowRoot:Theme(Highlight, "BackgroundColor3", "AccentColor")
+
+            local isHovering = false
+            Tab.MouseEnter:Connect(function()
+                isHovering = true
+                if not Page.Visible then
+                    TweenService:Create(Tab, TweenInfo.new(0.2), {TextColor3 = THEMES.TextColor}):Play()
+                    TweenService:Create(TabBg, TweenInfo.new(0.2), {BackgroundTransparency = 0.9}):Play()
+                    if TabIcon then TweenService:Create(TabIcon, TweenInfo.new(0.2), {ImageColor3 = THEMES.TextColor}):Play() end
+                end
+            end)
+            Tab.MouseLeave:Connect(function()
+                isHovering = false
+                if not Page.Visible then
+                    TweenService:Create(Tab, TweenInfo.new(0.2), {TextColor3 = THEMES.SubTextColor}):Play()
+                    TweenService:Create(TabBg, TweenInfo.new(0.2), {BackgroundTransparency = 1}):Play()
+                    if TabIcon then TweenService:Create(TabIcon, TweenInfo.new(0.2), {ImageColor3 = THEMES.SubTextColor}):Play() end
+                end
+            end)
         else
-            WindowRoot:Theme(Tab, "TextColor3", "TextColor")
-            WindowRoot:Theme(Tab, "BackgroundColor3", "TabColor")
-            Tab.Size = UDim2.new(0, 60, 0.5, 0)
-            Tab.Text = " " .. text .. " "
-            CreateGradient(Tab, -90)
+            Tab.Size = UDim2.new(0, 80, 1, 0)
+            Tab.Text = text
+            Tab.BackgroundTransparency = 1
+            WindowRoot:Theme(Tab, "TextColor3", "SubTextColor")
+            
+            Highlight.Name = "Highlight"
+            Highlight.Size = UDim2.new(0.6, 0, 0, 2)
+            Highlight.Position = UDim2.new(0.2, 0, 1, -2)
+            Highlight.BackgroundColor3 = THEMES.AccentColor
+            Highlight.BorderSizePixel = 0
+            Highlight.BackgroundTransparency = 1
+            Highlight.ZIndex = 5
+            Highlight.Parent = Tab
+            RoundCorner(Highlight, 2)
+            WindowRoot:Theme(Highlight, "BackgroundColor3", "AccentColor")
         end
         
-        Tab.Font = Enum.Font.Code
-        Tab.TextScaled = false
-        Tab.TextSize = THEMES.TextSize + 1
-        Tab.ZIndex = 3
-        Tab.Parent = ScrollingFrame
-
-        local Page = Instance.new("ScrollingFrame")
+        
         if isSidebar then
             Page.Size = UDim2.new(1, 0, 1, 0)
             Page.Position = UDim2.new(0, 0, 0, 0)
@@ -1074,19 +1214,41 @@ function Library.new(Name: string?, Size: UDim2?, KeyBind: (Enum.UserInputType |
         Page.ZIndex = 3
         Page.Parent = FrameHolder
 
+        Tab.Font = Enum.Font.GothamMedium
+        Tab.TextSize = THEMES.TextSize
+        Tab.ZIndex = 3
+        Tab.Parent = ScrollingFrame
+
         WindowRoot:Connect(ThemeEvent.Event, function()
+            local isActive = Page.Visible
             if isSidebar then
-                local color = Page.Visible and THEMES.LineColor or THEMES.TextColor
-                TweenService:Create(Tab, TweenInfo.new(0.2), {
-                    BackgroundColor3 = Page.Visible and THEMES.SelectedTab or THEMES.TabColor,
-                    TextColor3 = color
-                }):Play()
+                local targetColor = isActive and THEMES.TextColor or THEMES.SubTextColor
+                local bgTrans = isActive and 0.85 or 1
                 
-                if Tab:FindFirstChild("TabIcon") then
-                    TweenService:Create(Tab.TabIcon, TweenInfo.new(0.2), {ImageColor3 = color}):Play()
+                TweenService:Create(Tab, TweenInfo.new(0.2), {TextColor3 = targetColor}):Play()
+                if Tab:FindFirstChild("Bg") then
+                    TweenService:Create(Tab.Bg, TweenInfo.new(0.2), {BackgroundTransparency = bgTrans}):Play()
+                end
+                if TabIcon then
+                    TweenService:Create(TabIcon, TweenInfo.new(0.2), {ImageColor3 = targetColor}):Play()
+                end
+                if Tab:FindFirstChild("Highlight") then
+                    TweenService:Create(Tab.Highlight, TweenInfo.new(0.3, Enum.EasingStyle.Quart), {
+                        Size = isActive and UDim2.new(0, 3, 0.6, 0) or UDim2.new(0, 3, 0, 0),
+                        Position = isActive and UDim2.new(0, 0, 0.2, 0) or UDim2.new(0, 0, 0.5, 0),
+                        BackgroundTransparency = isActive and 0 or 1
+                    }):Play()
                 end
             else
-                TweenService:Create(Tab, TweenInfo.new(0.2), {BackgroundColor3 = Page.Visible and THEMES.SelectedTab or THEMES.TabColor}):Play()
+                local targetColor = isActive and THEMES.TextColor or THEMES.SubTextColor
+                TweenService:Create(Tab, TweenInfo.new(0.2), {TextColor3 = targetColor}):Play()
+                if Tab:FindFirstChild("Highlight") then
+                    TweenService:Create(Tab.Highlight, TweenInfo.new(0.3), {
+                        BackgroundTransparency = isActive and 0 or 1,
+                        Size = isActive and UDim2.new(0.6, 0, 0, 2) or UDim2.new(0, 0, 0, 2),
+                        Position = isActive and UDim2.new(0.2, 0, 1, -2) or UDim2.new(0.5, 0, 1, -2)
+                    }):Play()
+                end
             end
         end)
 
@@ -1121,37 +1283,75 @@ function Library.new(Name: string?, Size: UDim2?, KeyBind: (Enum.UserInputType |
         RightList:GetPropertyChangedSignal("AbsoluteContentSize"):Connect(UpdateCanvas)
 
         self:Connect(Tab.MouseButton1Click, function()
+            PlayClick()
             for _, tabObj in self.Tabs do
                 tabObj.Page.Visible = false
+                local t = tabObj.Button
                 if isSidebar then
-                    tabObj.Button.TextColor3 = THEMES.TextColor
-                    tabObj.Button.BackgroundColor3 = THEMES.TabColor
-                    if tabObj.Button:FindFirstChild("TabIcon") then tabObj.Button.TabIcon.ImageColor3 = THEMES.TextColor end
-                    if tabObj.Button:FindFirstChild("Highlight") then tabObj.Button.Highlight.Visible = false end
+                    TweenService:Create(t, TweenInfo.new(0.2), {TextColor3 = THEMES.SubTextColor}):Play()
+                    if t:FindFirstChild("Bg") then TweenService:Create(t.Bg, TweenInfo.new(0.2), {BackgroundTransparency = 1}):Play() end
+                    if t:FindFirstChild("TabIcon") then TweenService:Create(t.TabIcon, TweenInfo.new(0.2), {ImageColor3 = THEMES.SubTextColor}):Play() end
+                    if t:FindFirstChild("Highlight") then 
+                        TweenService:Create(t.Highlight, TweenInfo.new(0.3, Enum.EasingStyle.Quart), {
+                            Size = UDim2.new(0, 3, 0, 0),
+                            Position = UDim2.new(0, 0, 0.5, 0),
+                            BackgroundTransparency = 1
+                        }):Play()
+                    end
                 else
-                    tabObj.Button.BackgroundColor3 = THEMES.TabColor
+                    TweenService:Create(t, TweenInfo.new(0.2), {TextColor3 = THEMES.SubTextColor}):Play()
+                    if t:FindFirstChild("Highlight") then
+                        TweenService:Create(t.Highlight, TweenInfo.new(0.3), {
+                            BackgroundTransparency = 1,
+                            Size = UDim2.new(0, 0, 0, 2),
+                            Position = UDim2.new(0.5, 0, 1, -2)
+                        }):Play()
+                    end
                 end
             end
+            
             Page.Visible = true
             if isSidebar then
-                Tab.TextColor3 = THEMES.LineColor
-                Tab.BackgroundColor3 = THEMES.SelectedTab
-                if Tab:FindFirstChild("TabIcon") then Tab.TabIcon.ImageColor3 = THEMES.LineColor end
-                if Tab:FindFirstChild("Highlight") then Tab.Highlight.Visible = true end
+                TweenService:Create(Tab, TweenInfo.new(0.2), {TextColor3 = THEMES.TextColor}):Play()
+                if Tab:FindFirstChild("Bg") then TweenService:Create(Tab.Bg, TweenInfo.new(0.2), {BackgroundTransparency = 0.85}):Play() end
+                if TabIcon then TweenService:Create(TabIcon, TweenInfo.new(0.2), {ImageColor3 = THEMES.TextColor}):Play() end
+                if Tab:FindFirstChild("Highlight") then
+                    TweenService:Create(Tab.Highlight, TweenInfo.new(0.3, Enum.EasingStyle.Quart), {
+                        Size = UDim2.new(0, 3, 0.6, 0),
+                        Position = UDim2.new(0, 0, 0.2, 0),
+                        BackgroundTransparency = 0
+                    }):Play()
+                end
             else
-                Tab.BackgroundColor3 = THEMES.SelectedTab
+                TweenService:Create(Tab, TweenInfo.new(0.2), {TextColor3 = THEMES.TextColor}):Play()
+                if Tab:FindFirstChild("Highlight") then
+                    TweenService:Create(Tab.Highlight, TweenInfo.new(0.3), {
+                        BackgroundTransparency = 0,
+                        Size = UDim2.new(0.6, 0, 0, 2),
+                        Position = UDim2.new(0.2, 0, 1, -2)
+                    }):Play()
+                end
             end
         end)
 
         if #self.Tabs == 0 then
             Page.Visible = true
             if isSidebar then
-                Tab.TextColor3 = THEMES.LineColor
-                Tab.BackgroundColor3 = THEMES.SelectedTab
-                if Tab:FindFirstChild("TabIcon") then Tab.TabIcon.ImageColor3 = THEMES.LineColor end
-                if Tab:FindFirstChild("Highlight") then Tab.Highlight.Visible = true end
+                Tab.TextColor3 = THEMES.TextColor
+                if Tab:FindFirstChild("Bg") then Tab.Bg.BackgroundTransparency = 0.85 end
+                if TabIcon then TabIcon.ImageColor3 = THEMES.TextColor end
+                if Tab:FindFirstChild("Highlight") then
+                    Tab.Highlight.Size = UDim2.new(0, 3, 0.6, 0)
+                    Tab.Highlight.Position = UDim2.new(0, 0, 0.2, 0)
+                    Tab.Highlight.BackgroundTransparency = 0
+                end
             else
-                Tab.BackgroundColor3 = THEMES.SelectedTab
+                Tab.TextColor3 = THEMES.TextColor
+                if Tab:FindFirstChild("Highlight") then
+                    Tab.Highlight.BackgroundTransparency = 0
+                    Tab.Highlight.Size = UDim2.new(0.6, 0, 0, 2)
+                    Tab.Highlight.Position = UDim2.new(0.2, 0, 1, -2)
+                end
             end
         end
         table.insert(self.Tabs, {Button = Tab, Page = Page})
@@ -1223,7 +1423,10 @@ function Library.new(Name: string?, Size: UDim2?, KeyBind: (Enum.UserInputType |
                 Btn.LayoutOrder = ElementCount
                 Btn.ZIndex = 4
                 Btn.Parent = Container
-                WindowRoot:Connect(Btn.MouseButton1Click, callback)
+                WindowRoot:Connect(Btn.MouseButton1Click, function()
+                    PlayClick()
+                    callback()
+                end)
                 RegisterSearch(Btn, text)
                 return Btn
             end
@@ -1240,6 +1443,7 @@ function Library.new(Name: string?, Size: UDim2?, KeyBind: (Enum.UserInputType |
                 local Btn1 = CreateButton()
                 Btn1.Size = UDim2.new(0.5, -3, 1, 0)
                 Btn1.Text = text1
+                Btn1.ClipsDescendants = true
                 Btn1.ZIndex = 4
                 Btn1.Parent = RowFrame
 
@@ -1247,11 +1451,12 @@ function Library.new(Name: string?, Size: UDim2?, KeyBind: (Enum.UserInputType |
                 Btn2.Size = UDim2.new(0.5, -3, 1, 0)
                 Btn2.Position = UDim2.new(0.5, 3, 0, 0)
                 Btn2.Text = text2
+                Btn2.ClipsDescendants = true
                 Btn2.ZIndex = 4
                 Btn2.Parent = RowFrame
 
-                WindowRoot:Connect(Btn1.MouseButton1Click, callback1)
-                WindowRoot:Connect(Btn2.MouseButton1Click, callback2)
+                WindowRoot:Connect(Btn1.MouseButton1Click, function() PlayClick(); callback1() end)
+                WindowRoot:Connect(Btn2.MouseButton1Click, function() PlayClick(); callback2() end)
                 RegisterSearch(RowFrame, text1 .. " " .. text2)
                 return Btn1, Btn2
             end
@@ -1973,7 +2178,7 @@ function Library.new(Name: string?, Size: UDim2?, KeyBind: (Enum.UserInputType |
                 WindowRoot:Connect(ThemeEvent.Event, function()
                     TweenService:Create(TitleLbl, TweenInfo.new(0.2), {TextColor3 = THEMES.TextColor}):Play()
                     TweenService:Create(Icon, TweenInfo.new(0.2), {TextColor3 = THEMES.LineColor}):Play()
-                    for _, btn in ipairs(OptionContainer:GetChildren()) do
+                    for _, btn in OptionContainer:GetChildren() do
                         if btn:IsA("TextButton") then
                             local targetColor = THEMES.TextColor
                             if multi and table.find(selectedValues, btn.Text) then
@@ -2133,7 +2338,7 @@ function Library.new(Name: string?, Size: UDim2?, KeyBind: (Enum.UserInputType |
                         TextColor3 = THEMES.TextColor,
                         PlaceholderColor3 = THEMES.SubTextColor
                     }):Play()
-                    for _, btn in ipairs(OptionContainer:GetChildren()) do
+                    for _, btn in OptionContainer:GetChildren() do
                         if btn:IsA("TextButton") then
                             local targetColor = (selected == btn.Text) and THEMES.LineColor or THEMES.TextColor
                             TweenService:Create(btn, TweenInfo.new(0.2), {TextColor3 = targetColor}):Play()
@@ -2155,7 +2360,7 @@ function Library.new(Name: string?, Size: UDim2?, KeyBind: (Enum.UserInputType |
                 
                 local function UpdatePlayerList()
                     local list = {}
-                    for _, p in ipairs(Players:GetPlayers()) do
+                    for _, p in Players:GetPlayers() do
                         if includeSelf or p ~= Players.LocalPlayer then
                             table.insert(list, p.Name)
                         end
@@ -2205,7 +2410,7 @@ function Library.new(Name: string?, Size: UDim2?, KeyBind: (Enum.UserInputType |
 
                 local dots, labels = {}, {}
 
-                for i, opt in ipairs(options) do
+                for i, opt in options do
                     local RowBtn = Instance.new("TextButton")
                     RowBtn.Size = UDim2.new(1, 0, 0, THEMES.BaseHeight - 2)
                     RowBtn.Position = UDim2.new(0, 0, 0, headerH + (i - 1) * THEMES.BaseHeight)
@@ -2238,7 +2443,7 @@ function Library.new(Name: string?, Size: UDim2?, KeyBind: (Enum.UserInputType |
                     labels[opt] = OptLbl
 
                     WindowRoot:Connect(RowBtn.MouseButton1Click, function()
-                        for k, dot in pairs(dots) do
+                        for k, dot in dots do
                             TweenService:Create(dot, TweenInfo.new(0.15), {BackgroundColor3 = THEMES.FrameColor}):Play()
                             labels[k].TextColor3 = THEMES.SubTextColor
                         end
@@ -2252,7 +2457,7 @@ function Library.new(Name: string?, Size: UDim2?, KeyBind: (Enum.UserInputType |
 
                 if flag then
                     WindowRoot.Setters[flag] = function(val)
-                        for k, dot in pairs(dots) do
+                        for k, dot in dots do
                             TweenService:Create(dot, TweenInfo.new(0.15), {BackgroundColor3 = THEMES.FrameColor}):Play()
                             labels[k].TextColor3 = THEMES.SubTextColor
                         end
@@ -2271,7 +2476,7 @@ function Library.new(Name: string?, Size: UDim2?, KeyBind: (Enum.UserInputType |
                     if HeaderLbl then 
                         TweenService:Create(HeaderLbl, TweenInfo.new(0.2), {TextColor3 = THEMES.TextColor}):Play() 
                     end
-                    for opt, dot in pairs(dots) do
+                    for opt, dot in dots do
                         TweenService:Create(dot, TweenInfo.new(0.2), {
                             BackgroundColor3 = (opt == selected) and THEMES.LineColor or THEMES.FrameColor,
                             BorderColor3 = THEMES.BorderColor
@@ -2347,15 +2552,25 @@ function Library.new(Name: string?, Size: UDim2?, KeyBind: (Enum.UserInputType |
                 SVBox.ZIndex = 5
                 SVBox.Parent = Body
 
+                local SatOverlay = Instance.new("Frame")
+                SatOverlay.Size = UDim2.new(1, 0, 1, 0)
+                SatOverlay.BackgroundColor3 = Color3.new(1, 1, 1)
+                SatOverlay.BorderSizePixel = 0
+                SatOverlay.ZIndex = 6
+                SatOverlay.Parent = SVBox
+
                 local SatGradient = Instance.new("UIGradient")
-                SatGradient.Transparency = NumberSequence.new{NumberSequenceKeypoint.new(0, 0), NumberSequenceKeypoint.new(1, 1)}
-                SatGradient.Parent = SVBox
+                SatGradient.Transparency = NumberSequence.new{
+                    NumberSequenceKeypoint.new(0, 0), 
+                    NumberSequenceKeypoint.new(1, 1)
+                }
+                SatGradient.Parent = SatOverlay
 
                 local ValOverlay = Instance.new("Frame")
                 ValOverlay.Size = UDim2.new(1, 0, 1, 0)
                 ValOverlay.BackgroundColor3 = Color3.new(0, 0, 0)
                 ValOverlay.BorderSizePixel = 0
-                ValOverlay.ZIndex = 5
+                ValOverlay.ZIndex = 7
                 ValOverlay.Parent = SVBox
 
                 local ValGradient = Instance.new("UIGradient")
@@ -2368,13 +2583,13 @@ function Library.new(Name: string?, Size: UDim2?, KeyBind: (Enum.UserInputType |
                 SVCursor.BackgroundColor3 = Color3.new(1, 1, 1)
                 SVCursor.BorderColor3 = Color3.new(0, 0, 0)
                 SVCursor.Rotation = 45
-                SVCursor.ZIndex = 6
-                SVCursor.Position = UDim2.new(1 - s, -2, 1 - v, -2)
+                SVCursor.ZIndex = 8
+                SVCursor.Position = UDim2.new(s, -2, 1 - v, -2)
                 SVCursor.Parent = SVBox
 
                 local HueBar = Instance.new("TextButton")
                 HueBar.Size = UDim2.new(0, 15, 0, 130)
-                HueBar.Position = UDim2.new(0, 150, 0, 10)
+                HueBar.Position = UDim2.new(0, 152, 0, 10)
                 HueBar.BorderColor3 = THEMES.BorderColor
                 HueBar.Text = ""
                 HueBar.AutoButtonColor = false
@@ -2384,13 +2599,13 @@ function Library.new(Name: string?, Size: UDim2?, KeyBind: (Enum.UserInputType |
                 local HueGradient = Instance.new("UIGradient")
                 HueGradient.Rotation = 90
                 HueGradient.Color = ColorSequence.new{
-                    ColorSequenceKeypoint.new(0.00, Color3.fromHSV(1, 1, 1)),
-                    ColorSequenceKeypoint.new(0.17, Color3.fromHSV(0.83, 1, 1)),
-                    ColorSequenceKeypoint.new(0.33, Color3.fromHSV(0.66, 1, 1)),
+                    ColorSequenceKeypoint.new(0.00, Color3.fromHSV(0, 1, 1)),
+                    ColorSequenceKeypoint.new(0.17, Color3.fromHSV(0.16, 1, 1)),
+                    ColorSequenceKeypoint.new(0.33, Color3.fromHSV(0.33, 1, 1)),
                     ColorSequenceKeypoint.new(0.50, Color3.fromHSV(0.5, 1, 1)),
-                    ColorSequenceKeypoint.new(0.67, Color3.fromHSV(0.33, 1, 1)),
-                    ColorSequenceKeypoint.new(0.83, Color3.fromHSV(0.16, 1, 1)),
-                    ColorSequenceKeypoint.new(1.00, Color3.fromHSV(0, 1, 1))
+                    ColorSequenceKeypoint.new(0.67, Color3.fromHSV(0.66, 1, 1)),
+                    ColorSequenceKeypoint.new(0.83, Color3.fromHSV(0.83, 1, 1)),
+                    ColorSequenceKeypoint.new(1.00, Color3.fromHSV(1, 1, 1))
                 }
                 HueGradient.Parent = HueBar
 
@@ -2403,6 +2618,22 @@ function Library.new(Name: string?, Size: UDim2?, KeyBind: (Enum.UserInputType |
                 AlphaBar.ZIndex = 5
                 AlphaBar.Parent = Body
                 CreateGradient(AlphaBar)
+
+                local HueCursor = Instance.new("Frame")
+                HueCursor.Size = UDim2.new(1, 4, 0, 2)
+                HueCursor.Position = UDim2.new(0, -2, 1 - h, -2)
+                HueCursor.BackgroundColor3 = Color3.new(1, 1, 1)
+                HueCursor.BorderColor3 = Color3.new(0, 0, 0)
+                HueCursor.ZIndex = 6
+                HueCursor.Parent = HueBar
+
+                local AlphaCursor = Instance.new("Frame")
+                AlphaCursor.Size = UDim2.new(1, 4, 0, 2)
+                AlphaCursor.Position = UDim2.new(0, -2, 1 - a, -2)
+                AlphaCursor.BackgroundColor3 = Color3.new(1, 1, 1)
+                AlphaCursor.BorderColor3 = Color3.new(0, 0, 0)
+                AlphaCursor.ZIndex = 6
+                AlphaCursor.Parent = AlphaBar
 
                 local AlphaGradient = Instance.new("UIGradient")
                 AlphaGradient.Rotation = 90
@@ -2430,13 +2661,24 @@ function Library.new(Name: string?, Size: UDim2?, KeyBind: (Enum.UserInputType |
                     callback(newColor, a)
                 end
 
+                SVCursor.Position = UDim2.new(s, -2, 1 - v, -2) -- Corrected initial position
+                UpdateColor()
+
                 if flag then
                     WindowRoot.Setters[flag] = function(colorData)
-                        if type(colorData) == "table" then
-                            local newC = Color3.new(colorData.R, colorData.G, colorData.B)
+                        local newC
+                        if typeof(colorData) == "Color3" then
+                            newC = colorData
+                        elseif type(colorData) == "table" then
+                            newC = Color3.new(colorData.R or colorData.r or 1, colorData.G or colorData.g or 1, colorData.B or colorData.b or 1)
+                            a = colorData.A or colorData.a or 1
+                        end
+                        
+                        if newC then
                             h, s, v = Color3.toHSV(newC)
-                            a = colorData.A
-                            SVCursor.Position = UDim2.new(1 - s, -2, 1 - v, -2)
+                            SVCursor.Position = UDim2.new(s, -2, 1 - v, -2)
+                            HueCursor.Position = UDim2.new(0, -2, 1 - h, -2)
+                            AlphaCursor.Position = UDim2.new(0, -2, 1 - a, -2)
                             UpdateColor()
                         end
                     end
@@ -2444,22 +2686,38 @@ function Library.new(Name: string?, Size: UDim2?, KeyBind: (Enum.UserInputType |
 
                 local draggingSV, draggingHue, draggingAlpha = false, false, false
 
-                WindowRoot:Connect(SVBox.InputBegan, function(i) if i.UserInputType == Enum.UserInputType.MouseButton1 then draggingSV = true end end)
-                WindowRoot:Connect(HueBar.InputBegan, function(i) if i.UserInputType == Enum.UserInputType.MouseButton1 then draggingHue = true end end)
-                WindowRoot:Connect(AlphaBar.InputBegan, function(i) if i.UserInputType == Enum.UserInputType.MouseButton1 then draggingAlpha = true end end)
+                WindowRoot:Connect(SVBox.InputBegan, function(i) 
+                    if i.UserInputType == Enum.UserInputType.MouseButton1 then 
+                        draggingSV = true 
+                    end 
+                end)
+                WindowRoot:Connect(HueBar.InputBegan, function(i) 
+                    if i.UserInputType == Enum.UserInputType.MouseButton1 then 
+                        draggingHue = true 
+                    end 
+                end)
+                WindowRoot:Connect(AlphaBar.InputBegan, function(i) 
+                    if i.UserInputType == Enum.UserInputType.MouseButton1 then 
+                        draggingAlpha = true 
+                    end 
+                end)
 
                 WindowRoot:Connect(UserInputService.InputChanged, function(input)
                     if input.UserInputType == Enum.UserInputType.MouseMovement then
+                        local mPos = UserInputService:GetMouseLocation()
+                        -- Correct for CoreGui inset if needed, but AbsolutePosition handles it
                         if draggingSV then
-                            s = 1 - math.clamp((input.Position.X - SVBox.AbsolutePosition.X) / SVBox.AbsoluteSize.X, 0, 1)
+                            s = math.clamp((input.Position.X - SVBox.AbsolutePosition.X) / SVBox.AbsoluteSize.X, 0, 1)
                             v = 1 - math.clamp((input.Position.Y - SVBox.AbsolutePosition.Y) / SVBox.AbsoluteSize.Y, 0, 1)
-                            SVCursor.Position = UDim2.new(1 - s, -2, 1 - v, -2)
+                            SVCursor.Position = UDim2.new(s, -2, 1 - v, -2)
                             UpdateColor()
                         elseif draggingHue then
-                            h = 1 - math.clamp((input.Position.Y - HueBar.AbsolutePosition.Y) / HueBar.AbsoluteSize.Y, 0, 1)
+                            h = math.clamp((input.Position.Y - HueBar.AbsolutePosition.Y) / HueBar.AbsoluteSize.Y, 0, 1)
+                            HueCursor.Position = UDim2.new(0, -2, h, -2)
                             UpdateColor()
                         elseif draggingAlpha then
                             a = 1 - math.clamp((input.Position.Y - AlphaBar.AbsolutePosition.Y) / AlphaBar.AbsoluteSize.Y, 0, 1)
+                            AlphaCursor.Position = UDim2.new(0, -2, 1 - a, -2)
                             UpdateColor()
                         end
                     end
@@ -2493,13 +2751,15 @@ function Library.new(Name: string?, Size: UDim2?, KeyBind: (Enum.UserInputType |
             function SectionFunctions:Label(text: string)
                 ElementCount = ElementCount + 1
                 local Lbl = Instance.new("TextLabel")
-                Lbl.Size = UDim2.new(1, 0, 0, THEMES.BaseHeight)
+                Lbl.Size = UDim2.new(1, 0, 0, 0)
+                Lbl.AutomaticSize = Enum.AutomaticSize.Y
                 Lbl.BackgroundTransparency = 1
                 Lbl.Text = text
                 Lbl.TextColor3 = THEMES.TextColor
-                Lbl.TextXAlignment = Enum.TextXAlignment.Center
+                Lbl.TextXAlignment = Enum.TextXAlignment.Left
                 Lbl.Font = Enum.Font.Code
                 Lbl.TextSize = THEMES.TextSize
+                Lbl.TextWrapped = true
                 Lbl.LayoutOrder = ElementCount
                 Lbl.ZIndex = 4
                 Lbl.Parent = Container
@@ -2508,7 +2768,14 @@ function Library.new(Name: string?, Size: UDim2?, KeyBind: (Enum.UserInputType |
                 WindowRoot:Connect(ThemeEvent.Event, function()
                     TweenService:Create(Lbl, TweenInfo.new(0.2), {TextColor3 = THEMES.TextColor}):Play()
                 end)
-                return Lbl
+                
+                local LabelFunctions = setmetatable({
+                    SetText = function(_, txt) Lbl.Text = txt end
+                }, {
+                    __index = Lbl,
+                    __newindex = Lbl
+                })
+                return LabelFunctions
             end
 
             function SectionFunctions:Paragraph(text: string)
@@ -2532,7 +2799,14 @@ function Library.new(Name: string?, Size: UDim2?, KeyBind: (Enum.UserInputType |
                 WindowRoot:Connect(ThemeEvent.Event, function()
                     TweenService:Create(Lbl, TweenInfo.new(0.2), {TextColor3 = THEMES.SubTextColor}):Play()
                 end)
-                return Lbl
+                
+                local ParaFunctions = setmetatable({
+                    SetText = function(_, txt) Lbl.Text = txt end
+                }, {
+                    __index = Lbl,
+                    __newindex = Lbl
+                })
+                return ParaFunctions
             end
 
             function SectionFunctions:Separator(label: string?)
@@ -2835,7 +3109,7 @@ function Library.new(Name: string?, Size: UDim2?, KeyBind: (Enum.UserInputType |
                 local searchKeywords = ""
                 local rowFrames = {}
 
-                for i, row in ipairs(rows) do
+                for i, row in rows do
                     searchKeywords = searchKeywords .. tostring(row[1]) .. " " .. tostring(row[2]) .. " "
                     local RowBg = Instance.new("Frame")
                     RowBg.Size = UDim2.new(1, 0, 0, rowH)
@@ -2882,7 +3156,7 @@ function Library.new(Name: string?, Size: UDim2?, KeyBind: (Enum.UserInputType |
                 RegisterSearch(TableFrame, searchKeywords)
 
                 WindowRoot:Connect(ThemeEvent.Event, function()
-                    for _, r in ipairs(rowFrames) do
+                    for _, r in rowFrames do
                         TweenService:Create(r.Bg, TweenInfo.new(0.2), {BackgroundColor3 = (r.Index % 2 == 0) and THEMES.FrameColor or THEMES.MainColor}):Play()
                         TweenService:Create(r.Key, TweenInfo.new(0.2), {TextColor3 = THEMES.SubTextColor}):Play()
                         TweenService:Create(r.Val, TweenInfo.new(0.2), {TextColor3 = THEMES.TextColor}):Play()
@@ -2949,13 +3223,17 @@ function Library.new(Name: string?, Size: UDim2?, KeyBind: (Enum.UserInputType |
                     Line.ZIndex = 4
                     Line.Parent = InnerBox
 
+                    local isAtBottom = (InnerBox.CanvasPosition.Y + InnerBox.AbsoluteWindowSize.Y >= InnerBox.AbsoluteCanvasSize.Y - 20)
+                    
                     task.defer(function()
-                        InnerBox.CanvasPosition = Vector2.new(0, InnerBox.AbsoluteCanvasSize.Y)
+                        if isAtBottom then
+                            InnerBox.CanvasPosition = Vector2.new(0, 999999)
+                        end
                     end)
                 end
 
                 function ConsoleObj:Clear()
-                    for _, child in ipairs(InnerBox:GetChildren()) do
+                    for _, child in InnerBox:GetChildren() do
                         if child:IsA("TextLabel") then child:Destroy() end
                     end
                     lineCount = 0
@@ -2964,6 +3242,76 @@ function Library.new(Name: string?, Size: UDim2?, KeyBind: (Enum.UserInputType |
                 RegisterSearch(ConsoleFrame, "Console Log Output")
                 return ConsoleObj
             end
+
+                function SectionFunctions:Webhook(text: string, flag: string, callback)
+                    ElementCount = ElementCount + 1
+                    local WebhookFrame = Instance.new("Frame")
+                    WebhookFrame.Size = UDim2.new(1, 0, 0, THEMES.BaseHeight * 2 + 10)
+                    WebhookFrame.BackgroundTransparency = 1
+                    WebhookFrame.LayoutOrder = ElementCount
+                    WebhookFrame.Parent = Container
+                    
+                    local Lbl = Instance.new("TextLabel")
+                    Lbl.Size = UDim2.new(1, 0, 0, 16)
+                    Lbl.Text = text
+                    Lbl.BackgroundTransparency = 1
+                    WindowRoot:Theme(Lbl, "TextColor3", "SubTextColor")
+                    Lbl.Font = Enum.Font.Code
+                    Lbl.TextSize = THEMES.TextSize - 1
+                    Lbl.TextXAlignment = Enum.TextXAlignment.Left
+                    Lbl.Parent = WebhookFrame
+
+                    local Input = Instance.new("TextBox")
+                    Input.Size = UDim2.new(1, -65, 0, THEMES.BaseHeight)
+                    Input.Position = UDim2.new(0, 0, 0, 18)
+                    Input.PlaceholderText = "https://discord.com/api/webhooks/..."
+                    WindowRoot:Theme(Input, "BackgroundColor3", "FrameColor")
+                    WindowRoot:Theme(Input, "TextColor3", "TextColor")
+                    Input.Font = Enum.Font.Code
+                    Input.TextSize = THEMES.TextSize
+                    Input.ClipsDescendants = true
+                    Input.TextXAlignment = Enum.TextXAlignment.Left
+                    Input.Parent = WebhookFrame
+                    RoundCorner(Input, 4)
+                    
+                    local Padding = Instance.new("UIPadding")
+                    Padding.PaddingLeft = UDim.new(0, 8)
+                    Padding.PaddingRight = UDim.new(0, 8)
+                    Padding.Parent = Input
+                    
+                    if flag then
+                        Input.Text = WindowRoot.Flags[flag] or ""
+                        WindowRoot:Connect(Input:GetPropertyChangedSignal("Text"), function()
+                            WindowRoot.Flags[flag] = Input.Text
+                            callback(Input.Text)
+                        end)
+                    end
+
+                    local TestBtn = CreateButton()
+                    TestBtn.Size = UDim2.new(0, 55, 0, THEMES.BaseHeight)
+                    TestBtn.Position = UDim2.new(1, -55, 0, 18)
+                    TestBtn.Text = "Test"
+                    TestBtn.Parent = WebhookFrame
+                    
+                    WindowRoot:Connect(TestBtn.MouseButton1Click, function()
+                        PlayClick()
+                        local data = {
+                            content = "NextLevel UI Webhook Test Successful!",
+                            username = "NextLevel Hub"
+                        }
+                        local response = request({
+                            Url = Input.Text,
+                            Method = "POST",
+                            Headers = { ["Content-Type"] = "application/json" },
+                            Body = HttpService:JSONEncode(data)
+                        })
+                        if response.Success then
+                            WindowRoot:Notify("Success", "Webhook test sent.", 2)
+                        else
+                            WindowRoot:Notify("Error", "Failed to send webhook.", 3)
+                        end
+                    end)
+                end
 
             function SectionFunctions:Grid(text, items, columns, callback)
                 ElementCount = ElementCount + 1
@@ -2996,7 +3344,7 @@ function Library.new(Name: string?, Size: UDim2?, KeyBind: (Enum.UserInputType |
                 end
         
                 local colW = 1 / columns
-                for i, item in ipairs(items) do
+                for i, item in items do
                     local itemText = type(item) == "table" and item.text or tostring(item)
                     local itemId   = type(item) == "table" and item.id   or tostring(item)
                     local col      = (i - 1) % columns
@@ -3022,7 +3370,7 @@ function Library.new(Name: string?, Size: UDim2?, KeyBind: (Enum.UserInputType |
                 RegisterSearch(GridFrame, text or table.concat(
                     (function()
                         local t = {}
-                        for _, item in ipairs(items) do
+                        for _, item in items do
                             table.insert(t, type(item) == "table" and item.text or tostring(item))
                         end
                         return t
@@ -3040,7 +3388,7 @@ function Library.new(Name: string?, Size: UDim2?, KeyBind: (Enum.UserInputType |
                 if flag then WindowRoot.Flags[flag] = "" end
         
                 local MLFrame = Instance.new("Frame")
-                MLFrame.Size               = UDim2.new(1, 0, 0, THEMES.BaseHeight + h + 6)
+                MLFrame.Size               = UDim2.new(1, 0, 0, THEMES.BaseHeight + h + 15)
                 MLFrame.BackgroundTransparency = 1
                 MLFrame.LayoutOrder        = ElementCount
                 MLFrame.ZIndex             = 4
@@ -3072,9 +3420,18 @@ function Library.new(Name: string?, Size: UDim2?, KeyBind: (Enum.UserInputType |
                 IBox.ClearTextOnFocus   = false
                 IBox.TextXAlignment     = Enum.TextXAlignment.Left
                 IBox.TextYAlignment     = Enum.TextYAlignment.Top
+                IBox.ClipsDescendants   = true
                 IBox.ZIndex             = 4
                 IBox.Parent             = MLFrame
                 CreateGradient(IBox)
+                RoundCorner(IBox, 4)
+
+                local Padding = Instance.new("UIPadding")
+                Padding.PaddingLeft = UDim.new(0, 8)
+                Padding.PaddingRight = UDim.new(0, 8)
+                Padding.PaddingTop = UDim.new(0, 8)
+                Padding.PaddingBottom = UDim.new(0, 8)
+                Padding.Parent = IBox
         
                 local Pad = Instance.new("UIPadding")
                 Pad.PaddingLeft = UDim.new(0, 5)
@@ -3187,10 +3544,10 @@ function Library.new(Name: string?, Size: UDim2?, KeyBind: (Enum.UserInputType |
         end)
  
         local function RebuildTags()
-            for _, c in ipairs(TagDisplay:GetChildren()) do
+            for _, c in TagDisplay:GetChildren() do
                 if not c:IsA("UIListLayout") then c:Destroy() end
             end
-            for i, tag in ipairs(tags) do
+            for i, tag in tags do
                 local charW   = math.max(#tag * 7, 20) + 24
                 local Pill    = Instance.new("Frame")
                 Pill.Size     = UDim2.new(0, charW, 0, THEMES.BaseHeight - 4)
@@ -3419,7 +3776,7 @@ function Library.new(Name: string?, Size: UDim2?, KeyBind: (Enum.UserInputType |
         data   = data   or {}
  
         local maxVal = 0
-        for _, d in ipairs(data) do
+        for _, d in data do
             maxVal = math.max(maxVal, d.value or 0)
         end
  
@@ -3454,7 +3811,7 @@ function Library.new(Name: string?, Size: UDim2?, KeyBind: (Enum.UserInputType |
         local barBars = {}
         if #data > 0 then
             local segW = 1 / #data
-            for i, d in ipairs(data) do
+            for i, d in data do
                 local ratio = maxVal > 0 and (d.value / maxVal) or 0
  
                 local Bar = Instance.new("Frame")
@@ -3505,7 +3862,7 @@ function Library.new(Name: string?, Size: UDim2?, KeyBind: (Enum.UserInputType |
                 BackgroundColor3 = THEMES.FrameColor,
                 BorderColor3     = THEMES.BorderColor,
             }):Play()
-            for _, b in ipairs(barBars) do
+            for _, b in barBars do
                 TweenService:Create(b, TweenInfo.new(0.2), {BackgroundColor3 = THEMES.LineColor}):Play()
             end
         end)
@@ -3594,11 +3951,21 @@ function Library.new(Name: string?, Size: UDim2?, KeyBind: (Enum.UserInputType |
         WindowRoot:Theme(MsgL, "TextColor3", "SubTextColor")
  
         local function CloseDialog(selected)
-            TweenService:Create(Scale,
-                TweenInfo.new(0.2, Enum.EasingStyle.Quart, Enum.EasingDirection.In),
-                {Scale = 0.8}):Play()
-            TweenService:Create(Overlay, TweenInfo.new(0.2), {BackgroundTransparency = 1}):Play()
-            task.delay(0.25, function()
+            local fadeInfo = TweenInfo.new(0.15, Enum.EasingStyle.Quad, Enum.EasingDirection.In)
+            TweenService:Create(Scale, fadeInfo, {Scale = 0.8}):Play()
+            TweenService:Create(Overlay, fadeInfo, {BackgroundTransparency = 1}):Play()
+            
+            for _, child in DialogBox:GetDescendants() do
+                if child:IsA("TextLabel") then
+                    TweenService:Create(child, fadeInfo, {TextTransparency = 1}):Play()
+                elseif child:IsA("Frame") or child:IsA("TextButton") then
+                    TweenService:Create(child, fadeInfo, {BackgroundTransparency = 1}):Play()
+                    if child:IsA("UIStroke") then TweenService:Create(child, fadeInfo, {Transparency = 1}):Play() end
+                end
+            end
+            TweenService:Create(DialogBox, fadeInfo, {BackgroundTransparency = 1}):Play()
+
+            task.delay(0.15, function()
                 DialogBox:Destroy()
                 Overlay:Destroy()
             end)
@@ -3607,7 +3974,7 @@ function Library.new(Name: string?, Size: UDim2?, KeyBind: (Enum.UserInputType |
  
         -- Buttons
         local startX = (dialogW - btnTotalW) / 2
-        for i, btnText in ipairs(buttons) do
+        for i, btnText in buttons do
             local B = Instance.new("TextButton")
             B.Size     = UDim2.new(0, 80, 0, THEMES.BaseHeight)
             B.Position = UDim2.new(0, startX + (i - 1) * 86, 0, dialogH - THEMES.BaseHeight - 10)
@@ -3626,6 +3993,14 @@ function Library.new(Name: string?, Size: UDim2?, KeyBind: (Enum.UserInputType |
 
 
     return self
+end
+
+function Library:ApplyPreset(presetName)
+    local preset = self.Presets[presetName]
+    if preset then
+        for k, v in preset do THEMES[k] = v end
+        ThemeEvent:Fire()
+    end
 end
 
 function Library:BuildUtilityTab(iconId)
@@ -3680,7 +4055,7 @@ function Library:BuildSettingsTab(iconId)
     local function GetConfigs()
         local list = {}
         if isfolder(self.ConfigFolder) then
-            for _, file in ipairs(listfiles(self.ConfigFolder)) do
+            for _, file in listfiles(self.ConfigFolder) do
                 local name = file:match("([^/\\]+)%.json$")
                 if name then table.insert(list, name) end
             end
@@ -3690,20 +4065,31 @@ function Library:BuildSettingsTab(iconId)
 
     SettingsSection:Input("Config Name", "Enter name to save...", nil, function(txt) ConfigName = txt end)
     local Dropdown = SettingsSection:SearchableDropdown("Select Config", GetConfigs(), "", nil, function(val) SelectedConfig = val end)
+    local ActiveConfigLbl = SettingsSection:Label("Active Config: None")
 
     SettingsSection:CreateButtonRow("Save Config", function()
         local name = ConfigName ~= "" and ConfigName or SelectedConfig
         if name == "" then return self:Notify("Error", "Please enter a config name.", 3) end
         
         local dataToSave = {}
-        for flag, val in pairs(self.Flags) do
-            if not self.IgnoredFlags[flag] then dataToSave[flag] = val end
+        for flag, val in self.Flags do
+            if not self.IgnoredFlags[flag] then
+                if typeof(val) == "Color3" then
+                    dataToSave[flag] = {r = val.R, g = val.G, b = val.B, _type = "Color3"}
+                elseif type(val) == "table" and (val.R or val.r) then
+                    -- Handle ColorPicker table format
+                    dataToSave[flag] = {r = val.R or val.r, g = val.G or val.g, b = val.B or val.b, a = val.A or val.a or 1, _type = "ThemeColor"}
+                else
+                    dataToSave[flag] = val
+                end
+            end
         end
 
         local ok, err = pcall(function() writefile(self.ConfigFolder .. "/" .. name .. ".json", HttpService:JSONEncode(dataToSave)) end)
         if ok then
             self:Notify("Saved", "Config '" .. name .. "' saved.", 3)
             Dropdown:Refresh(GetConfigs())
+            ActiveConfigLbl:SetText("Active Config: " .. name)
         else
             self:Notify("Error", "Save failed: " .. tostring(err), 5)
         end
@@ -3713,9 +4099,26 @@ function Library:BuildSettingsTab(iconId)
         if not isfile(path) then return self:Notify("Error", "File not found.", 3) end
         local ok, data = pcall(function() return HttpService:JSONDecode(readfile(path)) end)
         if ok and type(data) == "table" then
-            for flag, value in pairs(data) do 
-                if not self.IgnoredFlags[flag] and self.Setters[flag] then self.Setters[flag](value) end 
+            for flag, value in data do 
+                if not self.IgnoredFlags[flag] and self.Setters[flag] then
+                    local realVal = value
+                    if type(value) == "table" then
+                        if value._type == "Color3" or value._type == "ThemeColor" then
+                            realVal = {R = value.r, G = value.g, B = value.b, A = value.a or 1}
+                        end
+                    end
+                    -- For themes, we want to make sure they apply after a tiny frame gap
+                    if flag:find("Theme_") then
+                        task.spawn(function()
+                            task.wait()
+                            self.Setters[flag](realVal)
+                        end)
+                    else
+                        self.Setters[flag](realVal)
+                    end
+                end 
             end
+            ActiveConfigLbl:SetText("Active Config: " .. SelectedConfig)
             self:Notify("Loaded", "Config '" .. SelectedConfig .. "' applied.", 3)
         else
             self:Notify("Error", "Failed to parse config.", 5)
@@ -3739,7 +4142,7 @@ function Library:BuildSettingsTab(iconId)
 
     SettingsSection:CreateButtonRow("Export to Clipboard", function()
         local dataToExport = {}
-        for flag, val in pairs(self.Flags) do
+        for flag, val in self.Flags do
             if not self.IgnoredFlags[flag] then dataToExport[flag] = val end
         end
         setclipboard(HttpService:JSONEncode(dataToExport))
@@ -3748,7 +4151,7 @@ function Library:BuildSettingsTab(iconId)
         local data = getclipboard()
         local ok, parsed = pcall(function() return HttpService:JSONDecode(data) end)
         if ok and type(parsed) == "table" then
-            for flag, value in pairs(parsed) do 
+            for flag, value in parsed do 
                 if not self.IgnoredFlags[flag] and self.Setters[flag] then self.Setters[flag](value) end 
             end
             self:Notify("Imported", "Config loaded from clipboard.", 3)
@@ -3766,20 +4169,24 @@ function Library:BuildSettingsTab(iconId)
     
     UISetupSection:Toggle("Show Active Keybinds", not Library.IsSilent, "ShowKeybinds", function(state)
         if self.KeybindGui then self.KeybindGui.Enabled = state end
+        self:UpdateKeybinds()
     end)
 
-    local rgbLoop = false
+    local rgbLoopId = 0
     UISetupSection:Toggle("RGB Chroma Accents", false, "RGBMode", function(state)
         rgbLoop = state
         if state then
+            rgbLoopId = rgbLoopId + 1
+            local currentId = rgbLoopId
             task.spawn(function()
-                while rgbLoop do
+                while rgbLoop and currentId == rgbLoopId do
                     local hue = tick() % 10 / 10 
                     self:SetTheme({LineColor = Color3.fromHSV(hue, 1, 1)})
-                    task.wait(0.5) 
+                    task.wait(0.1) 
                 end
             end)
         else
+            rgbLoopId = rgbLoopId + 1
             self:SetTheme({LineColor = Color3.fromRGB(255, 255, 255)})
         end
     end)
@@ -3787,9 +4194,9 @@ function Library:BuildSettingsTab(iconId)
     local BlurEffect = Instance.new("BlurEffect")
     BlurEffect.Size = 15
     BlurEffect.Enabled = false
-    BlurEffect.Name = "Heartkiss_Blur"
+    BlurEffect.Name = "NextLevel_Blur"
     BlurEffect.Parent = game:GetService("Lighting")
-    table.insert(getgenv()._Heartkiss_Garbage[self.Name], BlurEffect)
+    table.insert(getgenv()._NextLevel_Garbage[self.Name], BlurEffect)
 
     local ScreenGui = self.Frames.MainFrame.Parent
     self:Connect(ScreenGui:GetPropertyChangedSignal("Enabled"), function()
@@ -3816,15 +4223,32 @@ function Library:BuildSettingsTab(iconId)
 
     -- AUTOLOAD EXECUTION
     if isfile(AutoloadFile) then
-        local autoName = readfile(AutoloadFile)
+        local autoName = readfile(AutoloadFile):gsub("%s+", "") -- Trim whitespace
         local path = self.ConfigFolder .. "/" .. autoName .. ".json"
         if isfile(path) then
             local ok, data = pcall(function() return HttpService:JSONDecode(readfile(path)) end)
             if ok and type(data) == "table" then
                 task.delay(0.5, function()
-                    for flag, value in pairs(data) do 
-                        if not self.IgnoredFlags[flag] and self.Setters[flag] then self.Setters[flag](value) end 
+                    for flag, value in data do 
+                        if not self.IgnoredFlags[flag] and self.Setters[flag] then
+                            local realVal = value
+                            if type(value) == "table" then
+                                if value._type == "Color3" or value._type == "ThemeColor" then
+                                    realVal = {R = value.r, G = value.g, B = value.b, A = value.a or 1}
+                                end
+                            end
+                            
+                            if flag:find("Theme_") then
+                                task.spawn(function()
+                                    task.wait(0.2) -- Give theme tab extra time
+                                    if self.Setters[flag] then self.Setters[flag](realVal) end
+                                end)
+                            else
+                                self.Setters[flag](realVal)
+                            end
+                        end 
                     end
+                    ActiveConfigLbl:SetText("Active Config: " .. autoName)
                     self:Notify("Autoload", "Successfully loaded config: " .. autoName, 3)
                 end)
             end
@@ -3833,13 +4257,21 @@ function Library:BuildSettingsTab(iconId)
 end
 
 function Library:BuildThemeTab(iconId)
-    local ThemeTab = self:Tab("Theme", iconId or 7743869054) 
+    local ThemeTab = self:Tab("Theme", iconId or 3926305904)
+    local PresetSec = ThemeTab:Section("Theme Presets")
     local ThemeSec = ThemeTab:Section("Custom Theme")
 
-    for key, defaultColor in pairs(THEMES) do
-        if type(defaultColor) == "userdata" and typeof(defaultColor) == "Color3" then
+    for name, colors in self.Presets do
+        PresetSec:Button(name, function()
+            self:ApplyPreset(name)
+        end)
+    end
+
+    for key, defaultColor in THEMES do
+        if typeof(defaultColor) == "Color3" then
             ThemeSec:ColorPicker(key, defaultColor, 0, "Theme_"..key, function(color)
-                self:SetTheme({[key] = color})
+                THEMES[key] = color
+                ThemeEvent:Fire()
             end)
         end
     end
@@ -3863,6 +4295,59 @@ function Library:BuildThemeTab(iconId)
         })
         self:Notify("Theme Reset", "Restored default styling.", 3)
     end)
+end
+
+function Library:BuildNotificationLogTab(iconId)
+    local LogTab = self:Tab("Notifications", iconId or 12154388837)
+    local LogSec = LogTab:Section("Notification History")
+    
+    LogSec:Button("Refresh Log", function()
+        LogSec:Clear()
+        for i = #self.NotificationHistory, 1, -1 do
+            local n = self.NotificationHistory[i]
+            LogSec:Paragraph("[" .. n.Time .. "] " .. n.Title .. "\n" .. n.Text)
+        end
+    end)
+    
+    LogSec:Button("Clear History", function()
+        self.NotificationHistory = {}
+        LogSec:Clear()
+        LogSec:Label("History cleared.")
+    end)
+
+    -- Initial load
+    for i = #self.NotificationHistory, 1, -1 do
+        local n = self.NotificationHistory[i]
+        LogSec:Paragraph("[" .. n.Time .. "] " .. n.Title .. "\n" .. n.Text)
+    end
+end
+
+function Library:BuildExecutorTab(iconId)
+    local ExecTab = self:Tab("Executor", iconId or 11419711674)
+    local ExecSec = ExecTab:Section("Internal Runner")
+    
+    local Code = ""
+    ExecSec:MultilineInput("Source Code", "print('Hello NextLevel')", 10, "Exec_Source", function(t) Code = t end)
+    
+    ExecSec:CreateButtonRow("Execute", function()
+        local func, err = loadstring(Code)
+        if func then
+            task.spawn(func)
+            self:Notify("Success", "Code executed.", 2)
+        else
+            self:Notify("Error", err, 5)
+        end
+    end, "Clear", function()
+        Code = ""
+    end)
+end
+
+function Library:BuildChangelogTab(data, iconId)
+    local ChangeTab = self:Tab("Changelog", iconId or 11419714317)
+    for version, notes in data do
+        local Sec = ChangeTab:Section("Version " .. version)
+        Sec:Paragraph(notes)
+    end
 end
 
 
@@ -3889,11 +4374,11 @@ function Library:InitLoad(options)
         local configFolder = Title .. "_Configs/" .. tostring(game.PlaceId)
         local autoloadFile = configFolder .. "/autoload.txt"
         if isfile(autoloadFile) then
-            local autoName = readfile(autoloadFile)
+            local autoName = readfile(autoloadFile):gsub("%s+", "") -- Trim all whitespace/newlines
             local path = configFolder .. "/" .. autoName .. ".json"
             if isfile(path) then
                 local ok, data = pcall(function() return HttpService:JSONDecode(readfile(path)) end)
-                if ok and type(data) == "table" and data["SilentExecution"] == true then
+                if ok and type(data) == "table" and (data["SilentExecution"] == true or data["SilentExecution"] == 1) then
                     isSilent = true
                 end
             end
@@ -4176,7 +4661,7 @@ function Library:InitLoad(options)
     TweenService:Create(Card,     inInfo, {BackgroundTransparency = 0.05}):Play()
     TweenService:Create(CardStroke, inInfo, {Transparency = 0.5}):Play()
  
-    for _, ce in ipairs(cornerElems) do
+    for _, ce in cornerElems do
         TweenService:Create(ce.hz, inInfo, {BackgroundTransparency = 0}):Play()
         TweenService:Create(ce.vt, inInfo, {BackgroundTransparency = 0}):Play()
     end
@@ -4222,7 +4707,7 @@ function Library:InitLoad(options)
     -- Particle drift loop
     task.spawn(function()
         while animating do
-            for _, p in ipairs(particles) do
+            for _, p in particles do
                 local pos = p.frame.Position
                 local nx = pos.X.Scale + p.speedX
                 local ny = pos.Y.Scale + p.speedY
@@ -4243,7 +4728,7 @@ function Library:InitLoad(options)
             local progress = math.clamp(elapsed / Duration, 0, 1)
             local filled   = math.floor(progress * SEG_COUNT)
  
-            for i, seg in ipairs(segments) do
+            for i, seg in segments do
                 seg.BackgroundTransparency = i <= filled and 0 or 0.86
             end
             PctLbl.Text = string.format("[ %d%% ]", math.floor(progress * 100))
@@ -4268,7 +4753,7 @@ function Library:InitLoad(options)
  
             task.wait()
         end
-        for _, seg in ipairs(segments) do seg.BackgroundTransparency = 0 end
+        for _, seg in segments do seg.BackgroundTransparency = 0 end
         PctLbl.Text = "[ 100% ]"
     end)
  
@@ -4280,7 +4765,7 @@ function Library:InitLoad(options)
     StatusLbl.TextColor3 = AccentColor
  
     -- Cascade-fill segments white → accent
-    for i, seg in ipairs(segments) do
+    for i, seg in segments do
         task.delay((i - 1) * 0.025, function()
             seg.BackgroundColor3    = Color3.new(1, 1, 1)
             seg.BackgroundTransparency = 0
@@ -4297,11 +4782,11 @@ function Library:InitLoad(options)
     TweenService:Create(Card,       outInfo, {BackgroundTransparency = 1}):Play()
     TweenService:Create(CardStroke, outInfo, {Transparency = 1}):Play()
     TweenService:Create(BG,         outInfo, {BackgroundTransparency = 1}):Play()
-    for _, ce in ipairs(cornerElems) do
+    for _, ce in cornerElems do
         TweenService:Create(ce.hz, outInfo, {BackgroundTransparency = 1}):Play()
         TweenService:Create(ce.vt, outInfo, {BackgroundTransparency = 1}):Play()
     end
-    for _, desc in ipairs(Card:GetDescendants()) do
+    for _, desc in Card:GetDescendants() do
         if desc:IsA("TextLabel") then
             TweenService:Create(desc, outInfo, {TextTransparency = 1}):Play()
         elseif desc:IsA("ImageLabel") then
@@ -4314,6 +4799,5 @@ function Library:InitLoad(options)
     task.wait(0.6)
     LoadGui:Destroy()
 end
-
 
 return Library
