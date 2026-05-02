@@ -4,31 +4,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NextLevel UI v0.06 Documentation</title>
-
-    <!-- Fonts -->
+    <title>NextLevel UI v0.06 — Complete Reference</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap"
         rel="stylesheet">
-
-    <!-- Prism Syntax Highlighting -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
-
     <style>
         :root {
-            --bg: #030303;
-            --sidebar: #070707;
-            --accent: #ffffff;
-            --accent-glow: rgba(255, 0, 0, 0.3);
-            --text: #ffffff;
-            --subtext: #a0a0a0;
-            --card: rgba(15, 15, 15, 0.6);
-            --border: rgba(255, 255, 255, 0.05);
-            --code-bg: #000000;
-            --selection: rgba(255, 0, 0, 0.2);
-            --success: #00ff88;
+            --bg: #020202;
+            --sidebar: #060606;
+            --card: rgba(16, 16, 16, 0.9);
+            --card-hover: rgba(22, 22, 22, 0.95);
+            --border: rgba(255, 255, 255, 0.08);
+            --border-hi: rgba(255, 255, 255, 0.18);
+            --text: #f0f0f0;
+            --sub: #888;
+            --sub2: #555;
+            --accent: #fff;
+            --glow: rgba(255, 255, 255, 0.12);
+            --code-bg: #000;
+            --green: #4ade80;
+            --yellow: #fbbf24;
+            --red: #f87171;
+            --blue: #60a5fa;
+            --purple: #a78bfa;
+            --sidebar-w: 280px;
+            --radius: 10px;
         }
 
         * {
@@ -38,733 +41,2815 @@
             -webkit-font-smoothing: antialiased;
         }
 
+        html {
+            scroll-behavior: smooth;
+        }
+
         body {
-            font-family: 'Inter', sans-serif;
-            background-color: var(--bg);
+            font-family: 'Outfit', sans-serif;
+            background: var(--bg);
             color: var(--text);
-            line-height: 1.6;
+            line-height: 1.65;
             display: flex;
             height: 100vh;
             overflow: hidden;
         }
 
-        /* Sidebar */
+        /* ─── SIDEBAR ─────────────────────────────── */
         .sidebar {
-            width: 320px;
-            background-color: var(--sidebar);
+            width: var(--sidebar-w);
+            background: var(--sidebar);
             border-right: 1px solid var(--border);
             display: flex;
             flex-direction: column;
             flex-shrink: 0;
+            z-index: 100;
+            overflow: hidden;
         }
 
         .sidebar-header {
-            padding: 40px 30px;
+            padding: 28px 24px 22px;
             border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
         }
 
         .logo {
-            font-size: 22px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: 900;
+            letter-spacing: -0.5px;
+        }
+
+        .logo-badge {
+            background: #fff;
+            color: #000;
+            font-size: 10px;
+            font-weight: 900;
+            padding: 2px 8px;
+            border-radius: 4px;
+            letter-spacing: 0.5px;
+        }
+
+        .logo-sub {
+            font-size: 11px;
+            color: var(--sub2);
+            font-weight: 500;
+            margin-top: 4px;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .sidebar-search {
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--border);
+            flex-shrink: 0;
+        }
+
+        .sidebar-search input {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 7px 12px;
+            color: var(--text);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            outline: none;
+        }
+
+        .sidebar-search input::placeholder {
+            color: var(--sub2);
+        }
+
+        .sidebar-search input:focus {
+            border-color: var(--border-hi);
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            overflow-y: auto;
+            padding: 16px 0;
+        }
+
+        .sidebar-nav::-webkit-scrollbar {
+            width: 3px;
+        }
+
+        .sidebar-nav::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        .sidebar-nav::-webkit-scrollbar-thumb {
+            background: var(--border);
+            border-radius: 10px;
+        }
+
+        .nav-group {
+            margin-bottom: 24px;
+        }
+
+        .nav-group-title {
+            font-size: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--sub2);
+            padding: 0 24px;
+            margin-bottom: 6px;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 24px;
+            color: var(--sub);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s;
+            position: relative;
+            border-left: 2px solid transparent;
+        }
+
+        .nav-link:hover {
+            color: var(--text);
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .nav-link.active {
+            color: var(--text);
+            border-left-color: #fff;
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .nav-link .nav-tag {
+            margin-left: auto;
+            font-size: 9px;
+            font-family: 'JetBrains Mono', monospace;
+            background: rgba(255, 255, 255, 0.07);
+            padding: 1px 5px;
+            border-radius: 3px;
+            color: var(--sub2);
+        }
+
+        /* ─── MAIN ─────────────────────────────────── */
+        .main {
+            flex: 1;
+            overflow-y: auto;
+            scroll-behavior: smooth;
+        }
+
+        .main::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .main::-webkit-scrollbar-track {
+            background: var(--bg);
+        }
+
+        .main::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .content {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 80px 56px 160px;
+        }
+
+        /* ─── SECTIONS ─────────────────────────────── */
+        section {
+            margin-bottom: 100px;
+            scroll-margin-top: 80px;
+        }
+
+        /* ─── HERO ─────────────────────────────────── */
+        .hero-eyebrow {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--sub2);
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            font-size: 72px;
+            font-weight: 900;
+            letter-spacing: -4px;
+            line-height: 0.92;
+            margin-bottom: 22px;
+            background: linear-gradient(135deg, #fff 0%, #666 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-desc {
+            font-size: 17px;
+            color: var(--sub);
+            max-width: 580px;
+            margin-bottom: 36px;
+            font-weight: 400;
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 32px;
+            margin-top: 32px;
+        }
+
+        .hero-stat-num {
+            font-size: 28px;
+            font-weight: 900;
+            letter-spacing: -1px;
+            color: #fff;
+        }
+
+        .hero-stat-label {
+            font-size: 11px;
+            color: var(--sub2);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-top: 2px;
+        }
+
+        /* ─── HEADINGS ─────────────────────────────── */
+        h2 {
+            font-size: 30px;
             font-weight: 800;
             letter-spacing: -1.5px;
+            color: var(--text);
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        h2::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(to right, var(--border), transparent);
+        }
+
+        .section-desc {
+            font-size: 15px;
+            color: var(--sub);
+            margin-bottom: 28px;
+            max-width: 700px;
+        }
+
+        h3 {
+            font-size: 17px;
+            font-weight: 700;
+            color: #fff;
+            margin-bottom: 10px;
             display: flex;
             align-items: center;
             gap: 10px;
         }
 
-        .logo span {
-            background: var(--accent);
-            color: var(--bg);
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: 900;
-            letter-spacing: 0;
-        }
-
-        .sidebar-nav {
-            flex-grow: 1;
-            overflow-y: auto;
-            padding: 30px;
-        }
-
-        .nav-group {
-            margin-bottom: 35px;
-        }
-
-        .nav-title {
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: uppercase;
-            color: var(--subtext);
-            letter-spacing: 1.5px;
-            margin-bottom: 15px;
-        }
-
-        .nav-link {
-            display: block;
-            padding: 8px 0;
-            color: var(--subtext);
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 500;
-            transition: all 0.2s;
-            cursor: pointer;
-        }
-
-        .nav-link:hover {
-            color: var(--text);
-            transform: translateX(5px);
-        }
-
-        .nav-link.active {
-            color: var(--accent);
-            font-weight: 700;
-        }
-
-        /* Main Content */
-        .main {
-            flex-grow: 1;
-            overflow-y: auto;
-            scroll-behavior: smooth;
-            padding: 80px 0;
-        }
-
-        .container {
-            max-width: 960px;
-            margin: 0 auto;
-            padding: 0 60px;
-        }
-
-        section {
-            margin-bottom: 120px;
-        }
-
-        h1 {
-            font-size: 64px;
-            font-weight: 800;
-            letter-spacing: -4px;
-            margin-bottom: 20px;
-            background: linear-gradient(to bottom, #fff, #666);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: pulse 4s ease-in-out infinite;
-        }
-
-        @keyframes pulse {
-
-            0%,
-            100% {
-                filter: drop-shadow(0 0 0px var(--accent-glow));
-            }
-
-            50% {
-                filter: drop-shadow(0 0 15px var(--accent-glow));
-            }
-        }
-
-        h2 {
-            font-size: 36px;
-            font-weight: 700;
-            letter-spacing: -2px;
-            margin: 80px 0 30px;
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            color: var(--text);
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
-        }
-
-        h2::after {
-            content: '';
-            flex-grow: 1;
-            height: 1px;
-            background: var(--border);
-        }
-
-        h3 {
-            font-size: 24px;
-            font-weight: 700;
-            letter-spacing: -1px;
-            margin: 50px 0 20px;
-            color: var(--accent);
-        }
-
-        p {
-            font-size: 17px;
-            color: var(--subtext);
-            margin-bottom: 30px;
-            max-width: 800px;
-        }
-
-        .method-signature {
+        h3 .method-tag {
             font-family: 'JetBrains Mono', monospace;
-            font-size: 15px;
-            color: var(--success);
-            margin-bottom: 10px;
+            font-size: 10px;
             font-weight: 600;
-        }
-
-        /* Prism Styling Overrides */
-        pre[class*="language-"] {
-            margin: 30px 0 50px;
-            border-radius: 16px;
-            border: 1px solid var(--border);
-            background: var(--code-bg) !important;
-            padding: 30px !important;
-            font-size: 14px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-        }
-
-        .feature-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 24px;
-            margin-top: 50px;
-        }
-
-        .feature-card {
-            background: var(--card);
-            backdrop-filter: blur(12px);
-            border: 1px solid var(--border);
-            padding: 35px;
-            border-radius: 12px;
-            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .feature-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: radial-gradient(circle at top right, var(--accent-glow), transparent 70%);
-            opacity: 0;
-            transition: opacity 0.4s ease;
-        }
-
-        .feature-card:hover {
-            border-color: var(--accent);
-            transform: translateY(-5px) scale(1.02);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8), 0 0 20px var(--accent-glow);
-        }
-
-        .feature-card:hover::before {
-            opacity: 1;
-        }
-
-        .feature-card h4 {
-            font-size: 20px;
-            font-weight: 700;
-            margin-bottom: 15px;
-        }
-
-        .badge {
-            font-size: 11px;
-            font-weight: 800;
-            text-transform: uppercase;
-            padding: 5px 12px;
-            background: rgba(255, 255, 255, 0.08);
-            border-radius: 100px;
-            margin-bottom: 20px;
-            display: inline-block;
+            padding: 2px 7px;
+            border-radius: 4px;
             letter-spacing: 0.5px;
         }
 
-        .tutorial-step {
-            border-left: 2px solid var(--border);
-            padding-left: 30px;
-            margin-bottom: 60px;
-            position: relative;
+        .tag-method {
+            background: rgba(96, 165, 250, 0.15);
+            color: var(--blue);
         }
 
-        .tutorial-step::before {
-            content: '';
-            position: absolute;
-            left: -5px;
-            top: 0;
-            width: 8px;
-            height: 8px;
-            background: var(--accent);
+        .tag-returns {
+            background: rgba(74, 222, 128, 0.15);
+            color: var(--green);
+        }
+
+        .tag-new {
+            background: rgba(167, 139, 250, 0.15);
+            color: var(--purple);
+        }
+
+        .tag-window {
+            background: rgba(251, 191, 36, 0.15);
+            color: var(--yellow);
+        }
+
+        /* ─── CARDS ─────────────────────────────────── */
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 28px;
+            margin-bottom: 16px;
+            transition: border-color 0.2s, background 0.2s;
+        }
+
+        .card:hover {
+            border-color: var(--border-hi);
+            background: var(--card-hover);
+        }
+
+        .card+.card {
+            margin-top: 12px;
+        }
+
+        /* ─── SIGNATURE ────────────────────────────── */
+        .sig {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12.5px;
+            background: #000;
+            border: 1px solid var(--border);
+            border-radius: 7px;
+            padding: 12px 16px;
+            margin-bottom: 14px;
+            overflow-x: auto;
+            white-space: nowrap;
+        }
+
+        .sig .fn {
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .sig .obj {
+            color: var(--yellow);
+            font-weight: 500;
+        }
+
+        .sig .param {
+            color: var(--blue);
+        }
+
+        .sig .type {
+            color: var(--sub);
+        }
+
+        .sig .ret {
+            color: var(--green);
+        }
+
+        .sig .kw {
+            color: var(--purple);
+        }
+
+        .sig .op {
+            color: var(--sub);
+        }
+
+        /* ─── PARAM TABLE ──────────────────────────── */
+        .params {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            margin: 14px 0 18px;
+        }
+
+        .params th {
+            text-align: left;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--sub2);
+            padding: 0 0 8px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .params td {
+            padding: 9px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            vertical-align: top;
+        }
+
+        .params td:first-child {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: #fff;
+            padding-right: 16px;
+            white-space: nowrap;
+        }
+
+        .params td:nth-child(2) {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--blue);
+            padding-right: 16px;
+            white-space: nowrap;
+        }
+
+        .params td:nth-child(3) {
+            color: var(--sub);
+        }
+
+        .params .opt {
+            color: var(--sub2);
+        }
+
+        /* ─── CODE BLOCKS ──────────────────────────── */
+        .code-wrap {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 16px 0;
+        }
+
+        .code-header {
+            background: #0a0a0a;
+            padding: 8px 16px;
+            font-size: 10px;
+            font-weight: 700;
+            color: var(--sub2);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .code-header .code-lang {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            background: rgba(255, 255, 255, 0.06);
+            padding: 2px 7px;
+            border-radius: 3px;
+        }
+
+        pre[class*="language-"] {
+            margin: 0 !important;
+            background: #000 !important;
+            padding: 20px !important;
+            font-size: 13px !important;
+            line-height: 1.7 !important;
+        }
+
+        /* ─── CALLOUTS ─────────────────────────────── */
+        .callout {
+            display: flex;
+            gap: 14px;
+            align-items: flex-start;
+            padding: 16px 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .callout-info {
+            background: rgba(96, 165, 250, 0.07);
+            border: 1px solid rgba(96, 165, 250, 0.2);
+        }
+
+        .callout-warn {
+            background: rgba(251, 191, 36, 0.07);
+            border: 1px solid rgba(251, 191, 36, 0.2);
+        }
+
+        .callout-tip {
+            background: rgba(74, 222, 128, 0.07);
+            border: 1px solid rgba(74, 222, 128, 0.2);
+        }
+
+        .callout-note {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+        }
+
+        .callout-icon {
+            font-size: 16px;
+            flex-shrink: 0;
+            margin-top: 1px;
+        }
+
+        .callout-info .callout-icon {
+            color: var(--blue);
+        }
+
+        .callout-warn .callout-icon {
+            color: var(--yellow);
+        }
+
+        .callout-tip .callout-icon {
+            color: var(--green);
+        }
+
+        .callout-note .callout-icon {
+            color: var(--sub);
+        }
+
+        .callout-body {
+            color: var(--sub);
+        }
+
+        .callout-body strong {
+            color: var(--text);
+        }
+
+        .callout-body code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            background: rgba(255, 255, 255, 0.08);
+            padding: 1px 5px;
+            border-radius: 3px;
+            color: #fff;
+        }
+
+        /* ─── RETURN BADGES ────────────────────────── */
+        .returns-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0 0;
+            font-size: 13px;
+            color: var(--sub);
+        }
+
+        .returns-row .ret-label {
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: var(--sub2);
+        }
+
+        .ret-type {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: var(--green);
+            background: rgba(74, 222, 128, 0.1);
+            padding: 2px 8px;
+            border-radius: 4px;
+            border: 1px solid rgba(74, 222, 128, 0.2);
+        }
+
+        /* ─── THEME TABLE ──────────────────────────── */
+        .theme-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+            margin: 16px 0;
+        }
+
+        .theme-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 10px 14px;
+        }
+
+        .theme-swatch {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            flex-shrink: 0;
+        }
+
+        .theme-key {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .theme-default {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            color: var(--sub2);
+            margin-left: auto;
+        }
+
+        /* ─── PRESET PILLS ─────────────────────────── */
+        .preset-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 16px 0;
+        }
+
+        .preset-pill {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            padding: 6px 14px 6px 8px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+
+        .preset-color {
+            width: 14px;
+            height: 14px;
             border-radius: 50%;
         }
 
+        /* ─── INLINE CODE ──────────────────────────── */
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12.5px;
+            background: rgba(255, 255, 255, 0.07);
+            padding: 1px 6px;
+            border-radius: 4px;
+            color: #ddd;
+        }
+
+        /* ─── CONTROLLER BADGE ─────────────────────── */
+        .controller-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .controller-name {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--green);
+        }
+
+        .controller-desc {
+            font-size: 13px;
+            color: var(--sub);
+        }
+
+        .method-mini {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            font-size: 13px;
+        }
+
+        .method-mini:last-child {
+            border-bottom: none;
+        }
+
+        .method-mini .mn {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            font-weight: 600;
+            color: #fff;
+            white-space: nowrap;
+        }
+
+        .method-mini .md {
+            color: var(--sub);
+        }
+
+        /* ─── DIVIDER ──────────────────────────────── */
+        .divider {
+            height: 1px;
+            background: linear-gradient(to right, var(--border), transparent);
+            margin: 40px 0;
+        }
+
+        /* ─── FLAG/SETTER TABLE ────────────────────── */
+        .flag-info {
+            background: rgba(251, 191, 36, 0.05);
+            border: 1px solid rgba(251, 191, 36, 0.15);
+            border-radius: 8px;
+            padding: 16px 20px;
+            margin: 14px 0;
+            font-size: 13px;
+            color: var(--sub);
+            line-height: 1.7;
+        }
+
+        .flag-info strong {
+            color: var(--yellow);
+        }
+
+        .flag-info code {
+            background: rgba(251, 191, 36, 0.08);
+            color: var(--yellow);
+        }
+
+        /* ─── FOOTER ───────────────────────────────── */
         footer {
-            margin-top: 150px;
-            padding: 80px 0;
+            margin-top: 80px;
+            padding: 60px 0 40px;
             border-top: 1px solid var(--border);
             text-align: center;
-            color: var(--subtext);
-            font-size: 15px;
         }
 
-        /* Scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
+        footer .logo {
+            justify-content: center;
+            margin-bottom: 10px;
         }
 
-        ::-webkit-scrollbar-track {
-            background: var(--bg);
+        footer p {
+            font-size: 13px;
+            color: var(--sub2);
         }
 
-        ::-webkit-scrollbar-thumb {
-            background: var(--border);
-            border-radius: 10px;
-        }
-
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--subtext);
-        }
-
-        /* Smooth scroll margin */
-        section {
-            scroll-margin-top: 100px;
+        /* ─── HIDDEN (for search filtering) ─────────── */
+        .nav-link.hidden {
+            display: none;
         }
     </style>
 </head>
 
 <body>
 
+    <!-- ═══════════════════════════════════════════════════════ SIDEBAR -->
     <aside class="sidebar">
         <div class="sidebar-header">
-            <div class="logo">NextLevel <span>0.06</span></div>
+            <div class="logo">NextLevel <div class="logo-badge">0.06</div>
+            </div>
+            <div class="logo-sub">Complete API Reference</div>
+        </div>
+        <div class="sidebar-search">
+            <input type="text" id="navSearch" placeholder="Search docs..." autocomplete="off" />
         </div>
         <nav class="sidebar-nav">
+
             <div class="nav-group">
-                <div class="nav-title">Fundamentals</div>
-                <a href="#intro" class="nav-link active">Introduction</a>
+                <div class="nav-group-title">Getting Started</div>
+                <a href="#intro" class="nav-link">Overview</a>
                 <a href="#install" class="nav-link">Installation</a>
-                <a href="#init" class="nav-link">InitLoad & Silent Mode</a>
-                <a href="#window" class="nav-link">Window & Tabs</a>
+                <a href="#initload" class="nav-link">InitLoad <span class="nav-tag">splash</span></a>
             </div>
 
             <div class="nav-group">
-                <div class="nav-title">The Big Widget Guide</div>
-                <a href="#buttons" class="nav-link">Buttons & Multi-Rows</a>
+                <div class="nav-group-title">Core</div>
+                <a href="#window" class="nav-link">Library.new</a>
+                <a href="#window-api" class="nav-link">Window API</a>
+                <a href="#theme" class="nav-link">Theme System</a>
+                <a href="#flags" class="nav-link">Flags & Setters</a>
+            </div>
+
+            <div class="nav-group">
+                <div class="nav-group-title">Structure</div>
+                <a href="#tabs" class="nav-link">Tabs</a>
+                <a href="#sections" class="nav-link">Sections</a>
+                <a href="#layout" class="nav-link">Layout Elements</a>
+            </div>
+
+            <div class="nav-group">
+                <div class="nav-group-title">Widgets</div>
+                <a href="#buttons" class="nav-link">Buttons</a>
                 <a href="#toggles" class="nav-link">Toggles & Switches</a>
                 <a href="#sliders" class="nav-link">Sliders & Steppers</a>
-                <a href="#inputs" class="nav-link">Inputs & Tag Fields</a>
-                <a href="#dropdowns" class="nav-link">Dropdowns (All Types)</a>
-                <a href="#grids" class="nav-link">Grids & Consoles</a>
-                <a href="#data" class="nav-link">Data Viz & Charts</a>
+                <a href="#inputs" class="nav-link">Text Inputs</a>
+                <a href="#dropdowns" class="nav-link">Dropdowns</a>
+                <a href="#colors" class="nav-link">Color & Images</a>
             </div>
 
             <div class="nav-group">
-                <div class="nav-title">Visuals</div>
-                <a href="#visuals" class="nav-link">Labels & Layout</a>
-                <a href="#alerts" class="nav-link">Alerts & Info</a>
+                <div class="nav-group-title">Data & Utility</div>
+                <a href="#data" class="nav-link">Data Viz</a>
+                <a href="#utility" class="nav-link">Utility Widgets</a>
+                <a href="#controllers" class="nav-link">Controllers</a>
             </div>
 
             <div class="nav-group">
-                <div class="nav-title">Advanced API</div>
-                <a href="#dialogs" class="nav-link">Dialogs & Popups</a>
-                <a href="#configs" class="nav-link">Configs & Settings</a>
-                <a href="#themes" class="nav-link">Theme Management</a>
-                <a href="#utils" class="nav-link">Utility Functions</a>
+                <div class="nav-group-title">System</div>
+                <a href="#global" class="nav-link">Global Methods</a>
+                <a href="#config" class="nav-link">Config System</a>
+                <a href="#prebuilt" class="nav-link">Pre-built Tabs</a>
             </div>
+
         </nav>
     </aside>
 
-    <main class="main">
-        <div class="container">
-            <!-- INTRODUCTION -->
-            <section id="intro">
-                <h1>NextLevel UI</h1>
-                <p>Version 0.06 is the definitive update to our framework. We've replaced every soft edge with a sharp,
-                    professional finish and expanded the widget library to cover every possible use case for high-end
-                    Roblox executors.</p>
+    <!-- ═══════════════════════════════════════════════════════ MAIN -->
+    <main class="main" id="mainScroll">
+        <div class="content">
 
-                <div class="feature-grid">
-                    <div class="feature-card">
-                        <div class="badge">Performance</div>
-                        <h4>0ms Response</h4>
-                        <p>No more input lag. Every click, drag, and scroll is handled with maximum efficiency.</p>
+
+            <!-- ─── INTRO ──────────────────────────────────────────── -->
+            <section id="intro">
+                <div class="hero-eyebrow">NextLevel UI Framework</div>
+                <h1>Complete<br>Reference.</h1>
+                <p class="hero-desc">Every method, every option, every controller. The definitive engineering guide to
+                    NextLevel v0.06 — from boot to unload.</p>
+
+                <div class="callout callout-tip">
+                    <div class="callout-icon">✦</div>
+                    <div class="callout-body">
+                        <strong>v0.06 highlights:</strong> generalized iteration, redesigned <code>InitLoad</code>
+                        splash with particle effects, two-column Sidebar layout, resize grip, dialog system, TagInput
+                        chips, Timer widget, animated Chart, and Changelog builder.
                     </div>
-                    <div class="feature-card">
-                        <div class="badge">Unique</div>
-                        <h4>Smart Scroll</h4>
-                        <p>Console widget now detects if you're reading old logs and stops forced scrolling
-                            automatically.</p>
+                </div>
+
+                <div class="hero-stats">
+                    <div>
+                        <div class="hero-stat-num">34+</div>
+                        <div class="hero-stat-label">Widget types</div>
+                    </div>
+                    <div>
+                        <div class="hero-stat-num">7</div>
+                        <div class="hero-stat-label">Pre-built tabs</div>
+                    </div>
+                    <div>
+                        <div class="hero-stat-num">6</div>
+                        <div class="hero-stat-label">Color presets</div>
+                    </div>
+                    <div>
+                        <div class="hero-stat-num">∞</div>
+                        <div class="hero-stat-label">Custom themes</div>
                     </div>
                 </div>
             </section>
 
-            <!-- INSTALLATION -->
+
+            <!-- ─── INSTALLATION ────────────────────────────────────── -->
             <section id="install">
                 <h2>Installation</h2>
-                <p>Simply use <code>loadstring</code> to fetch the library. This ensures you always have the latest
-                    visually-beautified version.</p>
-                <pre><code class="language-lua">local Library = loadstring(game:HttpGet("https://gist.githubusercontent.com/Acidgorgon/2c0654b99a77b27e801ca6eb952a1e6c/raw/a887a7de559fc0fc6eb6542066f648a91f8b9e28/UILib"))()</code></pre>
+                <p class="section-desc">Load the library from the CDN with a single <code>loadstring</code> call. The
+                    return value is your <code>Library</code> module.</p>
+
+                <div class="code-wrap">
+                    <div class="code-header"><span>CDN Loadstring</span><span class="code-lang">lua</span></div>
+                    <pre><code class="language-lua">local Library = loadstring(game:HttpGet("https://gist.githubusercontent.com/Acidgorgon/2c0654b99a77b27e801ca6eb952a1e6c/raw/ecc019d89a367df71c86a5531525db52907f961c/UILib"))()</code></pre>
+                </div>
+
+                <div class="callout callout-info">
+                    <div class="callout-icon">ℹ</div>
+                    <div class="callout-body">
+                        The returned <strong>Library</strong> table exposes <code>Library.new()</code>,
+                        <code>Library:InitLoad()</code>, <code>Library:Notify()</code>, and
+                        <code>Library:SetTheme()</code> at the global level.
+                    </div>
+                </div>
             </section>
 
-            <!-- INITLOAD -->
-            <section id="init">
-                <h2>The Boot Sequence</h2>
-                <p>Every professional script starts with a great loader. NextLevel's <code>InitLoad</code> is fully
-                    customizable and supports a hidden "Silent Mode".</p>
 
-                <div class="tutorial-step">
-                    <h3>Step 1: The Premium Loader</h3>
-                    <div class="method-signature">Library:InitLoad(options: table)</div>
-                    <pre><code class="language-lua">Library:InitLoad({
-    Title = "NextLevel",
-    SubTitle = "v0.06 Premium",
-    Icon = 89738140174311,          -- asset id
-    Duration = 3,                   -- seconds to stay visible
-    AccentColor = Color3.fromRGB(255, 255, 255),
-    Statuses = {
-        "Checking license...",
-        "Fetching data...",
-        "Injecting..."
-    },
-    Silent = false -- Set to true for stealth execution
+            <!-- ─── INITLOAD ────────────────────────────────────────── -->
+            <section id="initload">
+                <h2>InitLoad</h2>
+                <p class="section-desc">Displays a full-screen cinematic splash screen with a particle field, animated
+                    segment bar, glitch-typewriter title, and terminal-style status log. Call this <em>before</em>
+                    <code>Library.new()</code>.
+                </p>
+
+                <div class="card">
+                    <div class="sig">
+                        <span class="obj">Library</span><span class="op">:</span><span class="fn">InitLoad</span>(<span
+                            class="param">options</span><span class="op">:</span> <span class="type">table</span>)
+                    </div>
+
+                    <table class="params">
+                        <tr>
+                            <th>Key</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                        <tr>
+                            <td>Title</td>
+                            <td>string</td>
+                            <td>Large glitch-typewriter title text. Default: <code>"NEXUS HUB"</code></td>
+                        </tr>
+                        <tr>
+                            <td>SubTitle</td>
+                            <td>string</td>
+                            <td>Secondary line shown below title (version, author). Default: <code>""</code></td>
+                        </tr>
+                        <tr>
+                            <td>Icon</td>
+                            <td>number|string</td>
+                            <td>Asset ID or rbxassetid URI for the logo. Displayed above the title. Optional.</td>
+                        </tr>
+                        <tr>
+                            <td>Duration</td>
+                            <td>number</td>
+                            <td>Total splash duration in seconds (minimum 2). Default: <code>5</code></td>
+                        </tr>
+                        <tr>
+                            <td>AccentColor</td>
+                            <td>Color3</td>
+                            <td>Color used for segments, corners, particles. Default:
+                                <code>Color3.fromRGB(0, 210, 150)</code>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>BackgroundColor</td>
+                            <td>Color3</td>
+                            <td>Backdrop color. Default: <code>Color3.fromRGB(5, 8, 13)</code></td>
+                        </tr>
+                        <tr>
+                            <td>Statuses</td>
+                            <td>{string}</td>
+                            <td>Array of terminal log strings to cycle through. Each is typewritten as the bar
+                                progresses.</td>
+                        </tr>
+                        <tr>
+                            <td>Silent</td>
+                            <td>boolean</td>
+                            <td>If <code>true</code>, skips the UI entirely and sets
+                                <code>Library.IsSilent = true</code>. Also auto-detected from saved config.
+                            </td>
+                        </tr>
+                    </table>
+
+                    <div class="code-wrap">
+                        <div class="code-header"><span>Example</span><span class="code-lang">lua</span></div>
+                        <pre><code class="language-lua">Library:InitLoad({
+    Title       = "NEXUS HUB",
+    SubTitle    = "v0.06 — by acidg",
+    Icon        = 10734914443,
+    Duration    = 5,
+    AccentColor = Color3.fromRGB(0, 200, 255),
+    Statuses    = {
+        "Verifying environment...",
+        "Loading modules...",
+        "Authenticating...",
+        "Building interface...",
+        "Ready."
+    }
 })</code></pre>
-                </div>
+                    </div>
 
-                <div class="tutorial-step">
-                    <h3>Step 2: Silent Execution</h3>
-                    <p>If <code>Silent</code> is true (or if the user enabled "Silent Execution" in their saved config),
-                        the loader will be completely skipped and the UI will start hidden.</p>
+                    <div class="callout callout-warn">
+                        <div class="callout-icon">⚠</div>
+                        <div class="callout-body">
+                            <strong>Silent Execution</strong>: If the player has a saved config with
+                            <code>SilentExecution = true</code>, <code>InitLoad</code> will automatically set
+                            <code>Library.IsSilent = true</code> and return early — even if <code>Silent</code> is not
+                            passed. All subsequent UI calls are no-ops in silent mode.
+                        </div>
+                    </div>
                 </div>
             </section>
 
-            <!-- WINDOW & TABS -->
+
+            <!-- ─── LIBRARY.NEW ─────────────────────────────────────── -->
             <section id="window">
-                <h2>Window & Layout</h2>
-                <p>NextLevel supports a powerful Sidebar navigation system with active tab highlighting.</p>
+                <h2>Library.new</h2>
+                <p class="section-desc">Creates and returns a <strong>Window</strong> — the root container for all tabs
+                    and widgets. Registers cleanup automatically via <code>getgenv()._NextLevel_Garbage</code>.</p>
 
-                <div class="method-signature">Library.new(Name: string, Size: UDim2, KeyBind: Enum, Mode: string, Icon:
-                    number)</div>
-                <pre><code class="language-lua">local Window = Library.new(
-    "NextLevel", 
-    UDim2.fromOffset(540, 580), 
-    Enum.KeyCode.RightControl, 
-    "Sidebar", 
-    89738140174311
+                <div class="card">
+                    <div class="sig">
+                        <span class="kw">local</span> <span class="param">Window</span> <span class="op">=</span> <span
+                            class="obj">Library</span><span class="op">.</span><span class="fn">new</span>(<span
+                            class="param">Name</span>, <span class="param">Size</span>, <span
+                            class="param">ToggleKey</span>, <span class="param">Mode</span>, <span
+                            class="param">Icon</span>)
+                    </div>
+
+                    <table class="params">
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                        <tr>
+                            <td>Name</td>
+                            <td>string</td>
+                            <td>Window title shown in the header. Also used as the GC namespace and config folder
+                                prefix.</td>
+                        </tr>
+                        <tr>
+                            <td>Size</td>
+                            <td>UDim2</td>
+                            <td>Initial window dimensions. Minimum enforced at 400×300 by the resize grip. Default:
+                                <code>UDim2.fromOffset(520, 560)</code>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>ToggleKey</td>
+                            <td>Enum.KeyCode | Enum.UserInputType</td>
+                            <td>Key/input to show or hide the window. Default: <code>Enum.KeyCode.RightControl</code>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>Mode</td>
+                            <td>string</td>
+                            <td><code>"Sidebar"</code> — icon sidebar with two-column sections. <code>"Classic"</code> —
+                                top tab bar with single column. Default: <code>"Classic"</code></td>
+                        </tr>
+                        <tr>
+                            <td>Icon</td>
+                            <td>number|string</td>
+                            <td>Asset ID for the logo shown next to the title. Optional.</td>
+                        </tr>
+                    </table>
+
+                    <div class="code-wrap">
+                        <div class="code-header"><span>Sidebar Mode</span><span class="code-lang">lua</span></div>
+                        <pre><code class="language-lua">local Window = Library.new(
+    "My Hub",
+    UDim2.new(0, 560, 0, 580),
+    Enum.KeyCode.RightControl,
+    "Sidebar",
+    10734914443
 )</code></pre>
+                    </div>
 
-                <h3>Creating Tabs & Sections</h3>
-                <pre><code class="language-lua">local Tab = Window:Tab("Combat", 3926307971) -- Tab name and Icon ID
-local Section = Tab:Section("Main Features")  -- Create a categorized group</code></pre>
+                    <div class="code-wrap">
+                        <div class="code-header"><span>Classic Mode</span><span class="code-lang">lua</span></div>
+                        <pre><code class="language-lua">local Window = Library.new(
+    "My Hub",
+    UDim2.new(0, 520, 0, 480),
+    Enum.KeyCode.Insert,
+    "Classic"
+)</code></pre>
+                    </div>
+
+                    <div class="callout callout-info">
+                        <div class="callout-icon">ℹ</div>
+                        <div class="callout-body">
+                            <strong>Window properties accessible after creation:</strong>
+                            <code>Window.Name</code>, <code>Window.Size</code>, <code>Window.KeyBind</code>,
+                            <code>Window.Flags</code>, <code>Window.Setters</code>, <code>Window.ConfigFolder</code>,
+                            <code>Window.Presets</code>, <code>Window.NotificationHistory</code>,
+                            <code>Window.IsSilent</code>.
+                        </div>
+                    </div>
+                </div>
             </section>
 
-            <!-- BUTTONS -->
-            <section id="buttons">
-                <h2>Buttons & Multi-Rows</h2>
-                <p>Interactive triggers for your script's logic.</p>
 
-                <div class="method-signature">Section:Button(Text: string, Callback: function)</div>
-                <pre><code class="language-lua">Section:Button("Destroy All", function()
-    print("Action triggered!")
+            <!-- ─── WINDOW API ──────────────────────────────────────── -->
+            <section id="window-api">
+                <h2>Window API</h2>
+                <p class="section-desc">All methods available on the Window object returned by
+                    <code>Library.new()</code>.
+                </p>
+
+                <!-- Notify -->
+                <div class="card">
+                    <h3>Notify <span class="method-tag tag-window">window</span></h3>
+                    <div class="sig">
+                        <span class="obj">Window</span><span class="op">:</span><span class="fn">Notify</span>(<span
+                            class="param">title</span><span class="op">:</span> <span class="type">string</span>, <span
+                            class="param">text</span><span class="op">:</span> <span class="type">string</span>, <span
+                            class="param">duration</span><span class="op">?:</span> <span class="type">number</span>)
+                    </div>
+                    <p style="font-size:14px;color:var(--sub);margin-bottom:12px;">Displays an animated slide-in
+                        notification in the top-right corner. Entries are recorded to
+                        <code>Window.NotificationHistory</code>. No-op in silent mode.
+                    </p>
+                    <div class="code-wrap">
+                        <div class="code-header"><span>Example</span><span class="code-lang">lua</span></div>
+                        <pre><code class="language-lua">Window:Notify("Success", "Operation completed.", 3)
+ Window:Notify("Warning", "Rate limit approaching.", 5)
+ Window:Notify("Error",   "Connection timed out.",   8)
+</code></pre>
+                    </div>
+                </div>
+
+                <!-- Dialog -->
+                <div class="card">
+                    <h3>Dialog <span class="method-tag tag-window">window</span></h3>
+                    <div class="sig">
+                        <span class="obj">Window</span><span class="op">:</span><span class="fn">Dialog</span>(<span
+                            class="param">title</span><span class="op">:</span> <span class="type">string</span>, <span
+                            class="param">message</span><span class="op">:</span> <span class="type">string</span>,
+                        <span class="param">buttons</span><span class="op">:</span> <span class="type">{string}</span>,
+                        <span class="param">callback</span><span class="op">:</span> <span class="type">(choice: string)
+                            -> ()</span>)
+                    </div>
+                    <p style="font-size:14px;color:var(--sub);margin-bottom:12px;">Renders a blocking modal with a
+                        backdrop overlay. The callback receives the text of the button clicked. Animates in with a
+                        spring scale and fades out on close.</p>
+                    <div class="code-wrap">
+                        <div class="code-header"><span>Example</span><span class="code-lang">lua</span></div>
+                        <pre><code class="language-lua">Window:Dialog("Confirm Reset", "This will delete all saved data. Are you sure?",
+    {"Yes, Reset", "Cancel"},
+    function(choice)
+        if choice == "Yes, Reset" then
+            -- wipe data
+        end
+    end
+)</code></pre>
+                    </div>
+                </div>
+
+                <!-- Unload -->
+                <div class="card">
+                    <h3>Unload <span class="method-tag tag-window">window</span></h3>
+                    <div class="sig">
+                        <span class="obj">Window</span><span class="op">:</span><span class="fn">Unload</span>()
+                    </div>
+                    <p style="font-size:14px;color:var(--sub);margin-bottom:12px;">Cleanly destroys all GUI instances,
+                        disconnects all RBXScriptConnections, cancels all running threads, and calls all registered
+                        <code>:OnUnload()</code> callbacks. Uses the global GC table keyed by <code>Window.Name</code>.
+                    </p>
+                    <div class="code-wrap">
+                        <div class="code-header"><span>Example</span><span class="code-lang">lua</span></div>
+                        <pre><code class="language-lua">Window:Unload()</code></pre>
+                    </div>
+                </div>
+
+                <!-- OnUnload -->
+                <div class="card">
+                    <h3>OnUnload <span class="method-tag tag-window">window</span></h3>
+                    <div class="sig">
+                        <span class="obj">Window</span><span class="op">:</span><span class="fn">OnUnload</span>(<span
+                            class="param">callback</span><span class="op">:</span> <span class="type">() -> ()</span>)
+                    </div>
+                    <p style="font-size:14px;color:var(--sub);margin-bottom:12px;">Registers a cleanup function to run
+                        when <code>:Unload()</code> is called. Use this to stop game loops or restore modified
+                        properties.</p>
+                    <div class="code-wrap">
+                        <div class="code-header"><span>Example</span><span class="code-lang">lua</span></div>
+                        <pre><code class="language-lua">local flyLoop = task.spawn(function()
+    while true do
+        -- fly logic
+        task.wait()
+    end
+end)
+
+Window:OnUnload(function()
+    task.cancel(flyLoop)
+    -- restore player speed, etc.
 end)</code></pre>
+                    </div>
+                </div>
 
-                <h3>Button Rows</h3>
-                <p>Save vertical space by putting two buttons on a single row.</p>
-                <div class="method-signature">Section:CreateButtonRow(Text1: string, CB1: func, Text2: string, CB2:
-                    func)</div>
-                <pre><code class="language-lua">Section:CreateButtonRow("Accept", function() end, "Decline", function() end)</code></pre>
+                <!-- Connect -->
+                <div class="card">
+                    <h3>Connect <span class="method-tag tag-window">window</span></h3>
+                    <div class="sig">
+                        <span class="obj">Window</span><span class="op">:</span><span class="fn">Connect</span>(<span
+                            class="param">signal</span><span class="op">:</span> <span
+                            class="type">RBXScriptSignal</span>, <span class="param">callback</span><span
+                            class="op">:</span> <span class="type">function</span>) <span class="op">→</span> <span
+                            class="ret">RBXScriptConnection</span>
+                    </div>
+                    <p style="font-size:14px;color:var(--sub);margin-bottom:12px;">Connects a signal and registers the
+                        connection in the GC table. Connections are automatically disconnected on
+                        <code>:Unload()</code>. Prefer this over bare <code>:Connect()</code> inside your script.
+                    </p>
+                    <div class="code-wrap">
+                        <div class="code-header"><span>Example</span><span class="code-lang">lua</span></div>
+                        <pre><code class="language-lua">Window:Connect(game.Players.LocalPlayer.CharacterAdded, function(char)
+    Window:Notify("Respawned", "Character loaded.", 2)
+end)</code></pre>
+                    </div>
+                </div>
+
+                <!-- SetPanicKey -->
+                <div class="card">
+                    <h3>SetPanicKey <span class="method-tag tag-window">window</span></h3>
+                    <div class="sig">
+                        <span class="obj">Window</span><span class="op">:</span><span
+                            class="fn">SetPanicKey</span>(<span class="param">key</span><span class="op">:</span> <span
+                            class="type">Enum.KeyCode</span>)
+                    </div>
+                    <p style="font-size:14px;color:var(--sub);margin-bottom:12px;">Registers an emergency key that calls
+                        <code>:Unload()</code> instantly, removing all traces of the GUI.
+                    </p>
+                    <div class="code-wrap">
+                        <div class="code-header"><span>Example</span><span class="code-lang">lua</span></div>
+                        <pre><code class="language-lua">Window:SetPanicKey(Enum.KeyCode.End)  -- DELETE key unloads everything</code></pre>
+                    </div>
+                </div>
+
+                <!-- AddTooltip -->
+                <div class="card">
+                    <h3>AddTooltip <span class="method-tag tag-window">window</span></h3>
+                    <div class="sig">
+                        <span class="obj">Window</span><span class="op">:</span><span class="fn">AddTooltip</span>(<span
+                            class="param">element</span><span class="op">:</span> <span class="type">GuiObject</span>,
+                        <span class="param">tipText</span><span class="op">:</span> <span class="type">string</span>)
+                    </div>
+                    <p style="font-size:14px;color:var(--sub);margin-bottom:12px;">Attaches a hover tooltip to any
+                        GuiObject created by the library. Follows the mouse cursor and auto-hides on leave.</p>
+                    <div class="code-wrap">
+                        <div class="code-header"><span>Example</span><span class="code-lang">lua</span></div>
+                        <pre><code class="language-lua">local myBtn = Section:Button("Teleport", function() end)
+Window:AddTooltip(myBtn, "Teleports you to spawn point.")</code></pre>
+                    </div>
+                </div>
+
+                <!-- GetFlag / IgnoreFlag -->
+                <div class="card">
+                    <h3>GetFlag / IgnoreFlag <span class="method-tag tag-window">window</span></h3>
+                    <div class="sig">
+                        <span class="obj">Window</span><span class="op">:</span><span class="fn">GetFlag</span>(<span
+                            class="param">flag</span><span class="op">:</span> <span class="type">string</span>) <span
+                            class="op">→</span> <span class="ret">any</span>
+                    </div>
+                    <div class="sig" style="margin-top:8px;">
+                        <span class="obj">Window</span><span class="op">:</span><span class="fn">IgnoreFlag</span>(<span
+                            class="param">flag</span><span class="op">:</span> <span class="type">string</span>)
+                    </div>
+                    <p style="font-size:14px;color:var(--sub);margin-bottom:12px;margin-top:10px;"><code>GetFlag</code>
+                        reads the current value for a named flag. <code>IgnoreFlag</code> marks a flag so it is excluded
+                        from config saves/loads.</p>
+                    <div class="code-wrap">
+                        <div class="code-header"><span>Example</span><span class="code-lang">lua</span></div>
+                        <pre><code class="language-lua">-- Read a flag at any point:
+local fov = Window:GetFlag("FovFlag")  -- returns current slider value
+
+-- Prevent a flag from being persisted:
+Window:IgnoreFlag("SensitiveFlag")</code></pre>
+                    </div>
+                </div>
+
+                <!-- ServerHop -->
+                <div class="card">
+                    <h3>ServerHop <span class="method-tag tag-window">window</span></h3>
+                    <div class="sig">
+                        <span class="obj">Window</span><span class="op">:</span><span class="fn">ServerHop</span>(<span
+                            class="param">placeId</span><span class="op">:</span> <span class="type">number</span>,
+                        <span class="param">jobId</span><span class="op">?:</span> <span class="type">string</span>,
+                        <span class="param">scriptToQueue</span><span class="op">?:</span> <span
+                            class="type">string</span>)
+                    </div>
+                    <p style="font-size:14px;color:var(--sub);margin-bottom:12px;">Saves all current flags to
+                        <code>teleport_state.json</code> and sets autoload to that file, then teleports the player. If
+                        <code>scriptToQueue</code> is provided, it is queued via <code>queue_on_teleport</code>.
+                    </p>
+                    <div class="code-wrap">
+                        <div class="code-header"><span>Example</span><span class="code-lang">lua</span></div>
+                        <pre><code class="language-lua">-- Hop to a random server in the same game:
+Window:ServerHop(game.PlaceId)
+
+-- Hop to a specific server with a re-inject script:
+Window:ServerHop(game.PlaceId, someJobId, [[
+    loadstring(game:HttpGet("https://my.cdn/script.lua"))()
+]])</code></pre>
+                    </div>
+                </div>
+
+                <!-- SetTheme / ApplyPreset -->
+                <div class="card">
+                    <h3>SetTheme / ApplyPreset <span class="method-tag tag-window">window</span></h3>
+                    <div class="sig">
+                        <span class="obj">Window</span><span class="op">:</span><span class="fn">SetTheme</span>(<span
+                            class="param">overrides</span><span class="op">:</span> <span class="type">table</span>)
+                    </div>
+                    <div class="sig" style="margin-top:8px;">
+                        <span class="obj">Window</span><span class="op">:</span><span
+                            class="fn">ApplyPreset</span>(<span class="param">name</span><span class="op">:</span> <span
+                            class="type">string</span>)
+                    </div>
+                    <p style="font-size:14px;color:var(--sub);margin-bottom:12px;margin-top:10px;">
+                        <code>SetTheme</code> merges a partial theme override and fires the reactive
+                        <code>ThemeEvent</code>, tweening all bound elements. <code>ApplyPreset</code> applies one of
+                        the six built-in color presets.
+                    </p>
+                    <div class="code-wrap">
+                        <div class="code-header"><span>Example</span><span class="code-lang">lua</span></div>
+                        <pre><code class="language-lua">Window:SetTheme({
+    AccentColor = Color3.fromRGB(120, 80, 255),
+    LineColor   = Color3.fromRGB(150, 100, 255),
+})
+
+Window:ApplyPreset("Cyberpunk") -- or "Midnight", "Toxic", "Ocean", "Classic", "Ghost"</code></pre>
+                    </div>
+                </div>
+
             </section>
 
-            <!-- TOGGLES -->
+
+            <!-- ─── THEME SYSTEM ─────────────────────────────────────── -->
+            <section id="theme">
+                <h2>Theme System</h2>
+                <p class="section-desc">All colors and size constants are held in the shared <code>THEMES</code> table.
+                    Every widget binds to these keys via a reactive event — changing a key instantly tweens all bound
+                    elements.</p>
+
+                <div class="card">
+                    <h3>THEMES Keys</h3>
+                    <div class="theme-grid">
+                        <div class="theme-row">
+                            <div class="theme-swatch" style="background:rgb(15,15,15);"></div><span
+                                class="theme-key">MainColor</span><span class="theme-default">15,15,15</span>
+                        </div>
+                        <div class="theme-row">
+                            <div class="theme-swatch" style="background:rgb(20,20,20);"></div><span
+                                class="theme-key">FrameColor</span><span class="theme-default">20,20,20</span>
+                        </div>
+                        <div class="theme-row">
+                            <div class="theme-swatch" style="background:rgb(18,18,18);"></div><span
+                                class="theme-key">TabColor</span><span class="theme-default">18,18,18</span>
+                        </div>
+                        <div class="theme-row">
+                            <div class="theme-swatch" style="background:rgb(78,78,78);"></div><span
+                                class="theme-key">LineColor</span><span class="theme-default">78,78,78</span>
+                        </div>
+                        <div class="theme-row">
+                            <div class="theme-swatch" style="background:rgb(78,78,78);"></div><span
+                                class="theme-key">AccentColor</span><span class="theme-default">78,78,78</span>
+                        </div>
+                        <div class="theme-row">
+                            <div class="theme-swatch" style="background:rgb(40,40,40);"></div><span
+                                class="theme-key">BorderColor</span><span class="theme-default">40,40,40</span>
+                        </div>
+                        <div class="theme-row">
+                            <div class="theme-swatch" style="background:rgb(10,10,10);"></div><span
+                                class="theme-key">DarkColor</span><span class="theme-default">10,10,10</span>
+                        </div>
+                        <div class="theme-row">
+                            <div class="theme-swatch" style="background:rgb(245,245,245);"></div><span
+                                class="theme-key">TextColor</span><span class="theme-default">245,245,245</span>
+                        </div>
+                        <div class="theme-row">
+                            <div class="theme-swatch" style="background:rgb(35,35,35);"></div><span
+                                class="theme-key">ButtonBorderColor</span><span class="theme-default">35,35,35</span>
+                        </div>
+                        <div class="theme-row">
+                            <div class="theme-swatch" style="background:rgb(150,150,150);"></div><span
+                                class="theme-key">SubTextColor</span><span class="theme-default">150,150,150</span>
+                        </div>
+                        <div class="theme-row">
+                            <div class="theme-swatch" style="background:rgb(255,255,255);"></div><span
+                                class="theme-key">SuccessColor</span><span class="theme-default">255,255,255</span>
+                        </div>
+                        <div class="theme-row">
+                            <div class="theme-swatch" style="background:rgb(255,175,50);"></div><span
+                                class="theme-key">WarningColor</span><span class="theme-default">255,175,50</span>
+                        </div>
+                        <div class="theme-row">
+                            <div class="theme-swatch" style="background:rgb(255,70,90);"></div><span
+                                class="theme-key">ErrorColor</span><span class="theme-default">255,70,90</span>
+                        </div>
+                        <div class="theme-row">
+                            <div class="theme-swatch" style="background:rgb(255,255,255);"></div><span
+                                class="theme-key">InfoColor</span><span class="theme-default">255,255,255</span>
+                        </div>
+                    </div>
+                    <p style="font-size:13px;color:var(--sub);margin-top:8px;">Integer keys: <code>TextSize = 13</code>
+                        and <code>BaseHeight = 26</code> control global font size and widget row height.</p>
+                </div>
+
+                <div class="card">
+                    <h3>Built-in Presets</h3>
+                    <div class="preset-grid">
+                        <div class="preset-pill">
+                            <div class="preset-color" style="background:rgb(0,255,255);"></div>Cyberpunk
+                        </div>
+                        <div class="preset-pill">
+                            <div class="preset-color" style="background:rgb(120,80,255);"></div>Midnight
+                        </div>
+                        <div class="preset-pill">
+                            <div class="preset-color" style="background:rgb(170,255,0);"></div>Toxic
+                        </div>
+                        <div class="preset-pill">
+                            <div class="preset-color" style="background:rgb(0,180,255);"></div>Ocean
+                        </div>
+                        <div class="preset-pill">
+                            <div class="preset-color" style="background:rgb(255,0,0);"></div>Classic
+                        </div>
+                        <div class="preset-pill">
+                            <div class="preset-color" style="background:rgb(255,255,255);"></div>Ghost
+                        </div>
+                    </div>
+
+                    <div class="code-wrap">
+                        <div class="code-header"><span>Custom Preset Registration</span><span
+                                class="code-lang">lua</span></div>
+                        <pre><code class="language-lua">-- You can add your own presets to the Window's preset table:
+Window.Presets["MyPreset"] = {
+    MainColor   = Color3.fromRGB(10, 5, 20),
+    AccentColor = Color3.fromRGB(255, 100, 200),
+    LineColor   = Color3.fromRGB(200, 80, 160),
+}
+Window:ApplyPreset("MyPreset")</code></pre>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>RGB Chroma Loop</h3>
+                    <p style="font-size:14px;color:var(--sub);margin-bottom:12px;">The Settings tab provides a built-in
+                        "RGB Chroma Accents" toggle that continuously cycles <code>LineColor</code> through hue using
+                        <code>Color3.fromHSV</code>. You can replicate this manually:
+                    </p>
+                    <div class="code-wrap">
+                        <div class="code-header"><span>Manual RGB Loop</span><span class="code-lang">lua</span></div>
+                        <pre><code class="language-lua">task.spawn(function()
+    while true do
+        local hue = tick() % 10 / 10
+        Window:SetTheme({ LineColor = Color3.fromHSV(hue, 1, 1) })
+        task.wait(0.1)
+    end
+end)</code></pre>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- ─── FLAGS & SETTERS ──────────────────────────────────── -->
+            <section id="flags">
+                <h2>Flags & Setters</h2>
+                <p class="section-desc">Every widget with a <code>flag</code> parameter registers itself in two tables
+                    on the Window. Understanding this system is key to programmatic control and config persistence.</p>
+
+                <div class="flag-info">
+                    <strong>Window.Flags</strong> — a flat key-value table mapping every flag name to its current value.
+                    Readable at any time via <code>Window.Flags["MyFlag"]</code> or
+                    <code>Window:GetFlag("MyFlag")</code>.
+                </div>
+
+                <div class="flag-info" style="background:rgba(96,165,250,0.05);border-color:rgba(96,165,250,0.15);">
+                    <strong style="color:var(--blue);">Window.Setters</strong> — maps every flag name to a setter
+                    function. Calling <code>Window.Setters["MyFlag"](newValue)</code> is equivalent to the user
+                    interacting with the widget — it updates the visual, the flag, and fires the callback.
+                </div>
+
+                <div class="code-wrap">
+                    <div class="code-header"><span>Reading & Writing Flags</span><span class="code-lang">lua</span>
+                    </div>
+                    <pre><code class="language-lua">-- Create a toggle with a flag:
+Section:Toggle("Aimbot", false, "AimbotFlag", function(state)
+    print("Aimbot:", state)
+end)
+
+-- Read it anywhere:
+local isEnabled = Window:GetFlag("AimbotFlag")          -- false
+local isEnabled = Window.Flags["AimbotFlag"]            -- same thing
+
+-- Set it programmatically (fires callback + updates visual):
+Window.Setters["AimbotFlag"](true)
+
+-- Prevent from being saved in configs:
+Window:IgnoreFlag("AimbotFlag")</code></pre>
+                </div>
+
+                <div class="callout callout-tip">
+                    <div class="callout-icon">✦</div>
+                    <div class="callout-body">
+                        <strong>Config saving</strong> iterates over <code>Window.Flags</code> and serialises every key
+                        not in <code>Window.IgnoredFlags</code>. Loading calls each matching
+                        <code>Window.Setters[flag]</code> in turn. This is how all widget states are persisted
+                        automatically.
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- ─── TABS ─────────────────────────────────────────────── -->
+            <section id="tabs">
+                <h2>Tabs</h2>
+                <p class="section-desc">Tabs are primary navigation categories. In <code>Sidebar</code> mode, tabs
+                    display as icon-label rows in the left sidebar. In <code>Classic</code> mode, they display as a
+                    horizontal tab bar across the top.</p>
+
+                <div class="card">
+                    <div class="sig">
+                        <span class="kw">local</span> <span class="param">Tab</span> <span class="op">=</span> <span
+                            class="obj">Window</span><span class="op">:</span><span class="fn">Tab</span>(<span
+                            class="param">name</span><span class="op">:</span> <span class="type">string</span>, <span
+                            class="param">iconId</span><span class="op">?:</span> <span
+                            class="type">number|string</span>)
+                    </div>
+                    <table class="params">
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                        <tr>
+                            <td>name</td>
+                            <td>string</td>
+                            <td>Tab label text displayed in the navigation.</td>
+                        </tr>
+                        <tr>
+                            <td>iconId</td>
+                            <td>number|string</td>
+                            <td>Roblox asset ID for the tab icon. Highly recommended in Sidebar mode for best
+                                aesthetics.</td>
+                        </tr>
+                    </table>
+                    <div class="code-wrap">
+                        <div class="code-header"><span>Example</span><span class="code-lang">lua</span></div>
+                        <pre><code class="language-lua">local CombatTab  = Window:Tab("Combat",   10734914443)
+local VisualTab  = Window:Tab("Visuals",  9886724082)
+local MiscTab    = Window:Tab("Misc",     11963373104)
+local SettingsTab = Window:Tab("Settings", 3926307971)</code></pre>
+                    </div>
+                    <div class="callout callout-note">
+                        <div class="callout-icon">◦</div>
+                        <div class="callout-body">The <strong>first tab created</strong> is automatically shown and
+                            highlighted when the window opens.</div>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- ─── SECTIONS ─────────────────────────────────────────── -->
+            <section id="sections">
+                <h2>Sections</h2>
+                <p class="section-desc">Sections are bordered containers that hold widgets. In Sidebar mode, sections
+                    alternate between the left and right columns automatically for a two-column grid layout.</p>
+
+                <div class="card">
+                    <div class="sig">
+                        <span class="kw">local</span> <span class="param">Section</span> <span class="op">=</span> <span
+                            class="obj">Tab</span><span class="op">:</span><span class="fn">Section</span>(<span
+                            class="param">title</span><span class="op">:</span> <span class="type">string</span>)
+                    </div>
+                    <p style="font-size:14px;color:var(--sub);margin-bottom:12px;">Creates a bordered section with a
+                        floating title label. Section height is automatically driven by its content via
+                        <code>UIListLayout.AbsoluteContentSize</code>.
+                    </p>
+                    <div class="code-wrap">
+                        <div class="code-header"><span>Example</span><span class="code-lang">lua</span></div>
+                        <pre><code class="language-lua">local AimSection   = CombatTab:Section("Aimbot")
+local ESPSection   = VisualTab:Section("ESP Settings")
+local MiscSection  = MiscTab:Section("Miscellaneous")
+
+-- All widgets go into a Section:
+AimSection:Toggle("Enable Aimbot", false, "AimFlag", function(state) end)</code></pre>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- ─── LAYOUT ───────────────────────────────────────────── -->
+            <section id="layout">
+                <h2>Layout Elements</h2>
+                <p class="section-desc">Structural helpers for organising content within sections.</p>
+
+                <!-- Separator -->
+                <div class="card">
+                    <h3>Separator</h3>
+                    <div class="sig"><span class="obj">Section</span><span class="op">:</span><span
+                            class="fn">Separator</span>(<span class="param">label</span><span class="op">?:</span> <span
+                            class="type">string</span>)</div>
+                    <p style="font-size:14px;color:var(--sub);margin-bottom:12px;">A thin 1px horizontal rule. With a
+                        label, shows flanking lines around centred text. Without, a simple full-width line.</p>
+                    <div class="code-wrap">
+                        <div class="code-header"><span>Example</span><span class="code-lang">lua</span></div>
+                        <pre><code class="language-lua">Section:Separator()                  -- bare line
+Section:Separator("ADVANCED")</code></pre>
+                    </div>
+                </div>
+
+                <!-- Spacer -->
+                <div class="card">
+                    <h3>Spacer</h3>
+                    <div class="sig"><span class="obj">Section</span><span class="op">:</span><span
+                            class="fn">Spacer</span>(<span class="param">height</span><span class="op">?:</span> <span
+                            class="type">number</span>)</div>
+                    <p style="font-size:14px;color:var(--sub);margin-bottom:12px;">Invisible vertical padding in pixels.
+                        Default: <code>10</code>.</p>
+                    <div class="code-wrap">
+                        <div class="code-header"><span>Example</span><span class="code-lang">lua</span></div>
+                        <pre><code class="language-lua">Section:Spacer(20)  -- 20px vertical gap</code></pre>
+                    </div>
+                </div>
+
+                <!-- Label -->
+                <div class="card">
+                    <h3>Label <span class="method-tag tag-returns">→ controller</span></h3>
+                    <div class="sig"><span class="obj">Section</span><span class="op">:</span><span
+                            class="fn">Label</span>(<span class="param">text</span><span class="op">:</span> <span
+                            class="type">string</span>) <span class="op">→</span> <span
+                            class="ret">LabelController</span></div>
+                    <p style="font-size:14px;color:var(--sub);margin-bottom:12px;">Short single-line text in
+                        <code>TextColor</code>. Supports <code>TextWrapped</code>. Returns an object with
+                        <code>:SetText(str)</code> for dynamic updates.
+                    </p>
+                    <div class="code-wrap">
+                        <div class="code-header"><span>Example</span><span class="code-lang">lua</span></div>
+                        <pre><code class="language-lua">local lbl = Section:Label("Status: Idle")
+
+-- Update dynamically:
+lbl:SetText("Status: Active")
+
+-- Or directly set Roblox property:
+lbl.TextColor3 = Color3.new(0, 1, 0)</code></pre>
+                    </div>
+                </div>
+
+                <!-- Paragraph -->
+                <div class="card">
+                    <h3>Paragraph <span class="method-tag tag-returns">→ controller</span></h3>
+                    <div class="sig"><span class="obj">Section</span><span class="op">:</span><span
+                            class="fn">Paragraph</span>(<span class="param">text</span><span class="op">:</span> <span
+                            class="type">string</span>) <span class="op">→</span> <span
+                            class="ret">ParagraphController</span></div>
+                    <p style="font-size:14px;color:var(--sub);margin-bottom:12px;">Multi-line wrapped text in
+                        <code>SubTextColor</code>. Auto-sizes height. Returns <code>:SetText(str)</code>.
+                    </p>
+                    <div class="code-wrap">
+                        <div class="code-header"><span>Example</span><span class="code-lang">lua</span></div>
+                        <pre><code class="language-lua">local info = Section:Paragraph("This feature is in beta. Report any bugs in the Discord server.")
+info:SetText("Updated: " .. os.date("%d/%m/%Y"))</code></pre>
+                    </div>
+                </div>
+
+                <!-- Alert -->
+                <div class="card">
+                    <h3>Alert</h3>
+                    <div class="sig"><span class="obj">Section</span><span class="op">:</span><span
+                            class="fn">Alert</span>(<span class="param">text</span><span class="op">:</span> <span
+                            class="type">string</span>, <span class="param">alertType</span><span class="op">?:</span>
+                        <span class="type">"info"|"warn"|"error"|"success"</span>)
+                    </div>
+                    <p style="font-size:14px;color:var(--sub);margin-bottom:12px;">A coloured inline notification box
+                        with a left accent bar and an icon glyph. Height scales to fit wrapped content.</p>
+                    <div class="code-wrap">
+                        <div class="code-header"><span>Example</span><span class="code-lang">lua</span></div>
+                        <pre><code class="language-lua">Section:Alert("New update available — v0.07", "info")
+Section:Alert("High ping detected. Performance may be reduced.", "warn")
+Section:Alert("Authentication failed. Re-inject to fix.", "error")
+Section:Alert("All systems operational.", "success")</code></pre>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- ─── BUTTONS ──────────────────────────────────────────── -->
+            <section id="buttons">
+                <h2>Buttons</h2>
+                <p class="section-desc">Clickable action elements with hover animations and click sound feedback.</p>
+
+                <!-- Button -->
+                <div class="card">
+                    <h3>Button <span class="method-tag tag-returns">→ TextButton</span></h3>
+                    <div class="sig"><span class="obj">Section</span><span class="op">:</span><span
+                            class="fn">Button</span>(<span class="param">text</span><span class="op">:</span> <span
+                            class="type">string</span>, <span class="param">callback</span><span class="op">?:</span>
+                        <span class="type">() -> ()</span>) <span class="op">→</span> <span
+                            class="ret">TextButton</span>
+                    </div>
+                    <p style="font-size:14px;color:var(--sub);margin-bottom:12px;">Full-width button. Returns the raw
+                        <code>TextButton</code> instance so you can pass it to <code>:AddTooltip()</code> or modify it
+                        directly.
+                    </p>
+                    <div class="code-wrap">
+                        <div class="code-header"><span>Example</span><span class="code-lang">lua</span></div>
+                        <pre><code class="language-lua">local resetBtn = Section:Button("Reset Character", function()
+    game.Players.LocalPlayer.Character:BreakJoints()
+end)
+
+Window:AddTooltip(resetBtn, "Instantly kills your character.")</code></pre>
+                    </div>
+                </div>
+
+                <!-- CreateButtonRow -->
+                <div class="card">
+                    <h3>CreateButtonRow</h3>
+                    <div class="sig"><span class="obj">Section</span><span class="op">:</span><span
+                            class="fn">CreateButtonRow</span>(<span class="param">text1</span>, <span
+                            class="param">callback1</span>, <span class="param">text2</span>, <span
+                            class="param">callback2</span>) <span class="op">→</span> <span class="ret">btn1,
+                            btn2</span></div>
+                    <p style="font-size:14px;color:var(--sub);margin-bottom:12px;">Places two equal-width buttons side
+                        by side in a single row. Returns both <code>TextButton</code> instances.</p>
+                    <div class="code-wrap">
+                        <div class="code-header"><span>Example</span><span class="code-lang">lua</span></div>
+                        <pre><code class="language-lua">local accept, decline = Section:CreateButtonRow(
+    "Accept", function()
+        Window:Notify("Accepted", "Terms accepted.", 3)
+    end,
+    "Decline", function()
+        Window:Notify("Declined", "Terms declined.", 3)
+    end
+)</code></pre>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- ─── TOGGLES ──────────────────────────────────────────── -->
             <section id="toggles">
                 <h2>Toggles & Switches</h2>
-                <p>Binary state management with persistent flags.</p>
+                <p class="section-desc">Boolean state widgets. All register to <code>Window.Flags</code> and
+                    <code>Window.Setters</code>.
+                </p>
 
-                <h3>Standard Toggle</h3>
-                <pre><code class="language-lua">Section:Toggle("Kill Aura", false, "KAFG", function(state) end)</code></pre>
+                <!-- Toggle -->
+                <div class="card">
+                    <h3>Toggle</h3>
+                    <div class="sig"><span class="obj">Section</span><span class="op">:</span><span
+                            class="fn">Toggle</span>(<span class="param">text</span>, <span
+                            class="param">default</span><span class="op">?:</span> <span class="type">boolean</span>,
+                        <span class="param">flag</span><span class="op">?:</span> <span class="type">string</span>,
+                        <span class="param">callback</span><span class="op">?:</span> <span
+                            class="type">(boolean)->void</span>)
+                    </div>
+                    <p style="font-size:14px;color:var(--sub);margin-bottom:12px;">Checkbox-style toggle with a filled
+                        square. Also updates the Keybind HUD when active.</p>
+                    <div class="code-wrap">
+                        <div class="code-header"><span>Example</span><span class="code-lang">lua</span></div>
+                        <pre><code class="language-lua">Section:Toggle("Aimbot", false, "AimbotState", function(state)
+    aimbot.enabled = state
+end)
 
-                <h3>Toggle with Keybind</h3>
-                <p>Allows users to bind a key to toggle the state instantly.</p>
-                <div class="method-signature">Section:ToggleBind(Text, DefaultState, DefaultKey, StateFlag, KeyFlag,
-                    Callback)</div>
-                <pre><code class="language-lua">Section:ToggleBind("Fly", false, Enum.KeyCode.F, "FState", "FKey", function(s, k) end)</code></pre>
+-- Programmatically enable:
+Window.Setters["AimbotState"](true)</code></pre>
+                    </div>
+                </div>
 
-                <h3>Modern Switch</h3>
-                <pre><code class="language-lua">Section:Switch("Auto Farm", true, "AFrm", function(state) end)</code></pre>
-            </section>
-
-            <!-- SLIDERS -->
-            <section id="sliders">
-                <h2>Sliders & Steppers</h2>
-                <p>Precise numeric control widgets.</p>
-
-                <h3>Slider</h3>
-                <div class="method-signature">Section:Slider(Label, Min, Max, Default, Decimals, Flag, Callback)</div>
-                <pre><code class="language-lua">Section:Slider("Speed", 16, 100, 16, 0, "SpeedFlag", function(v) end)
--- Set Decimals to 2 for float values like 0.00</code></pre>
-
-                <h3>Stepper</h3>
-                <p>Perfect for FOV or precise increments.</p>
-                <pre><code class="language-lua">Section:Stepper("Jump Power", 50, 200, 50, 5, "JPFlag", function(v) end)</code></pre>
-            </section>
-
-            <!-- INPUTS -->
-            <section id="inputs">
-                <h2>Inputs & Tag Fields</h2>
-                <p>NextLevel features advanced text entry widgets.</p>
-
-                <h3>Tag Input (Chips)</h3>
-                <p>The <code>TagInput</code> allows users to add multiple "chips" or tags to a list. Perfect for player
-                    ignore-lists.</p>
-                <pre><code class="language-lua">local List = Section:TagInput("Ignore List", {"Admin1"}, 10, "IgnFlag", function(t) end)
-List:AddTag("User2") -- Programmatic addition</code></pre>
-
-                <h3>Multiline Input</h3>
-                <pre><code class="language-lua">Section:MultilineInput("Config Info", "Notes...", 4, "NoteFlag", function(t) end)</code></pre>
-            </section>
-
-            <!-- DROPDOWNS -->
-            <section id="dropdowns">
-                <h2>The Dropdown Suite</h2>
-                <p>Our dropdowns are fully searchable and support multi-selection.</p>
-
-                <h3>Searchable Dropdown</h3>
-                <pre><code class="language-lua">Section:SearchableDropdown("Weapons", {"Sword", "Bow", "Axe"}, "Sword", "WpFlag", function(s) end)</code></pre>
-
-                <h3>Multi-Select Dropdown</h3>
-                <pre><code class="language-lua">Section:Dropdown("Target Elements", {"Fire", "Water", "Ice"}, true, {"Fire"}, "ElFlag", function(s) end)</code></pre>
-
-                <h3>Player Dropdown</h3>
-                <p>Auto-populates with server players and updates when they join/leave.</p>
-                <pre><code class="language-lua">Section:PlayerDropdown("Select Target", false, "PlrFlag", function(name) end)</code></pre>
-            </section>
-
-            <!-- GRIDS & CONSOLES -->
-            <section id="grids">
-                <h2>Grids & Consoles</h2>
-                <p>Visual utility widgets for complex interactions.</p>
-
-                <h3>Smart Console</h3>
-                <p>Our console automatically stops auto-scrolling if you scroll up to read, but resumes if you stay at
-                    the bottom.</p>
-                <pre><code class="language-lua">local Console = Section:Console(120) -- height
-Console:Print("Success", Color3.fromRGB(0,255,100))
-Console:Clear()</code></pre>
-
-                <h3>Action Grid</h3>
-                <pre><code class="language-lua">Section:Grid("Quick Spells", {"Fire", "Frost", "Shield"}, 3, function(id) end)</code></pre>
-
-                <h3>Timer Widget</h3>
-                <p>A live countdown widget with a completion callback.</p>
-                <div class="method-signature">Section:Timer(Label, Duration, AutoStart, Callback)</div>
-                <pre><code class="language-lua">local T = Section:Timer("Round Ends In", 120, true, function() 
-    print("Time is up!")
-end)</code></pre>
-            </section>
-
-            <!-- DATA VIZ -->
-            <section id="data">
-                <h2>Data Visualization</h2>
-                <p>Track your script's performance in real-time.</p>
-
-                <h3>Bar Chart</h3>
-                <pre><code class="language-lua">Section:Chart("Wealth", {
-    {label = "Mon", value = 1500},
-    {label = "Tue", value = 3200}
-}, 90)</code></pre>
-
-                <h3>Status Indicators</h3>
-                <pre><code class="language-lua">local stat = Section:StatusIndicator("Connection", "Stable", Color3.fromRGB(0,255,0))
-stat:Set("High Ping", Color3.fromRGB(255,0,0))</code></pre>
-
-                <h3>Key-Value Table</h3>
-                <pre><code class="language-lua">local table = Section:KeyValueTable({
-    {"Version", "0.06"},
-    {"License", "Premium"}
-})</code></pre>
-            </section>
-
-            <!-- VISUALS -->
-            <section id="visuals">
-                <h2>Visuals & Layout</h2>
-                <p>Structure your UI with clean spacing and descriptive labels.</p>
-
-                <h3>Labels & Paragraphs</h3>
-                <pre><code class="language-lua">Section:Label("Stat: Active")
-Section:Paragraph("This is a longer description that automatically wraps and maintains professional padding.")</code></pre>
-
-                <h3>Dividers & Spacers</h3>
-                <div class="method-signature">Section:Separator(Text)</div>
-                <pre><code class="language-lua">Section:Separator("ACCOUNT SETTINGS") -- Labeled line
-Section:Spacer(10) -- Exact pixel padding</code></pre>
-
-                <h3>Images</h3>
-                <pre><code class="language-lua">Section:Image(89738140174311, Vector2.new(100, 100))</code></pre>
-            </section>
-
-            <!-- ALERTS -->
-            <section id="alerts">
-                <h2>Alerts & Feedback</h2>
-                <p>Communicate state changes clearly to your users.</p>
-
-                <div class="method-signature">Section:Alert(Type, Message)</div>
-                <pre><code class="language-lua">Section:Alert("info", "Your config was loaded.")
-Section:Alert("warn", "This feature is experimental.")
-Section:Alert("error", "Failed to connect to server.")
-Section:Alert("success", "Operation complete!")</code></pre>
-            </section>
-
-            <!-- DIALOGS -->
-            <section id="dialogs">
-                <h2>Dialogs & Popups</h2>
-                <p>Modal overlays for critical user interaction.</p>
-
-                <div class="method-signature">Window:Dialog(Title, Message, Buttons: table, Callback: function)</div>
-                <pre><code class="language-lua">Window:Dialog(
-    "Warning", 
-    "This will reset your data. Continue?", 
-    {"Yes", "No"}, 
-    function(choice)
-        if choice == "Yes" then print("Confirmed") end
+                <!-- ToggleBind -->
+                <div class="card">
+                    <h3>ToggleBind</h3>
+                    <div class="sig"><span class="obj">Section</span><span class="op">:</span><span
+                            class="fn">ToggleBind</span>(<span class="param">text</span>, <span
+                            class="param">state</span><span class="op">?:</span><span class="type">bool</span>, <span
+                            class="param">key</span><span class="op">?:</span><span class="type">KeyCode</span>, <span
+                            class="param">stateFlag</span><span class="op">?:</span><span class="type">string</span>,
+                        <span class="param">keyFlag</span><span class="op">?:</span><span class="type">string</span>,
+                        <span class="param">callback</span><span class="op">?:</span><span
+                            class="type">(bool,string)->void</span>)
+                    </div>
+                    <p style="font-size:14px;color:var(--sub);margin-bottom:12px;">Combines a toggle checkbox with a
+                        rebindable key button. Pressing the bound key toggles state in real-time. Both the state and key
+                        are independently persisted as separate flags. Callback receives
+                        <code>(enabled, keyName)</code>.
+                    </p>
+                    <div class="code-wrap">
+                        <div class="code-header"><span>Example</span><span class="code-lang">lua</span></div>
+                        <pre><code class="language-lua">Section:ToggleBind(
+    "Fly",
+    false,
+    Enum.KeyCode.F,
+    "FlyState",
+    "FlyKey",
+    function(enabled, keyName)
+        if enabled then
+            startFly()
+        else
+            stopFly()
+        end
     end
 )</code></pre>
-            </section>
+                    </div>
+                </div>
 
-            <!-- CONFIGS -->
-            <section id="configs">
-                <h2>Config System</h2>
-                <p>One line of code to give your users full profile management.</p>
-                <pre><code class="language-lua">Window:BuildSettingsTab()</code></pre>
-                <p>This automatically builds a tab with **Save, Load, Delete, Autoload, and Clipboard Import/Export**
-                    functionality.</p>
-            </section>
-
-            <!-- THEMES -->
-            <section id="themes">
-                <h2>Theme Management</h2>
-                <p>Live, real-time UI skinning for your users.</p>
-                <pre><code class="language-lua">Window:BuildThemeTab()</code></pre>
-                <p>Allows users to edit all 14 core colors of the UI library at once.</p>
-            </section>
-
-            <!-- EXTRA METHODS -->
-            <section id="utils">
-                <h2>Utility & Elite Features</h2>
-                <p>NextLevel v0.06 is designed as a standalone power-tool for players.</p>
-
-                <h3>Webhook Widget</h3>
-                <p>Built-in Discord logging with a "Test" button to verify connections instantly. The widget
-                    automatically handles long URLs by clipping them within the input box.</p>
-                <div class="method-signature">Section:Webhook(Label, Flag, Callback)</div>
-                <pre><code class="language-lua">Section:Webhook("Discord Logger", "WebhookFlag", function(url) 
-    print("User entered webhook:", url)
+                <!-- Switch -->
+                <div class="card">
+                    <h3>Switch</h3>
+                    <div class="sig"><span class="obj">Section</span><span class="op">:</span><span
+                            class="fn">Switch</span>(<span class="param">text</span>, <span
+                            class="param">default</span><span class="op">?:</span><span class="type">bool</span>, <span
+                            class="param">flag</span><span class="op">?:</span><span class="type">string</span>, <span
+                            class="param">callback</span><span class="op">?:</span><span
+                            class="type">(bool)->void</span>)</div>
+                    <p style="font-size:14px;color:var(--sub);margin-bottom:12px;">Animated sliding pill switch.
+                        Functionally identical to Toggle but uses a track-and-knob visual. Ideal for on/off settings
+                        where the sliding motion reinforces the "mode" metaphor.</p>
+                    <div class="code-wrap">
+                        <div class="code-header"><span>Example</span><span class="code-lang">lua</span></div>
+                        <pre><code class="language-lua">Section:Switch("Silent Mode", false, "SilentF", function(state)
+    game.SoundService.RespectFilteringEnabled = not state
 end)</code></pre>
-
-                <h3>How to use Webhooks</h3>
-                <p>Webhooks are used to send data (logs, notifications, or player data) from Roblox directly to a
-                    Discord channel.</p>
-                <ol>
-                    <li><b>Create a Webhook:</b> In Discord, go to Server Settings > Integrations > Webhooks > New
-                        Webhook.</li>
-                    <li><b>Copy URL:</b> Copy the Webhook URL and paste it into the UI's Webhook widget.</li>
-                    <li><b>Send Data:</b> Use the following snippet to send logs manually:</li>
-                </ol>
-                <pre><code class="language-lua">local function SendLog(msg)
-    local url = Window.Flags["WebhookFlag"] -- The flag you used in Section:Webhook
-    if url and url ~= "" then
-        request({
-            Url = url,
-            Method = "POST",
-            Headers = { ["Content-Type"] = "application/json" },
-            Body = game:GetService("HttpService"):JSONEncode({
-                content = msg,
-                username = "NextLevel Logs"
-            })
-        })
-    end
-end
-
--- Example usage:
-SendLog("Player " .. game.Players.LocalPlayer.Name .. " has injected the script!")</code></pre>
-
-                <h3>Notification Log</h3>
-                <p>Never miss a drop. Access every notification sent during your session.</p>
-                <pre><code class="language-lua">Window:BuildNotificationLogTab()</code></pre>
-
-                <h3>Internal Executor</h3>
-                <p>Run Lua code directly inside your UI without opening external windows.</p>
-                <pre><code class="language-lua">Window:BuildExecutorTab()</code></pre>
-
-                <h3>Changelog UI</h3>
-                <p>Professional version tracking for your community.</p>
-                <pre><code class="language-lua">Window:BuildChangelogTab({
-    ["1.0"] = "Initial release",
-    ["1.1"] = "Added Fly"
-})</code></pre>
-
-                <h3>Global Search Engine</h3>
-                <p>The search bar now looks through <b>every tab</b> simultaneously. When you type, tabs containing
-                    matches are highlighted, allowing you to find features across complex setups instantly.</p>
-
-                <h3>Theme Presets</h3>
-                <p>One-click professional aesthetics. Choose from <b>Cyberpunk, Midnight, Toxic, Ocean</b>, and more in
-                    the Theme tab.</p>
-                <div class="method-signature">Library:ApplyPreset(Name: string)</div>
-                <pre><code class="language-lua">Library:ApplyPreset("Cyberpunk")</code></pre>
-
-                <h3>Keybind HUD</h3>
-                <p>A draggable on-screen display showing all your active toggles. Perfect for tracking what cheats are
-                    enabled during gameplay.</p>
-                <div class="method-signature">Window:BuildKeybindHUD()</div>
-
-                <h3>Window Utilities</h3>
-                <p>Advanced methods for managing connections, tooltips, and window state.</p>
-                <div class="method-signature">Window:Connect(signal, callback)</div>
-                <p>Connects a signal and automatically disconnects it when the UI is unloaded.</p>
-
-                <div class="method-signature">Window:OnUnload(callback)</div>
-                <p>Registers a function to be executed when the library is unloaded (via Panic Key or Unload button).
-                    Perfect for stopping loops or resetting player properties.</p>
-
-                <div class="method-signature">Window:AddTooltip(element, text)</div>
-                <p>Adds a hover-to-view description to any UI element.</p>
-
-                <div class="method-signature">Window:SetPanicKey(KeyCode)</div>
-                <p>Set a key that instantly unloads the library when pressed.</p>
-
-                <div class="method-signature">Window:IgnoreFlag(Flag)</div>
-                <p>Excludes a specific flag from being saved in configurations.</p>
-
-                <div class="method-signature">Window:ListConfigs()</div>
-                <p>Returns an array of strings containing all saved configuration names.</p>
-
-                <h3>Audio-Visual Polish</h3>
-                <p>The UI now features <b>Mechanical Click Sounds</b> for every interaction, providing high-quality
-                    tactical feedback.</p>
+                    </div>
+                </div>
             </section>
+
+
+            <!-- ─── SLIDERS ──────────────────────────────────────────── -->
+            <section id="sliders">
+                <h2>Sliders, Steppers & Bind</h2>
+                <p class="section-desc">Numeric control widgets for continuous values, stepped values, and hotkey
+                    assignment.</p>
+
+                <!-- Slider -->
+                <div class="card">
+                    <h3>Slider</h3>
+                    <div class="sig"><span class="obj">Section</span><span class="op">:</span><span
+                            class="fn">Slider</span>(<span class="param">text</span>, <span class="param">min</span>,
+                        <span class="param">max</span>, <span class="param">default</span><span class="op">?</span>,
+                        <span class="param">decimals</span><span class="op">?</span>, <span
+                            class="param">flag</span><span class="op">?</span>, <span class="param">callback</span><span
+                            class="op">?</span>)
+                    </div>
+                    <p style="font-size:14px;color:var(--sub);margin-bottom:12px;">A draggable fill bar for continuous
+                        numeric values. <code>decimals</code> controls float precision (0 = integers). Dragging and
+                        releasing fires the callback. The current value is displayed top-right.</p>
+                    <div class="code-wrap">
+                        <div class="code-header"><span>Example</span><span class="code-lang">lua</span></div>
+                        <pre><code class="language-lua">-- Integer slider (0 decimals):
+Section:Slider("FOV", 10, 180, 70, 0, "FovF", function(val)
+    Camera.FieldOfView = val
+end)
+
+-- Float slider with 2 decimal places:
+Section:Slider("Speed Multiplier", 0.1, 5.0, 1.0, 2, "SpeedF", function(val)
+    humanoid.WalkSpeed = 16 * val
+end)</code></pre>
+                    </div>
+                </div>
+
+                <!-- Stepper -->
+                <div class="card">
+                    <h3>Stepper</h3>
+                    <div class="sig"><span class="obj">Section</span><span class="op">:</span><span
+                            class="fn">Stepper</span>(<span class="param">text</span>, <span class="param">min</span>,
+                        <span class="param">max</span>, <span class="param">default</span><span class="op">?</span>,
+                        <span class="param">step</span><span class="op">?</span>, <span class="param">flag</span><span
+                            class="op">?</span>, <span class="param">callback</span><span class="op">?</span>)
+                    </div>
+                    <p style="font-size:14px;color:var(--sub);margin-bottom:12px;">Discrete <code>−</code> /
+                        <code>+</code> increment control. Best for values with fixed steps like gravity (multiples of 5)
+                        or hit delay (multiples of 50ms).
+                    </p>
+                    <div class="code-wrap">
+                        <div class="code-header"><span>Example</span><span class="code-lang">lua</span></div>
+                        <pre><code class="language-lua">Section:Stepper("Gravity", 0, 196, 196, 5, "GravF", function(val)
+    workspace.Gravity = val
+end)
+
+Section:Stepper("Hit Delay (ms)", 0, 1000, 100, 50, "HitDelayF", function(val)
+    hitbox.delay = val / 1000
+end)</code></pre>
+                    </div>
+                </div>
+
+                <!-- Bind -->
+                <div class="card">
+                    <h3>Bind</h3>
+                    <div class="sig"><span class="obj">Section</span><span class="op">:</span><span
+                            class="fn">Bind</span>(<span class="param">text</span>, <span
+                            class="param">defaultKey</span><span class="op">?:</span><span class="type">KeyCode</span>,
+                        <span class="param">flag</span><span class="op">?</span>, <span
+                            class="param">callback</span><span class="op">?</span>)
+                    </div>
+                    <p style="font-size:14px;color:var(--sub);margin-bottom:12px;">Standalone keybind listener. Click
+                        the button, then press any key to bind. <kbd>Backspace</kbd> or <kbd>Escape</kbd> clears the
+                        bind. The callback fires each time the key is pressed (not held).</p>
+                    <div class="code-wrap">
+                        <div class="code-header"><span>Example</span><span class="code-lang">lua</span></div>
+                        <pre><code class="language-lua">Section:Bind("Teleport to Waypoint", Enum.KeyCode.T, "TpWaypointKey", function()
+    teleportToWaypoint()
+end)
+
+Section:Bind("Panic Key", Enum.KeyCode.End, "PanicKey", function()
+    Window:Unload()
+end)</code></pre>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- ─── INPUTS ───────────────────────────────────────────── -->
+            <section id="inputs">
+                <h2>Text Inputs</h2>
+                <p class="section-desc">Text entry widgets from single-line inputs to tag chip collections.</p>
+
+                <!-- Input -->
+                <div class="card">
+                    <h3>Input</h3>
+                    <div class="sig"><span class="obj">Section</span><span class="op">:</span><span
+                            class="fn">Input</span>(<span class="param">text</span>, <span
+                            class="param">placeholder</span><span class="op">?</span>, <span
+                            class="param">flag</span><span class="op">?</span>, <span class="param">callback</span><span
+                            class="op">?</span>)</div>
+                    <p style="font-size:14px;color:var(--sub);margin-bottom:12px;">Single-line text box. Callback fires
+                        on <code>FocusLost</code>, not on every keystroke.</p>
+                    <div class="code-wrap">
+                        <div class="code-header"><span>Example</span><span class="code-lang">lua</span></div>
+                        <pre><code class="language-lua">Section:Input("Target Username", "Enter player name...", "TargetNameF", function(text)
+    targetPlayer = findPlayer(text)
+end)</code></pre>
+                    </div>
+                </div>
+
+                <!-- MultilineInput -->
+                <div class="card">
+                    <h3>MultilineInput</h3>
+                    <div class="sig"><span class="obj">Section</span><span class="op">:</span><span
+                            class="fn">MultilineInput</span>(<span class="param">text</span>, <span
+                            class="param">placeholder</span><span class="op">?</span>, <span
+                            class="param">lineCount</span><span class="op">?:</span><span class="type">number</span>,
+                        <span class="param">flag</span><span class="op">?</span>, <span
+                            class="param">callback</span><span class="op">?</span>)
+                    </div>
+                    <p style="font-size:14px;color:var(--sub);margin-bottom:12px;">Multi-line text area. Height is
+                        derived from <code>lineCount × 18 + 10</code> pixels. Default: <code>3</code> lines. Used
+                        internally by <code>BuildExecutorTab</code>.</p>
+                    <div class="code-wrap">
+                        <div class="code-header"><span>Example</span><span class="code-lang">lua</span></div>
+                        <pre><code class="language-lua">Section:MultilineInput(
+    "Custom Script",
+    "print('Hello World')",
+    8,            -- 8 visible lines
+    "ScriptSource",
+    function(code)
+        loadstring(code)()
+    end
+)</code></pre>
+                    </div>
+                </div>
+
+                <!-- TagInput -->
+                <div class="card">
+                    <h3>TagInput <span class="method-tag tag-returns">→ TagController</span></h3>
+                    <div class="sig"><span class="obj">Section</span><span class="op">:</span><span
+                            class="fn">TagInput</span>(<span class="param">text</span>, <span
+                            class="param">initialTags</span><span class="op">?:</span><span
+                            class="type">{string}</span>, <span class="param">maxTags</span><span
+                            class="op">?:</span><span class="type">number</span>, <span class="param">flag</span><span
+                            class="op">?</span>, <span class="param">callback</span><span class="op">?</span>)</div>
+                    <p style="font-size:14px;color:var(--sub);margin-bottom:12px;">Chips-style multi-value input. Press
+                        <kbd>Enter</kbd> or click <code>+ Add</code> to add a chip. Click <code>×</code> on a chip to
+                        remove it. Duplicate entries and the max cap are automatically enforced. Section height grows to
+                        fit chips.
+                    </p>
+
+                    <table class="params">
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                        <tr>
+                            <td>text</td>
+                            <td>string</td>
+                            <td>Section label above the input.</td>
+                        </tr>
+                        <tr>
+                            <td>initialTags</td>
+                            <td>{string}</td>
+                            <td>Pre-populated chip values. Default: <code>{}</code></td>
+                        </tr>
+                        <tr>
+                            <td>maxTags</td>
+                            <td>number</td>
+                            <td>Maximum number of chips. Default: <code>10</code></td>
+                        </tr>
+                        <tr>
+                            <td>flag</td>
+                            <td>string</td>
+                            <td>Persists the tags array as a JSON array.</td>
+                        </tr>
+                        <tr>
+                            <td>callback</td>
+                            <td>(tags: {string})->void</td>
+                            <td>Fired on add or remove with the full current array.</td>
+                        </tr>
+                    </table>
+
+                    <div class="code-wrap">
+                        <div class="code-header"><span>Example</span><span class="code-lang">lua</span></div>
+                        <pre><code class="language-lua">local tagCtrl = Section:TagInput(
+    "ESP Whitelist",
+    {"Friend1", "Ally2"},  -- initial chips
+    20,                    -- max 20 players
+    "EspWhitelistF",
+    function(tags)
+        espWhitelist = tags
+    end
+)
+
+-- Controller API:
+tagCtrl:GetTags()            -- returns copy of current tags
+tagCtrl:SetTags({"A","B"})   -- replace all chips
+tagCtrl:AddTag("NewPlayer")  -- add a single chip programmatically</code></pre>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- ─── DROPDOWNS ────────────────────────────────────────── -->
+            <section id="dropdowns">
+                <h2>Selection Suites</h2>
+                <p class="section-desc">All dropdown variants return a <code>DropdownController</code> with a
+                    <code>:Refresh()</code> method for dynamic list updates.
+                </p>
+
+                <!-- Dropdown -->
+                <div class="card">
+                    <h3>Dropdown <span class="method-tag tag-returns">→ DropdownController</span></h3>
+                    <div class="sig"><span class="obj">Section</span><span class="op">:</span><span
+                            class="fn">Dropdown</span>(<span class="param">text</span>, <span
+                            class="param">options</span><span class="op">:</span><span class="type">{string}</span>,
+                        <span class="param">multi</span><span class="op">?:</span><span class="type">bool</span>, <span
+                            class="param">default</span><span class="op">?</span>, <span class="param">flag</span><span
+                            class="op">?</span>, <span class="param">callback</span><span class="op">?</span>)
+                    </div>
+                    <p style="font-size:14px;color:var(--sub);margin-bottom:12px;">Standard collapsible list. In
+                        <code>multi = true</code> mode, multiple options can be selected simultaneously — the flag value
+                        becomes an array. Dropdown opens with elevated <code>ZIndex</code> to render above other
+                        elements.
+                    </p>
+                    <div class="code-wrap">
+                        <div class="code-header"><span>Single Selection</span><span class="code-lang">lua</span></div>
+                        <pre><code class="language-lua">local drop = Section:Dropdown(
+    "Aim Part",
+    {"Head", "Torso", "Left Arm", "Right Arm"},
+    false,           -- single select
+    "Head",          -- default
+    "AimPartF",
+    function(selected)
+        aimPart = selected
+    end
+)
+
+-- Refresh list later:
+drop:Refresh({"Head", "Torso", "HumanoidRootPart"})</code></pre>
+                    </div>
+
+                    <div class="code-wrap">
+                        <div class="code-header"><span>Multi Selection</span><span class="code-lang">lua</span></div>
+                        <pre><code class="language-lua">Section:Dropdown(
+    "ESP Teams",
+    {"Red", "Blue", "Green", "Yellow"},
+    true,           -- multi select
+    {"Red", "Blue"}, -- default selected
+    "EspTeamsF",
+    function(selected)
+        -- selected is a {string} array
+        espTeams = selected
+    end
+)</code></pre>
+                    </div>
+                </div>
+
+                <!-- SearchableDropdown -->
+                <div class="card">
+                    <h3>SearchableDropdown <span class="method-tag tag-returns">→ DropdownController</span></h3>
+                    <div class="sig"><span class="obj">Section</span><span class="op">:</span><span
+                            class="fn">SearchableDropdown</span>(<span class="param">text</span>, <span
+                            class="param">options</span><span class="op">:</span><span class="type">{string}</span>,
+                        <span class="param">default</span><span class="op">?</span>, <span
+                            class="param">flag</span><span class="op">?</span>, <span class="param">callback</span><span
+                            class="op">?</span>)
+                    </div>
+                    <p style="font-size:14px;color:var(--sub);margin-bottom:12px;">Like <code>Dropdown</code> but
+                        includes an integrated search box that filters options in real-time. Essential for large lists
+                        (50+ items). Used internally by <code>PlayerDropdown</code>.</p>
+                    <div class="code-wrap">
+                        <div class="code-header"><span>Example</span><span class="code-lang">lua</span></div>
+                        <pre><code class="language-lua">local gameNames = {"Arsenal", "Jailbreak", "Phantom Forces", "Da Hood", -- ...hundreds more
+}
+
+local gameDrop = Section:SearchableDropdown(
+    "Select Game",
+    gameNames,
+    "",
+    "ActiveGameF",
+    function(selected)
+        loadGamePreset(selected)
+    end
+)
+
+-- Add entries dynamically:
+table.insert(gameNames, "New Game")
+gameDrop:Refresh(gameNames)</code></pre>
+                    </div>
+                </div>
+
+                <!-- PlayerDropdown -->
+                <div class="card">
+                    <h3>PlayerDropdown <span class="method-tag tag-returns">→ DropdownController</span></h3>
+                    <div class="sig"><span class="obj">Section</span><span class="op">:</span><span
+                            class="fn">PlayerDropdown</span>(<span class="param">text</span>, <span
+                            class="param">includeSelf</span><span class="op">?:</span><span class="type">bool</span>,
+                        <span class="param">flag</span><span class="op">?</span>, <span
+                            class="param">callback</span><span class="op">?</span>)
+                    </div>
+                    <p style="font-size:14px;color:var(--sub);margin-bottom:12px;">A <code>SearchableDropdown</code>
+                        pre-populated with all current server players. Automatically updates on <code>PlayerAdded</code>
+                        and <code>PlayerRemoving</code>. Connections are managed via <code>Window:Connect()</code> and
+                        cleaned up on unload.</p>
+                    <div class="code-wrap">
+                        <div class="code-header"><span>Example</span><span class="code-lang">lua</span></div>
+                        <pre><code class="language-lua">Section:PlayerDropdown(
+    "Target Player",
+    false,           -- exclude self
+    "TargetPlayerF",
+    function(playerName)
+        local target = game.Players:FindFirstChild(playerName)
+        -- do something with target
+    end
+)</code></pre>
+                    </div>
+                </div>
+
+                <!-- RadioGroup -->
+                <div class="card">
+                    <h3>RadioGroup</h3>
+                    <div class="sig"><span class="obj">Section</span><span class="op">:</span><span
+                            class="fn">RadioGroup</span>(<span class="param">label</span>, <span
+                            class="param">options</span><span class="op">:</span><span class="type">{string}</span>,
+                        <span class="param">default</span><span class="op">?</span>, <span
+                            class="param">flag</span><span class="op">?</span>, <span class="param">callback</span><span
+                            class="op">?</span>)
+                    </div>
+                    <p style="font-size:14px;color:var(--sub);margin-bottom:12px;">Displays all choices vertically with
+                        radio dot indicators. Only one can be active at a time. Ideal when all options should be visible
+                        simultaneously (3–6 choices).</p>
+                    <div class="code-wrap">
+                        <div class="code-header"><span>Example</span><span class="code-lang">lua</span></div>
+                        <pre><code class="language-lua">Section:RadioGroup(
+    "Aimbot Mode",
+    {"Silent Aim", "Lock-On", "Prediction", "Manual"},
+    "Silent Aim",
+    "AimModeF",
+    function(selected)
+        aimbot.mode = selected
+    end
+)</code></pre>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- ─── COLORS ───────────────────────────────────────────── -->
+            <section id="colors">
+                <h2>Color & Images</h2>
+
+                <!-- ColorPicker -->
+                <div class="card">
+                    <h3>ColorPicker</h3>
+                    <div class="sig"><span class="obj">Section</span><span class="op">:</span><span
+                            class="fn">ColorPicker</span>(<span class="param">text</span>, <span
+                            class="param">default</span><span class="op">?:</span><span class="type">Color3</span>,
+                        <span class="param">alpha</span><span class="op">?:</span><span class="type">number</span>,
+                        <span class="param">flag</span><span class="op">?</span>, <span
+                            class="param">callback</span><span class="op">?</span>)
+                    </div>
+                    <p style="font-size:14px;color:var(--sub);margin-bottom:12px;">Full HSV color picker with a
+                        saturation/value grid, a hue bar, and an alpha (transparency) bar. Expands/collapses inline. The
+                        color preview swatch in the header reflects alpha. Flag stores a table
+                        <code>{R, G, B, A}</code>.
+                    </p>
+                    <table class="params">
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                        <tr>
+                            <td>text</td>
+                            <td>string</td>
+                            <td>Label shown in the collapsed header.</td>
+                        </tr>
+                        <tr>
+                            <td>default</td>
+                            <td>Color3</td>
+                            <td>Initial color. Default: white.</td>
+                        </tr>
+                        <tr>
+                            <td>alpha</td>
+                            <td>number</td>
+                            <td>Initial alpha 0–1. Default: <code>1</code> (opaque).</td>
+                        </tr>
+                        <tr>
+                            <td>flag</td>
+                            <td>string</td>
+                            <td>Persists as <code>{R, G, B, A}</code> table. Setter accepts Color3 or the same table.
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>callback</td>
+                            <td>(color: Color3, alpha: number)->void</td>
+                            <td>Fires on any drag event with the new color and alpha.</td>
+                        </tr>
+                    </table>
+                    <div class="code-wrap">
+                        <div class="code-header"><span>Example</span><span class="code-lang">lua</span></div>
+                        <pre><code class="language-lua">Section:ColorPicker(
+    "ESP Colour",
+    Color3.fromRGB(255, 50, 50),
+    0.85,          -- slightly transparent
+    "EspColorF",
+    function(color, alpha)
+        espColor       = color
+        espTransparency = 1 - alpha
+    end
+)
+
+-- To set programmatically:
+Window.Setters["EspColorF"]({R=0, G=1, B=0, A=1})</code></pre>
+                    </div>
+                </div>
+
+                <!-- Image -->
+                <div class="card">
+                    <h3>Image</h3>
+                    <div class="sig"><span class="obj">Section</span><span class="op">:</span><span
+                            class="fn">Image</span>(<span class="param">assetId</span><span class="op">:</span><span
+                            class="type">number|string</span>, <span class="param">height</span><span
+                            class="op">?:</span><span class="type">number</span>) <span class="op">→</span> <span
+                            class="ret">ImageLabel</span></div>
+                    <p style="font-size:14px;color:var(--sub);margin-bottom:12px;">Embeds a Roblox image asset inline
+                        with <code>ScaleType.Fit</code>. Default height: <code>100</code> px. Pass either a numeric ID
+                        or a full <code>rbxassetid://</code> URI.</p>
+                    <div class="code-wrap">
+                        <div class="code-header"><span>Example</span><span class="code-lang">lua</span></div>
+                        <pre><code class="language-lua">Section:Image(10734914443, 120)      -- numeric ID, 120px tall
+Section:Image("rbxassetid://123456789", 80)</code></pre>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- ─── DATA VIZ ─────────────────────────────────────────── -->
+            <section id="data">
+                <h2>Data Visualization</h2>
+                <p class="section-desc">Widgets for displaying live or static data: charts, tables, bars, and status
+                    indicators.</p>
+
+                <!-- Chart -->
+                <div class="card">
+                    <h3>Chart</h3>
+                    <div class="sig"><span class="obj">Section</span><span class="op">:</span><span
+                            class="fn">Chart</span>(<span class="param">text</span>, <span
+                            class="param">data</span><span class="op">:</span><span class="type">{{label,value}}</span>,
+                        <span class="param">height</span><span class="op">?:</span><span class="type">number</span>)
+                    </div>
+                    <p style="font-size:14px;color:var(--sub);margin-bottom:12px;">Animated vertical bar chart. Bars
+                        grow from 0 on first render using <code>TweenService</code>. Each bar displays its value above.
+                        Column labels appear below the chart area. Default height: <code>90</code> px.</p>
+                    <div class="code-wrap">
+                        <div class="code-header"><span>Example</span><span class="code-lang">lua</span></div>
+                        <pre><code class="language-lua">Section:Chart("XP Per Hour", {
+    {label = "Mon", value = 1200},
+    {label = "Tue", value = 3400},
+    {label = "Wed", value = 2800},
+    {label = "Thu", value = 4100},
+    {label = "Fri", value = 3800},
+    {label = "Sat", value = 5200},
+    {label = "Sun", value = 4600},
+}, 100)</code></pre>
+                    </div>
+                </div>
+
+                <!-- KeyValueTable -->
+                <div class="card">
+                    <h3>KeyValueTable <span class="method-tag tag-returns">→ TableController</span></h3>
+                    <div class="sig"><span class="obj">Section</span><span class="op">:</span><span
+                            class="fn">KeyValueTable</span>(<span class="param">rows</span><span
+                            class="op">:</span><span class="type">{{key, value}}</span>) <span class="op">→</span> <span
+                            class="ret">KeyValueTableController</span></div>
+                    <p style="font-size:14px;color:var(--sub);margin-bottom:12px;">A compact two-column information
+                        grid. Odd/even rows alternate between <code>MainColor</code> and <code>FrameColor</code> for
+                        readability. Returns a controller to update individual values without rebuilding the table.</p>
+                    <div class="code-wrap">
+                        <div class="code-header"><span>Example</span><span class="code-lang">lua</span></div>
+                        <pre><code class="language-lua">local infoTable = Section:KeyValueTable({
+    {"Ping",    "0 ms"},
+    {"FPS",     "0"},
+    {"Players", tostring(#game.Players:GetPlayers())},
+    {"Version", "v0.06"},
+})
+
+-- Update live:
+game:GetService("RunService").RenderStepped:Connect(function(dt)
+    infoTable:SetValue("FPS",  tostring(math.round(1/dt)))
+    infoTable:SetValue("Ping", tostring(math.round(
+        game.Players.LocalPlayer:GetNetworkPing() * 1000)) .. " ms")
+end)</code></pre>
+                    </div>
+                </div>
+
+                <!-- ProgressBar -->
+                <div class="card">
+                    <h3>ProgressBar <span class="method-tag tag-returns">→ ProgressBarController</span></h3>
+                    <div class="sig"><span class="obj">Section</span><span class="op">:</span><span
+                            class="fn">ProgressBar</span>(<span class="param">text</span>, <span
+                            class="param">min</span><span class="op">?</span>, <span class="param">max</span><span
+                            class="op">?</span>, <span class="param">default</span><span class="op">?</span>, <span
+                            class="param">flag</span><span class="op">?</span>) <span class="op">→</span> <span
+                            class="ret">ProgressBarController</span></div>
+                    <p style="font-size:14px;color:var(--sub);margin-bottom:12px;">Animated horizontal fill bar. The
+                        fill tweens smoothly on each <code>:Set()</code> call. Displays <code>current / max</code> in
+                        the top-right corner.</p>
+                    <div class="code-wrap">
+                        <div class="code-header"><span>Example</span><span class="code-lang">lua</span></div>
+                        <pre><code class="language-lua">local xpBar = Section:ProgressBar("Experience", 0, 1000, 0, "XpF")
+
+-- Update when XP changes:
+function onXpChanged(newXp)
+    xpBar:Set(newXp)
+end</code></pre>
+                    </div>
+                </div>
+
+                <!-- StatusIndicator -->
+                <div class="card">
+                    <h3>StatusIndicator <span class="method-tag tag-returns">→ StatusController</span></h3>
+                    <div class="sig"><span class="obj">Section</span><span class="op">:</span><span
+                            class="fn">StatusIndicator</span>(<span class="param">label</span>, <span
+                            class="param">initialText</span><span class="op">?</span>, <span
+                            class="param">initialColor</span><span class="op">?:</span><span class="type">Color3</span>)
+                        <span class="op">→</span> <span class="ret">StatusIndicatorController</span>
+                    </div>
+                    <p style="font-size:14px;color:var(--sub);margin-bottom:12px;">A labelled row with a coloured dot
+                        and status text on the right. The dot colour tweens on update. Perfect for connection status,
+                        API health, or feature active-state displays.</p>
+                    <div class="code-wrap">
+                        <div class="code-header"><span>Example</span><span class="code-lang">lua</span></div>
+                        <pre><code class="language-lua">local serverStatus = Section:StatusIndicator(
+    "Server Link",
+    "Connected",
+    Color3.fromRGB(0, 255, 100)
+)
+
+local apiStatus = Section:StatusIndicator("API Key", "Unchecked")
+
+-- Update colours dynamically:
+serverStatus:Set("Disconnected", Color3.fromRGB(255, 60, 60))
+apiStatus:Set("Valid",           Color3.fromRGB(0, 200, 100))
+apiStatus:Set("Invalid",         Color3.fromRGB(255, 80, 80))</code></pre>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- ─── UTILITY WIDGETS ──────────────────────────────────── -->
+            <section id="utility">
+                <h2>Utility Widgets</h2>
+                <p class="section-desc">Higher-level interactive tools.</p>
+
+                <!-- Console -->
+                <div class="card">
+                    <h3>Console <span class="method-tag tag-returns">→ ConsoleController</span></h3>
+                    <div class="sig"><span class="obj">Section</span><span class="op">:</span><span
+                            class="fn">Console</span>(<span class="param">height</span><span class="op">?:</span><span
+                            class="type">number</span>) <span class="op">→</span> <span
+                            class="ret">ConsoleController</span></div>
+                    <p style="font-size:14px;color:var(--sub);margin-bottom:12px;">A scrollable output log. Each line is
+                        prefixed with a <code>[HH:MM:SS]</code> timestamp. If already scrolled to the bottom, the view
+                        auto-scrolls on new entries. Default height: <code>120</code> px.</p>
+                    <div class="code-wrap">
+                        <div class="code-header"><span>Example</span><span class="code-lang">lua</span></div>
+                        <pre><code class="language-lua">local console = Section:Console(160)
+
+console:Print("Script initialised", Color3.fromRGB(100, 255, 100))
+console:Print("Connecting to server...")
+console:Print("ERROR: Connection refused", Color3.fromRGB(255, 80, 80))
+console:Clear()  -- wipe all lines</code></pre>
+                    </div>
+                </div>
+
+                <!-- Timer -->
+                <div class="card">
+                    <h3>Timer <span class="method-tag tag-returns">→ TimerController</span></h3>
+                    <div class="sig"><span class="obj">Section</span><span class="op">:</span><span
+                            class="fn">Timer</span>(<span class="param">text</span>, <span
+                            class="param">seconds</span><span class="op">?</span>, <span
+                            class="param">autoStart</span><span class="op">?:</span><span class="type">bool</span>,
+                        <span class="param">onComplete</span><span class="op">?</span>) <span class="op">→</span> <span
+                            class="ret">TimerController</span>
+                    </div>
+                    <p style="font-size:14px;color:var(--sub);margin-bottom:12px;">Countdown widget with
+                        <code>▶ Start</code>, <code>‖ Pause</code>, and <code>↺ Reset</code> buttons. The fill bar
+                        colour transitions yellow (<50%) → red (<25%) as time runs out. The <code>onComplete</code>
+                            callback fires when the timer reaches 0.
+                    </p>
+                    <table class="params">
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                        <tr>
+                            <td>text</td>
+                            <td>string</td>
+                            <td>Label shown top-left.</td>
+                        </tr>
+                        <tr>
+                            <td>seconds</td>
+                            <td>number</td>
+                            <td>Total countdown duration. Default: <code>60</code></td>
+                        </tr>
+                        <tr>
+                            <td>autoStart</td>
+                            <td>boolean</td>
+                            <td>Begin counting immediately on creation. Default: <code>false</code></td>
+                        </tr>
+                        <tr>
+                            <td>onComplete</td>
+                            <td>()->void</td>
+                            <td>Called when remaining reaches 0.</td>
+                        </tr>
+                    </table>
+                    <div class="code-wrap">
+                        <div class="code-header"><span>Example</span><span class="code-lang">lua</span></div>
+                        <pre><code class="language-lua">local breakTimer = Section:Timer("Break Reminder", 300, false, function()
+    Window:Notify("Break Time", "Take a 5 minute break!", 10)
+end)
+
+-- Controller API:
+breakTimer:Start()      -- begin ticking
+breakTimer:Pause()      -- pause
+breakTimer:Reset()      -- reset to 300s
+breakTimer:Set(120)     -- change duration to 2 minutes</code></pre>
+                    </div>
+                </div>
+
+                <!-- Webhook -->
+                <div class="card">
+                    <h3>Webhook</h3>
+                    <div class="sig"><span class="obj">Section</span><span class="op">:</span><span
+                            class="fn">Webhook</span>(<span class="param">text</span>, <span
+                            class="param">flag</span><span class="op">?</span>, <span class="param">callback</span><span
+                            class="op">?</span>)</div>
+                    <p style="font-size:14px;color:var(--sub);margin-bottom:12px;">Discord webhook URL input with an
+                        integrated <strong>Test</strong> button. Clicking Test POSTs a confirmation message to the URL
+                        using <code>request()</code>. The URL is persisted via the flag on every edit.</p>
+                    <div class="code-wrap">
+                        <div class="code-header"><span>Example</span><span class="code-lang">lua</span></div>
+                        <pre><code class="language-lua">Section:Webhook("Kill Logger", "KillLoggerWebhookF", function(url)
+    killWebhookUrl = url
+end)</code></pre>
+                    </div>
+                </div>
+
+                <!-- Grid -->
+                <div class="card">
+                    <h3>Grid</h3>
+                    <div class="sig"><span class="obj">Section</span><span class="op">:</span><span
+                            class="fn">Grid</span>(<span class="param">text</span>, <span class="param">items</span>,
+                        <span class="param">columns</span><span class="op">?:</span><span class="type">number</span>,
+                        <span class="param">callback</span><span class="op">?</span>)
+                    </div>
+                    <p style="font-size:14px;color:var(--sub);margin-bottom:12px;">Arranges buttons in an evenly-spaced
+                        grid layout. Each item can be a plain string or a table <code>{text = "...", id = "..."}</code>.
+                        The callback receives the item's <code>id</code> (or the string itself if no id). Default
+                        columns: <code>3</code>.</p>
+                    <div class="code-wrap">
+                        <div class="code-header"><span>String items</span><span class="code-lang">lua</span></div>
+                        <pre><code class="language-lua">Section:Grid("Teleport Locations", {
+    "Spawn", "Castle", "Market", "Forest", "Cave", "Rooftop"
+}, 3, function(location)
+    teleportTo(location)
+end)</code></pre>
+                    </div>
+
+                    <div class="code-wrap">
+                        <div class="code-header"><span>Table items with separate IDs</span><span
+                                class="code-lang">lua</span></div>
+                        <pre><code class="language-lua">Section:Grid("Skins", {
+    {text = "Arctic",   id = "skin_001"},
+    {text = "Inferno",  id = "skin_002"},
+    {text = "Neon",     id = "skin_003"},
+    {text = "Spectral", id = "skin_004"},
+}, 2, function(skinId)
+    applySkin(skinId)
+end)</code></pre>
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- ─── CONTROLLERS ──────────────────────────────────────── -->
+            <section id="controllers">
+                <h2>Controller Reference</h2>
+                <p class="section-desc">Return objects from widgets that expose programmatic control. All controllers
+                    are independent tables with methods — they do not inherit from any base class.</p>
+
+                <div class="card">
+                    <div class="controller-header">
+                        <span class="controller-name">DropdownController</span>
+                        <span class="controller-desc">— returned by Dropdown, SearchableDropdown, PlayerDropdown</span>
+                    </div>
+                    <div class="method-mini">
+                        <span class="mn">:Refresh( newList: {string} )</span>
+                        <span class="md">— Rebuilds the option list and clears any search filter.</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="controller-header">
+                        <span class="controller-name">ProgressBarController</span>
+                        <span class="controller-desc">— returned by ProgressBar</span>
+                    </div>
+                    <div class="method-mini">
+                        <span class="mn">:Set( value: number )</span>
+                        <span class="md">— Animates the bar to the clamped value and updates the label.</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="controller-header">
+                        <span class="controller-name">StatusIndicatorController</span>
+                        <span class="controller-desc">— returned by StatusIndicator</span>
+                    </div>
+                    <div class="method-mini">
+                        <span class="mn">:Set( statusText: string, color?: Color3 )</span>
+                        <span class="md">— Tweens the dot colour and updates the right-side label.</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="controller-header">
+                        <span class="controller-name">KeyValueTableController</span>
+                        <span class="controller-desc">— returned by KeyValueTable</span>
+                    </div>
+                    <div class="method-mini">
+                        <span class="mn">:SetValue( key: string, value: any )</span>
+                        <span class="md">— Updates the value cell for the given key string.</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="controller-header">
+                        <span class="controller-name">ConsoleController</span>
+                        <span class="controller-desc">— returned by Console</span>
+                    </div>
+                    <div class="method-mini">
+                        <span class="mn">:Print( msg: string, color?: Color3 )</span>
+                        <span class="md">— Appends a timestamped line. Auto-scrolls if already at bottom.</span>
+                    </div>
+                    <div class="method-mini">
+                        <span class="mn">:Clear()</span>
+                        <span class="md">— Destroys all log lines and resets the line counter.</span>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="controller-header">
+                        <span class="controller-name">TimerController</span>
+                        <span class="controller-desc">— returned by Timer</span>
+                    </div>
+                    <div class="method-mini"><span class="mn">:Start()</span><span class="md">— Begin countdown (no-op
+                            if already running or at 0).</span></div>
+                    <div class="method-mini"><span class="mn">:Pause()</span><span class="md">— Halt the current
+                            countdown thread.</span></div>
+                    <div class="method-mini"><span class="mn">:Reset()</span><span class="md">— Restore remaining to
+                            original seconds and stop.</span></div>
+                    <div class="method-mini"><span class="mn">:Set( seconds: number )</span><span class="md">— Change
+                            the total duration and reset remaining.</span></div>
+                </div>
+
+                <div class="card">
+                    <div class="controller-header">
+                        <span class="controller-name">TagInputController</span>
+                        <span class="controller-desc">— returned by TagInput</span>
+                    </div>
+                    <div class="method-mini"><span class="mn">:GetTags()</span><span class="md">— Returns a copy of the
+                            current tags array.</span></div>
+                    <div class="method-mini"><span class="mn">:SetTags( list: {string} )</span><span class="md">—
+                            Replaces all chips and rebuilds the display.</span></div>
+                    <div class="method-mini"><span class="mn">:AddTag( str: string )</span><span class="md">—
+                            Programmatically inserts a tag (honours max cap and dedup).</span></div>
+                </div>
+
+                <div class="card">
+                    <div class="controller-header">
+                        <span class="controller-name">LabelController / ParagraphController</span>
+                        <span class="controller-desc">— returned by Label and Paragraph</span>
+                    </div>
+                    <div class="method-mini"><span class="mn">:SetText( text: string )</span><span class="md">— Updates
+                            the displayed text. Also proxies all raw TextLabel properties.</span></div>
+                </div>
+            </section>
+
+
+            <!-- ─── GLOBAL METHODS ───────────────────────────────────── -->
+            <section id="global">
+                <h2>Global Methods</h2>
+                <p class="section-desc">Methods accessible on both the <code>Library</code> table and on the
+                    <code>Window</code> object.
+                </p>
+
+                <div class="code-wrap">
+                    <div class="code-header"><span>Full Global Example</span><span class="code-lang">lua</span></div>
+                    <pre><code class="language-lua">-- Library-level (before Window is created):
+Library:SetTheme({AccentColor = Color3.fromRGB(120, 80, 255)})
+Library:Notify("Hello", "Loaded before window.", 3)
+
+-- Window-level (after Library.new):
+Window:Notify("Ready", "Interface online.", 3)
+Window:SetPanicKey(Enum.KeyCode.End)
+Window:AddTooltip(someButton, "Tooltip text here.")
+Window:ServerHop(game.PlaceId)
+Window:Dialog("Confirm", "Are you sure?", {"Yes","No"}, function(c) end)
+Window:OnUnload(function() print("Cleaned up!") end)
+Window:Unload()</code></pre>
+                </div>
+            </section>
+
+
+            <!-- ─── CONFIG SYSTEM ────────────────────────────────────── -->
+            <section id="config">
+                <h2>Config & Persistence</h2>
+                <p class="section-desc">All config files are saved to <code>{WindowName}_Configs/{PlaceId}/</code> as
+                    JSON. The Settings pre-built tab exposes all of this through a UI automatically.</p>
+
+                <div class="card">
+                    <h3>SaveConfig</h3>
+                    <div class="sig"><span class="obj">Window</span><span class="op">:</span><span
+                            class="fn">SaveConfig</span>(<span class="param">name</span><span class="op">:</span> <span
+                            class="type">string</span>)</div>
+                    <p style="font-size:14px;color:var(--sub);margin-bottom:12px;">Serialises all flags (excluding
+                        ignored flags) and the current window position to <code>{name}.json</code>.</p>
+                </div>
+
+                <div class="card">
+                    <h3>LoadConfig</h3>
+                    <div class="sig"><span class="obj">Window</span><span class="op">:</span><span
+                            class="fn">LoadConfig</span>(<span class="param">name</span><span class="op">:</span> <span
+                            class="type">string</span>)</div>
+                    <p style="font-size:14px;color:var(--sub);margin-bottom:12px;">Reads <code>{name}.json</code> and
+                        calls each matching <code>Window.Setters[flag]</code> in turn, updating all widget visuals and
+                        flags. Also restores the window position.</p>
+                </div>
+
+                <div class="card">
+                    <h3>ListConfigs</h3>
+                    <div class="sig"><span class="obj">Window</span><span class="op">:</span><span
+                            class="fn">ListConfigs</span>() <span class="op">→</span> <span class="ret">{string}</span>
+                    </div>
+                    <p style="font-size:14px;color:var(--sub);margin-bottom:12px;">Returns an array of config names
+                        (without extension) in the config folder. Does not include <code>teleport_state</code>.</p>
+                </div>
+
+                <div class="code-wrap">
+                    <div class="code-header"><span>Manual Config Usage</span><span class="code-lang">lua</span></div>
+                    <pre><code class="language-lua">-- Save current state:
+Window:SaveConfig("default")
+
+-- Load on next inject:
+local configs = Window:ListConfigs()  -- {"default", "pvp", "safe"}
+Window:LoadConfig("pvp")
+
+-- Autoload: write the config name to autoload.txt
+-- (BuildSettingsTab does this automatically via "Set Autoload" button)</code></pre>
+                </div>
+
+                <div class="callout callout-tip">
+                    <div class="callout-icon">✦</div>
+                    <div class="callout-body">
+                        <strong>Autoload</strong>: If <code>autoload.txt</code> exists in the config folder and points
+                        to a valid config, <code>BuildSettingsTab</code> automatically loads it 0.5 seconds after the
+                        window is built. This is also checked by <code>InitLoad</code> to detect silent execution mode.
+                    </div>
+                </div>
+            </section>
+
+
+            <!-- ─── PRE-BUILT TABS ───────────────────────────────────── -->
+            <section id="prebuilt">
+                <h2>Pre-built Tabs</h2>
+                <p class="section-desc">One-line commands that generate fully functional management tabs. Call after
+                    creating your Window.</p>
+
+                <div class="card">
+                    <h3>BuildSettingsTab</h3>
+                    <div class="sig"><span class="obj">Window</span><span class="op">:</span><span
+                            class="fn">BuildSettingsTab</span>(<span class="param">iconId</span><span
+                            class="op">?</span>)</div>
+                    <p style="font-size:14px;color:var(--sub);margin-bottom:12px;">Generates a <strong>Settings</strong>
+                        tab with: config save/load/delete/export/import UI, autoload assignment, watermark toggle,
+                        keybind HUD toggle, RGB chroma toggle, background blur toggle, silent execution toggle, Unload
+                        button, and a status indicator. Runs autoload on build.</p>
+                </div>
+
+                <div class="card">
+                    <h3>BuildThemeTab</h3>
+                    <div class="sig"><span class="obj">Window</span><span class="op">:</span><span
+                            class="fn">BuildThemeTab</span>(<span class="param">iconId</span><span class="op">?</span>)
+                    </div>
+                    <p style="font-size:14px;color:var(--sub);margin-bottom:12px;">Generates a <strong>Theme</strong>
+                        tab with a preset button row (Cyberpunk, Midnight, Toxic, Ocean, Classic, Ghost) and individual
+                        <code>ColorPicker</code> widgets for every Color3 key in <code>THEMES</code>. Includes a Reset
+                        to Default button.
+                    </p>
+                </div>
+
+                <div class="card">
+                    <h3>BuildUtilityTab</h3>
+                    <div class="sig"><span class="obj">Window</span><span class="op">:</span><span
+                            class="fn">BuildUtilityTab</span>(<span class="param">iconId</span><span
+                            class="op">?</span>)</div>
+                    <p style="font-size:14px;color:var(--sub);margin-bottom:12px;">Generates a <strong>Utility</strong>
+                        tab with: Auto Clicker (toggle+bind+CPS slider), Rejoin / Server Hop buttons, and Copy Job ID.
+                    </p>
+                </div>
+
+                <div class="card">
+                    <h3>BuildExecutorTab</h3>
+                    <div class="sig"><span class="obj">Window</span><span class="op">:</span><span
+                            class="fn">BuildExecutorTab</span>(<span class="param">iconId</span><span
+                            class="op">?</span>)</div>
+                    <p style="font-size:14px;color:var(--sub);margin-bottom:12px;">Generates an
+                        <strong>Executor</strong> tab with a 10-line multiline input and Execute / Clear buttons. Uses
+                        <code>loadstring</code> + <code>task.spawn</code> internally.
+                    </p>
+                </div>
+
+                <div class="card">
+                    <h3>BuildNotificationLogTab</h3>
+                    <div class="sig"><span class="obj">Window</span><span class="op">:</span><span
+                            class="fn">BuildNotificationLogTab</span>(<span class="param">iconId</span><span
+                            class="op">?</span>)</div>
+                    <p style="font-size:14px;color:var(--sub);margin-bottom:12px;">Generates a
+                        <strong>Notifications</strong> tab showing the full <code>Window.NotificationHistory</code> with
+                        timestamps. Includes Refresh and Clear History buttons. History cap: 100 entries.
+                    </p>
+                </div>
+
+                <div class="card">
+                    <h3>BuildChangelogTab</h3>
+                    <div class="sig"><span class="obj">Window</span><span class="op">:</span><span
+                            class="fn">BuildChangelogTab</span>(<span class="param">data</span><span
+                            class="op">:</span><span class="type">table</span>, <span class="param">iconId</span><span
+                            class="op">?</span>)</div>
+                    <p style="font-size:14px;color:var(--sub);margin-bottom:12px;">Generates a
+                        <strong>Changelog</strong> tab. Pass a table where keys are version strings and values are note
+                        strings. Optionally include an <code>Icon</code> key in the table instead of passing
+                        <code>iconId</code> separately.
+                    </p>
+                    <div class="code-wrap">
+                        <div class="code-header"><span>Example</span><span class="code-lang">lua</span></div>
+                        <pre><code class="language-lua">Window:BuildChangelogTab({
+    ["v0.06"] = "Redesigned InitLoad sequence. Added TagInput, Timer, Chart, Grid, Dialog.",
+    ["v0.05"] = "Added SearchableDropdown and PlayerDropdown. Improved config system.",
+    ["v0.04"] = "Theme system overhaul with reactive ThemeEvent. Added 6 presets.",
+    Icon = 11419714317  -- optional icon for the tab
+})</code></pre>
+                    </div>
+                </div>
+
+                <div class="callout callout-info">
+                    <div class="callout-icon">ℹ</div>
+                    <div class="callout-body">
+                        <strong>BuildKeybindHUD</strong> is not a separate method — the keybind HUD is automatically
+                        created by <code>Library.new()</code> and managed via <code>Window:UpdateKeybinds()</code>.
+                        Toggle it with the <code>ShowKeybinds</code> flag in <code>BuildSettingsTab</code>.
+                    </div>
+                </div>
+
+                <div class="code-wrap">
+                    <div class="code-header"><span>Complete recommended setup</span><span class="code-lang">lua</span>
+                    </div>
+                    <pre><code class="language-lua">local Library = loadstring(game:HttpGet("https://gist.githubusercontent.com/Acidgorgon/2c0654b99a77b27e801ca6eb952a1e6c/raw/ecc019d89a367df71c86a5531525db52907f961c/UILib"))()
+
+Library:InitLoad({
+    Title    = "MY HUB",
+    SubTitle = "v1.0.0",
+    Duration = 4,
+    Statuses = {"Loading modules...", "Checking version...", "Done."}
+})
+
+local Window = Library.new(
+    "My Hub",
+    UDim2.new(0, 560, 0, 580),
+    Enum.KeyCode.RightControl,
+    "Sidebar",
+    10734914443
+)
+
+-- Your custom tabs first:
+local CombatTab = Window:Tab("Combat", 10734914443)
+local VisualTab = Window:Tab("Visuals", 9886724082)
+
+-- Pre-built system tabs last:
+Window:BuildSettingsTab()
+Window:BuildThemeTab()
+Window:BuildUtilityTab()
+Window:BuildExecutorTab()
+Window:BuildNotificationLogTab()
+Window:BuildChangelogTab({
+    ["v1.0.0"] = "Initial release."
+})
+
+-- Panic key:
+Window:SetPanicKey(Enum.KeyCode.End)
+
+-- Your widgets:
+local CombatSec = CombatTab:Section("Aimbot")
+CombatSec:Toggle("Enable", false, "AimbotF", function(state)
+    -- ...
+end)</code></pre>
+                </div>
+            </section>
+
 
             <footer>
-                <p>&copy; 2026 NextLevel UI Library. Designed for the NextLevel community.</p>
+                <div class="logo" style="justify-content:center;margin-bottom:8px;">
+                    NextLevel <div class="logo-badge">0.06</div>
+                </div>
+                <p>NextLevel UI Framework &copy; 2026 &mdash; Complete API Reference</p>
             </footer>
+
         </div>
     </main>
 
-    <!-- Prism JS -->
+    <!-- ═══════════════════════════════════════════════════════ JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-lua.min.js"></script>
-
     <script>
-        const sections = document.querySelectorAll('section');
-        const navLinks = document.querySelectorAll('.nav-link');
-        const main = document.querySelector('.main');
+        // Active nav link on scroll
+        const sections = document.querySelectorAll('section[id]');
+        const links = document.querySelectorAll('.nav-link');
+        const scroll = document.getElementById('mainScroll');
 
-        main.addEventListener('scroll', () => {
-            let current = '';
-            sections.forEach(section => {
-                const sectionTop = section.offsetTop;
-                if (main.scrollTop >= sectionTop - 150) {
-                    current = section.getAttribute('id');
-                }
+        scroll.addEventListener('scroll', () => {
+            let cur = '';
+            sections.forEach(s => {
+                if (scroll.scrollTop >= s.offsetTop - 120) cur = s.id;
             });
+            links.forEach(l => {
+                l.classList.toggle('active', l.getAttribute('href') === '#' + cur);
+            });
+        });
 
-            navLinks.forEach(link => {
-                link.classList.remove('active');
-                if (link.getAttribute('href').includes(current)) {
-                    link.classList.add('active');
-                }
+        // Sidebar search
+        document.getElementById('navSearch').addEventListener('input', function () {
+            const q = this.value.toLowerCase().trim();
+            links.forEach(l => {
+                const text = l.textContent.toLowerCase();
+                l.classList.toggle('hidden', q !== '' && !text.includes(q));
             });
         });
     </script>

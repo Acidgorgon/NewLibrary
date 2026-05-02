@@ -2,7 +2,7 @@
 --!nolint
 
 -- ============================================================
---  HEARTKISS  —  Complete Feature Example
+--  NEXTLEVEL  —  Complete Feature Example
 --  Demonstrates every widget, method, and utility available.
 --  Updated for version 0.06 - Visually Unique Update
 -- ============================================================
@@ -11,24 +11,24 @@
 -- Example for external executors:
 -- local Library = loadstring(game:HttpGet(".../0.06/Lib.lua"))()
 -- For local executor testing if Lib.lua is in workspace:
-local Library = loadstring(game:HttpGet("https://gist.githubusercontent.com/Acidgorgon/2c0654b99a77b27e801ca6eb952a1e6c/raw/a887a7de559fc0fc6eb6542066f648a91f8b9e28/UILib"))()
+local Library = loadstring(game:HttpGet("https://gist.githubusercontent.com/Acidgorgon/2c0654b99a77b27e801ca6eb952a1e6c/raw/ecc019d89a367df71c86a5531525db52907f961c/UILib"))()
 
 
 -- ──────────────────────────────────────────────────────────────
 --  INIT LOAD SCREEN  (optional premium loader)
 -- ──────────────────────────────────────────────────────────────
 Library:InitLoad({
-    Title       = "CurseMark",
-    SubTitle    = "All-Feature Demo v0.06",
-    Icon        = 89738140174311,          -- rbxassetid
-    Duration    = 2,
-    AccentColor = Color3.fromRGB(255, 0, 0), -- Elite Red style
+    Title       = "NextLevel",
+    SubTitle    = "Premium Interface v0.06",
+    Icon        = 10734914443,          -- rbxassetid
+    Duration    = 2.5,
+    AccentColor = Color3.fromRGB(255, 255, 255),
     Statuses    = {
-        "Establishing secure connection...",
-        "Loading encryption modules...",
-        "Authenticating session...",
-        "Injecting core systems...",
-        "Building interface...",
+        "Initializing NextLevel framework...",
+        "Synchronizing cloud configurations...",
+        "Validating premium license...",
+        "Optimizing UI performance...",
+        "Welcome back, Administrator.",
     },
 })
 
@@ -37,13 +37,18 @@ Library:InitLoad({
 --  CREATE WINDOW
 -- ──────────────────────────────────────────────────────────────
 local Window = Library.new(
-    "CurseMark",                    -- title
+    "NextLevel",                    -- title
     UDim2.new(0, 520, 0, 560),      -- size
     Enum.KeyCode.RightControl,      -- toggle key
-    "Sidebar",                      -- UI Mode ("Sidebar" or "Classic")
-    89738140174311
+    "Classic",                      -- UI Mode ("Sidebar" or "Classic")
+    10734914443
 )
 Window:SetPanicKey(Enum.KeyCode.End)
+-- Window:SetTheme({
+--     AccentColor = Color3.fromRGB(255, 255, 255),
+--     LineColor = Color3.fromRGB(255, 255, 255),
+--     SelectedTab = Color3.fromRGB(255, 255, 255), -- Adds the white background box
+-- })
 
 -- Flags that should never be saved to configs
 Window:IgnoreFlag("SensitiveFlag")
@@ -52,7 +57,7 @@ Window:IgnoreFlag("SensitiveFlag")
 -- ══════════════════════════════════════════════════════════════
 --  TAB 1 — BASIC CONTROLS
 -- ══════════════════════════════════════════════════════════════
-local MainTab = Window:Tab("Main")
+local MainTab = Window:Tab("Main", 10734914443)
 
 
 -- ── Section: Buttons ──────────────────────────────────────────
@@ -178,8 +183,10 @@ end)
 -- ══════════════════════════════════════════════════════════════
 --  TAB 2 — INPUT & TEXT
 -- ══════════════════════════════════════════════════════════════
-local InputTab = Window:Tab("Input")
-
+local InputTab = Window:Tab("Input", 10734944524) -- Gear/Input icon
+local VisualTab = Window:Tab("Visual", 10734946327) -- Eye/Visual icon
+local DataTab = Window:Tab("Data", 10734945415) -- Database icon
+local GridTab = Window:Tab("Grid", 10723380158) -- Grid icon
 
 -- ── Section: Text Inputs ──────────────────────────────────────
 local TextSec = InputTab:Section("Text Input")
@@ -292,9 +299,6 @@ SelectSec:RadioGroup(
 -- ══════════════════════════════════════════════════════════════
 --  TAB 3 — VISUAL / DISPLAY
 -- ══════════════════════════════════════════════════════════════
-local VisualTab = Window:Tab("Visual")
-
-
 -- ── Section: Labels & Text ────────────────────────────────────
 local LabelSec = VisualTab:Section("Labels & Layout")
 
@@ -350,9 +354,6 @@ ImgSec:Label("Asset ID: ")
 -- ══════════════════════════════════════════════════════════════
 --  TAB 4 — DATA WIDGETS
 -- ══════════════════════════════════════════════════════════════
-local DataTab = Window:Tab("Data")
-
-
 -- ── Section: Progress Bars ────────────────────────────────────
 local ProgressSec = DataTab:Section("Progress Bars")
 
@@ -484,9 +485,6 @@ console:Print("[SYSTEM] NextLevel initialised.", Color3.fromRGB(0, 200, 145))
 -- ══════════════════════════════════════════════════════════════
 --  TAB 5 — GRID & DIALOG
 -- ══════════════════════════════════════════════════════════════
-local GridTab = Window:Tab("Grid")
-
-
 -- ── Section: Button Grid ─────────────────────────────────────
 local GridSec = GridTab:Section("Ability Grid")
 
@@ -557,7 +555,7 @@ end)
 DialogSec:Button("Info Dialog", function()
     Window:Dialog(
         "About NextLevel",
-        "Version 1.0  ·  All features demo.\nDeveloped with the Heartkiss UI Library.",
+        "Version 0.06  ·  Complete Feature Showcase.\nDeveloped by Acidgorgon.",
         {"OK"},
         function() end
     )
@@ -575,12 +573,13 @@ end)
 -- ══════════════════════════════════════════════════════════════
 --  BUILT-IN TABS  (Utility + Settings + Advanced)
 -- ══════════════════════════════════════════════════════════════
-Window:BuildUtilityTab()    
-Window:BuildThemeTab(3926305904)      -- Build theme tab before settings so we can refer to it
-Window:BuildSettingsTab(3926305904)   
-Window:BuildExecutorTab()             
-Window:BuildNotificationLogTab()      
-Window:BuildChangelogTab({            
+Window:BuildUtilityTab(10723374643) -- Tools icon
+Window:BuildThemeTab(10734947300) -- Brush icon
+Window:BuildSettingsTab(10734944524) -- Gear icon
+Window:BuildExecutorTab(10723415903) -- Terminal icon
+Window:BuildNotificationLogTab(10734950056) -- Bell icon
+Window:BuildChangelogTab({ -- List icon
+    Icon = 10723403565,
     ["0.06"] = "• Fixed Theme Persistence in Configs\n• Integrated Keybind HUD into core\n• Added Global Search\n• Added Theme Presets\n• Added Smart Scroll Console\n• Added Silent Mode\n• Added Notification History",
     ["0.05"] = "• Added Sidebar mode\n• Initial v0.05 release"
 })
@@ -594,7 +593,7 @@ task.delay(0.5, function()
 
     Window:Notify(
         "NextLevel Ready",
-        "All features loaded. Press RCtrl to toggle UI, End to panic-unload.",
+        "Premium Interface v0.06 initialized.\nPress RightControl to toggle UI.",
         5
     )
 end)

@@ -141,11 +141,11 @@ local THEMES = {
     MainColor        = Color3.fromRGB(15, 15, 15),
     FrameColor       = Color3.fromRGB(20, 20, 20),
     TabColor         = Color3.fromRGB(18, 18, 18),
-    LineColor        = Color3.fromRGB(255, 255, 255),
-    AccentColor      = Color3.fromRGB(255, 0, 0), -- Added missing property
+    LineColor        = Color3.fromRGB(78, 78, 78),
+    AccentColor      = Color3.fromRGB(78, 78, 78),
     BorderColor      = Color3.fromRGB(40, 40, 40),
     DarkColor        = Color3.fromRGB(10, 10, 10),
-    SelectedTab      = Color3.fromRGB(40, 40, 40),
+    SelectedTab      = Color3.fromRGB(78, 78, 78),
     TextColor        = Color3.fromRGB(245, 245, 245),
     ButtonBorderColor= Color3.fromRGB(35, 35, 35),
     SubTextColor     = Color3.fromRGB(150, 150, 150),
@@ -801,8 +801,8 @@ function Library.new(Name: string?, Size: UDim2?, KeyBind: (Enum.UserInputType |
         Tabs.ZIndex = 2
         Tabs.Parent = Sidebar
     else
-        Tabs.Size = UDim2.new(1, -170, 0, 28) 
-        Tabs.Position = UDim2.new(0, 12, 0, 42)
+        Tabs.Size = UDim2.new(1, -182, 0, 28) 
+        Tabs.Position = UDim2.new(0, 12, 0, 44)
         WindowRoot:Theme(Tabs, "BackgroundColor3", "TabColor")
         WindowRoot:Theme(Tabs, "BorderColor3", "BorderColor")
         Tabs.ZIndex = 2
@@ -832,8 +832,8 @@ function Library.new(Name: string?, Size: UDim2?, KeyBind: (Enum.UserInputType |
         SearchBox.Size = UDim2.new(1, -300, 0, 28)
         SearchBox.Position = UDim2.new(0, 150, 0, 8)
     else
-        SearchBox.Size = UDim2.new(0, 146, 0, 28)
-        SearchBox.Position = UDim2.new(1, -158, 0, 42)
+        SearchBox.Size = UDim2.new(0, 158, 0, 28)
+        SearchBox.Position = UDim2.new(1, -170, 0, 44) -- Matched with Tabs Y and Height
     end
     WindowRoot:Theme(SearchBox, "BackgroundColor3", "TabColor")
     WindowRoot:Theme(SearchBox, "BorderColor3", "BorderColor")
@@ -880,8 +880,8 @@ function Library.new(Name: string?, Size: UDim2?, KeyBind: (Enum.UserInputType |
         FrameHolder.Position = UDim2.new(0, 150, 0, 48)
         FrameHolder.BackgroundTransparency = 1
     else
-        FrameHolder.Size = UDim2.new(1, -24, 1, -84)
-        FrameHolder.Position = UDim2.new(0, 12, 0, 74)
+        FrameHolder.Size = UDim2.new(1, -24, 1, -94)
+        FrameHolder.Position = UDim2.new(0, 12, 0, 84) -- Pushed down to prevent overlap
         WindowRoot:Theme(FrameHolder, "BackgroundColor3", "TabColor")
         WindowRoot:Theme(FrameHolder, "BorderColor3", "BorderColor")
         CreateGradient(FrameHolder)
@@ -1127,15 +1127,16 @@ function Library.new(Name: string?, Size: UDim2?, KeyBind: (Enum.UserInputType |
             local TabBg = Instance.new("Frame")
             TabBg.Name = "Bg"
             TabBg.Size = UDim2.new(1, 0, 1, 0)
-            TabBg.BackgroundColor3 = THEMES.SelectedTab
+            TabBg.BackgroundColor3 = THEMES.AccentColor
             TabBg.BackgroundTransparency = 1
             TabBg.BorderSizePixel = 0
-            TabBg.ZIndex = Tab.ZIndex - 1
+            TabBg.ZIndex = 3
             TabBg.Parent = Tab
+            WindowRoot:Theme(TabBg, "BackgroundColor3", "AccentColor")
             RoundCorner(TabBg, 4)
             
             if iconId then
-                Tab.Text = "        " .. text 
+                Tab.Text = "          " .. text -- Increased spacing from 8 to 10 spaces
                 TabIcon = Instance.new("ImageLabel")
                 TabIcon.Name = "TabIcon"
                 TabIcon.Size = UDim2.new(0, 16, 0, 16)
@@ -1152,10 +1153,10 @@ function Library.new(Name: string?, Size: UDim2?, KeyBind: (Enum.UserInputType |
             Highlight.Name = "Highlight"
             Highlight.Size = UDim2.new(0, 3, 0, 0)
             Highlight.Position = UDim2.new(0, 0, 0.5, 0)
-            Highlight.BackgroundColor3 = THEMES.AccentColor
             Highlight.BorderSizePixel = 0
             Highlight.ZIndex = 5
             Highlight.Parent = Tab
+            WindowRoot:Theme(Highlight, "BackgroundColor3", "AccentColor")
             RoundCorner(Highlight, 2)
             WindowRoot:Theme(Highlight, "BackgroundColor3", "AccentColor")
 
@@ -1179,14 +1180,30 @@ function Library.new(Name: string?, Size: UDim2?, KeyBind: (Enum.UserInputType |
                 end
             end)
         else
-            Tab.Size = UDim2.new(0, 80, 1, 0)
-            Tab.Text = text
+            Tab.Size = UDim2.new(0, 0, 0.5, 0)
+            Tab.AutomaticSize = Enum.AutomaticSize.X
             Tab.BackgroundTransparency = 1
+            Tab.BorderSizePixel = 0
             WindowRoot:Theme(Tab, "TextColor3", "SubTextColor")
             
+            if iconId then
+                Tab.Text = "          " .. text .. "          " -- Equalized padding for centering
+                TabIcon = Instance.new("ImageLabel")
+                TabIcon.Name = "TabIcon"
+                TabIcon.Size = UDim2.new(0, 14, 0, 14)
+                TabIcon.Position = UDim2.new(0, 8, 0.5, -7)
+                TabIcon.BackgroundTransparency = 1
+                TabIcon.Image = type(iconId) == "number" and "rbxassetid://"..tostring(iconId) or iconId
+                WindowRoot:Theme(TabIcon, "ImageColor3", "SubTextColor")
+                TabIcon.ZIndex = 5
+                TabIcon.Parent = Tab
+            else
+                Tab.Text = "      " .. text .. "      " -- Equalized padding
+            end
+
             Highlight.Name = "Highlight"
-            Highlight.Size = UDim2.new(0.6, 0, 0, 2)
-            Highlight.Position = UDim2.new(0.2, 0, 1, -2)
+            Highlight.Size = UDim2.new(1, 0, 0, 2)
+            Highlight.Position = UDim2.new(0, 0, 1, -2)
             Highlight.BackgroundColor3 = THEMES.AccentColor
             Highlight.BorderSizePixel = 0
             Highlight.BackgroundTransparency = 1
@@ -1216,14 +1233,14 @@ function Library.new(Name: string?, Size: UDim2?, KeyBind: (Enum.UserInputType |
 
         Tab.Font = Enum.Font.GothamMedium
         Tab.TextSize = THEMES.TextSize
-        Tab.ZIndex = 3
+        Tab.ZIndex = 4
         Tab.Parent = ScrollingFrame
 
         WindowRoot:Connect(ThemeEvent.Event, function()
             local isActive = Page.Visible
             if isSidebar then
                 local targetColor = isActive and THEMES.TextColor or THEMES.SubTextColor
-                local bgTrans = isActive and 0.85 or 1
+                local bgTrans = isActive and 0.5 or 1
                 
                 TweenService:Create(Tab, TweenInfo.new(0.2), {TextColor3 = targetColor}):Play()
                 if Tab:FindFirstChild("Bg") then
@@ -1245,8 +1262,8 @@ function Library.new(Name: string?, Size: UDim2?, KeyBind: (Enum.UserInputType |
                 if Tab:FindFirstChild("Highlight") then
                     TweenService:Create(Tab.Highlight, TweenInfo.new(0.3), {
                         BackgroundTransparency = isActive and 0 or 1,
-                        Size = isActive and UDim2.new(0.6, 0, 0, 2) or UDim2.new(0, 0, 0, 2),
-                        Position = isActive and UDim2.new(0.2, 0, 1, -2) or UDim2.new(0.5, 0, 1, -2)
+                        Size = isActive and UDim2.new(1, 0, 0, 2) or UDim2.new(0, 0, 0, 2),
+                        Position = isActive and UDim2.new(0, 0, 1, -2) or UDim2.new(0.5, 0, 1, -2)
                     }):Play()
                 end
             end
@@ -1313,7 +1330,7 @@ function Library.new(Name: string?, Size: UDim2?, KeyBind: (Enum.UserInputType |
             Page.Visible = true
             if isSidebar then
                 TweenService:Create(Tab, TweenInfo.new(0.2), {TextColor3 = THEMES.TextColor}):Play()
-                if Tab:FindFirstChild("Bg") then TweenService:Create(Tab.Bg, TweenInfo.new(0.2), {BackgroundTransparency = 0.85}):Play() end
+                if Tab:FindFirstChild("Bg") then TweenService:Create(Tab.Bg, TweenInfo.new(0.2), {BackgroundTransparency = 0.5}):Play() end
                 if TabIcon then TweenService:Create(TabIcon, TweenInfo.new(0.2), {ImageColor3 = THEMES.TextColor}):Play() end
                 if Tab:FindFirstChild("Highlight") then
                     TweenService:Create(Tab.Highlight, TweenInfo.new(0.3, Enum.EasingStyle.Quart), {
@@ -1327,8 +1344,8 @@ function Library.new(Name: string?, Size: UDim2?, KeyBind: (Enum.UserInputType |
                 if Tab:FindFirstChild("Highlight") then
                     TweenService:Create(Tab.Highlight, TweenInfo.new(0.3), {
                         BackgroundTransparency = 0,
-                        Size = UDim2.new(0.6, 0, 0, 2),
-                        Position = UDim2.new(0.2, 0, 1, -2)
+                        Size = UDim2.new(1, 0, 0, 2),
+                        Position = UDim2.new(0, 0, 1, -2)
                     }):Play()
                 end
             end
@@ -1338,7 +1355,7 @@ function Library.new(Name: string?, Size: UDim2?, KeyBind: (Enum.UserInputType |
             Page.Visible = true
             if isSidebar then
                 Tab.TextColor3 = THEMES.TextColor
-                if Tab:FindFirstChild("Bg") then Tab.Bg.BackgroundTransparency = 0.85 end
+                if Tab:FindFirstChild("Bg") then Tab.Bg.BackgroundTransparency = 0.5 end
                 if TabIcon then TabIcon.ImageColor3 = THEMES.TextColor end
                 if Tab:FindFirstChild("Highlight") then
                     Tab.Highlight.Size = UDim2.new(0, 3, 0.6, 0)
@@ -1349,8 +1366,8 @@ function Library.new(Name: string?, Size: UDim2?, KeyBind: (Enum.UserInputType |
                 Tab.TextColor3 = THEMES.TextColor
                 if Tab:FindFirstChild("Highlight") then
                     Tab.Highlight.BackgroundTransparency = 0
-                    Tab.Highlight.Size = UDim2.new(0.6, 0, 0, 2)
-                    Tab.Highlight.Position = UDim2.new(0.2, 0, 1, -2)
+                    Tab.Highlight.Size = UDim2.new(1, 0, 0, 2)
+                    Tab.Highlight.Position = UDim2.new(0, 0, 1, -2)
                 end
             end
         end
@@ -1411,7 +1428,8 @@ function Library.new(Name: string?, Size: UDim2?, KeyBind: (Enum.UserInputType |
             local SectionFunctions: Section = {} :: any
             local ElementCount = 0
 
-            local function RegisterSearch(elem: Instance, searchText: string)
+            local function RegisterSearch(elem: Instance, searchText: any)
+                searchText = tostring(searchText or "")
                 table.insert(SectionData.Elements, { Element = elem, SearchText = searchText:lower() })
             end
 
@@ -4281,10 +4299,11 @@ function Library:BuildThemeTab(iconId)
             MainColor        = Color3.fromRGB(15, 15, 15),
             FrameColor       = Color3.fromRGB(20, 20, 20),
             TabColor         = Color3.fromRGB(18, 18, 18),
-            LineColor        = Color3.fromRGB(255, 255, 255),
+            LineColor        = Color3.fromRGB(78, 78, 78),
+            AccentColor      = Color3.fromRGB(78, 78, 78),
             BorderColor      = Color3.fromRGB(40, 40, 40),
             DarkColor        = Color3.fromRGB(10, 10, 10),
-            SelectedTab      = Color3.fromRGB(40, 40, 40),
+            SelectedTab      = Color3.fromRGB(78, 78, 78),
             TextColor        = Color3.fromRGB(245, 245, 245),
             ButtonBorderColor= Color3.fromRGB(35, 35, 35),
             SubTextColor     = Color3.fromRGB(150, 150, 150),
@@ -4343,10 +4362,15 @@ function Library:BuildExecutorTab(iconId)
 end
 
 function Library:BuildChangelogTab(data, iconId)
+    if type(data) == "table" and data.Icon then
+        iconId = data.Icon
+    end
     local ChangeTab = self:Tab("Changelog", iconId or 11419714317)
     for version, notes in data do
-        local Sec = ChangeTab:Section("Version " .. version)
-        Sec:Paragraph(notes)
+        if version ~= "Icon" then
+            local Sec = ChangeTab:Section("Version " .. tostring(version))
+            Sec:Paragraph(notes)
+        end
     end
 end
 
