@@ -11,7 +11,7 @@
 -- Example for external executors:
 -- local Library = loadstring(game:HttpGet(".../0.06/Lib.lua"))()
 -- For local executor testing if Lib.lua is in workspace:
-local Library = loadstring(game:HttpGet("https://gist.githubusercontent.com/Acidgorgon/2c0654b99a77b27e801ca6eb952a1e6c/raw/ecc019d89a367df71c86a5531525db52907f961c/UILib"))()
+local Library = loadstring(game:HttpGet("https://gist.githubusercontent.com/Acidgorgon/2c0654b99a77b27e801ca6eb952a1e6c/raw/33f0a4f978d700fab58fd2b4374004cf7a87e560/UILib"))()
 
 
 -- ──────────────────────────────────────────────────────────────
