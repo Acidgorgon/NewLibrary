@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NextLevel UI v0.06 — Complete Reference</title>
+    <title>NextLevel UI v0.07 — Complete Reference</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
@@ -757,29 +757,273 @@
         }
 
         /* ─── HIDDEN (for search filtering) ─────────── */
-        .nav-link.hidden {
+        .nav-link.hidden,
+        .nav-group.hidden {
             display: none;
+        }
+
+        .nav-empty {
+            display: none;
+            padding: 16px 24px;
+            font-size: 12px;
+            color: var(--sub2);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .nav-empty.visible {
+            display: block;
+        }
+
+        /* ─── HEADER ACTIONS & COPY BUTTONS ────────── */
+        .sidebar-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-top: 8px;
+            gap: 8px;
+        }
+
+        .repo-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            color: var(--sub);
+            text-decoration: none;
+            padding: 3px 8px;
+            border: 1px solid var(--border);
+            border-radius: 5px;
+            background: rgba(255, 255, 255, 0.03);
+            transition: border-color 0.2s, color 0.2s;
+        }
+
+        .repo-link:hover {
+            color: #fff;
+            border-color: var(--border-hi);
+        }
+
+        .code-header-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .copy-btn {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 10px;
+            font-weight: 600;
+            color: var(--sub);
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 2px 8px;
+            cursor: pointer;
+            transition: color 0.15s, border-color 0.15s, background 0.15s;
+        }
+
+        .copy-btn:hover {
+            color: #fff;
+            border-color: var(--border-hi);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .copy-btn.copied {
+            color: var(--green);
+            border-color: rgba(74, 222, 128, 0.4);
+        }
+
+        .theme-row {
+            cursor: pointer;
+            transition: border-color 0.15s, background 0.15s;
+        }
+
+        .theme-row:hover {
+            border-color: var(--border-hi);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .theme-row.copied .theme-default {
+            color: var(--green);
+        }
+
+        /* ─── GALLERY & LIGHTBOX ───────────────────── */
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+        }
+
+        .gallery-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            overflow: hidden;
+            cursor: zoom-in;
+            transition: border-color 0.2s, transform 0.2s;
+        }
+
+        .gallery-card:hover {
+            border-color: var(--border-hi);
+            transform: translateY(-2px);
+        }
+
+        .gallery-card img {
+            width: 100%;
+            height: 190px;
+            object-fit: cover;
+            display: block;
+            background: #050505;
+        }
+
+        .gallery-caption {
+            padding: 12px 14px;
+            border-top: 1px solid var(--border);
+        }
+
+        .gallery-caption strong {
+            display: block;
+            font-size: 13px;
+            color: #fff;
+            margin-bottom: 2px;
+        }
+
+        .gallery-caption span {
+            font-size: 12px;
+            color: var(--sub);
+        }
+
+        #lightbox {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.88);
+            backdrop-filter: blur(6px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 12px;
+            padding: 24px;
+            z-index: 2000;
+        }
+
+        #lightbox.open {
+            display: flex;
+        }
+
+        #lightbox img {
+            max-width: min(1000px, 94vw);
+            max-height: 82vh;
+            border-radius: 10px;
+            border: 1px solid var(--border-hi);
+            box-shadow: 0 24px 60px rgba(0, 0, 0, 0.8);
+        }
+
+        #lightboxCaption {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            color: var(--sub);
+            text-align: center;
+        }
+
+        /* ─── MOBILE DRAWER ────────────────────────── */
+        .mobile-topbar {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 54px;
+            background: rgba(6, 6, 6, 0.94);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid var(--border);
+            padding: 0 18px;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 900;
+        }
+
+        .menu-toggle {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            color: #fff;
+            border-radius: 6px;
+            padding: 6px 11px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            cursor: pointer;
+        }
+
+        .sidebar-backdrop {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.65);
+            z-index: 950;
+        }
+
+        @media (max-width: 900px) {
+            .mobile-topbar {
+                display: flex;
+            }
+
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                bottom: 0;
+                z-index: 1000;
+                transform: translateX(-100%);
+                transition: transform 0.24s ease;
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .sidebar-backdrop.open {
+                display: block;
+            }
+
+            .main {
+                margin-left: 0 !important;
+                padding-top: 64px;
+            }
+
+            .content {
+                padding: 24px 20px 80px !important;
+            }
         }
     </style>
 </head>
 
 <body>
+    <header class="mobile-topbar">
+        <div class="logo">NextLevel <div class="logo-badge">0.07</div></div>
+        <button type="button" class="menu-toggle" id="menuToggle" aria-label="Toggle navigation">Menu</button>
+    </header>
+    <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
 
     <!-- ═══════════════════════════════════════════════════════ SIDEBAR -->
-    <aside class="sidebar">
+    <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
-            <div class="logo">NextLevel <div class="logo-badge">0.06</div>
+            <div class="logo">NextLevel <div class="logo-badge">0.07</div>
             </div>
             <div class="logo-sub">Complete API Reference</div>
+            <div class="sidebar-meta">
+                <a class="repo-link" href="https://github.com/Acidgorgon/NewLibrary" target="_blank" rel="noopener">GitHub Repo</a>
+                <span class="repo-link" style="cursor:default;">/ or Ctrl+K</span>
+            </div>
         </div>
         <div class="sidebar-search">
-            <input type="text" id="navSearch" placeholder="Search docs..." autocomplete="off" />
+            <input type="text" id="navSearch" placeholder="Search docs (/)" autocomplete="off" />
         </div>
         <nav class="sidebar-nav">
 
             <div class="nav-group">
                 <div class="nav-group-title">Getting Started</div>
                 <a href="#intro" class="nav-link">Overview</a>
+                <a href="#gallery" class="nav-link">UI Preview <span class="nav-tag">imgs</span></a>
                 <a href="#install" class="nav-link">Installation</a>
                 <a href="#initload" class="nav-link">InitLoad <span class="nav-tag">splash</span></a>
             </div>
@@ -820,8 +1064,11 @@
                 <div class="nav-group-title">System</div>
                 <a href="#global" class="nav-link">Global Methods</a>
                 <a href="#config" class="nav-link">Config System</a>
+                <a href="#auto-update" class="nav-link">Auto-Update <span class="nav-tag">new</span></a>
                 <a href="#prebuilt" class="nav-link">Pre-built Tabs</a>
             </div>
+
+            <div class="nav-empty" id="navEmpty">No matching sections.</div>
 
         </nav>
     </aside>
@@ -836,14 +1083,16 @@
                 <div class="hero-eyebrow">NextLevel UI Framework</div>
                 <h1>Complete<br>Reference.</h1>
                 <p class="hero-desc">Every method, every option, every controller. The definitive engineering guide to
-                    NextLevel v0.06 — from boot to unload.</p>
+                    NextLevel v0.07 — from boot to unload.</p>
 
                 <div class="callout callout-tip">
                     <div class="callout-icon">✦</div>
                     <div class="callout-body">
-                        <strong>v0.06 highlights:</strong> generalized iteration, redesigned <code>InitLoad</code>
-                        splash with particle effects, two-column Sidebar layout, resize grip, dialog system, TagInput
-                        chips, Timer widget, animated Chart, and Changelog builder.
+                        <strong>v0.07 highlights:</strong> full executor shim &amp; memory leak fixes (Dropdown,
+                        SearchableDropdown, Timer, Search), ColorPicker HSV cursor &amp; Alpha fixes, Classic Webhook
+                        z-index &amp; Alert auto-sizing fixes, <code>Library.new(options)</code> overload,
+                        <code>Section:Clear()</code>, hardened <code>InitLoad</code> guards, and improved
+                        <code>AutoUpdate</code> / <code>BuildUpdateTab</code>.
                     </div>
                 </div>
 
@@ -868,23 +1117,68 @@
             </section>
 
 
+            <!-- ─── UI PREVIEW ──────────────────────────────────────── -->
+            <section id="gallery">
+                <h2>UI Preview</h2>
+                <p class="section-desc">Screenshots captured from NextLevel running in Sidebar mode, Classic mode, Settings, and InitLoad boot splash. Click any image to inspect full size.</p>
+                <div class="gallery-grid">
+                    <div class="gallery-card" data-caption="Sidebar Mode — Two-column sections, Keybind HUD, Watermark & Global Search">
+                        <img src="img/main.png" alt="NextLevel Sidebar Mode preview" loading="lazy" />
+                        <div class="gallery-caption">
+                            <strong>Sidebar Mode</strong>
+                            <span>Vertical icon rail, dual columns &amp; HUD overlays</span>
+                        </div>
+                    </div>
+                    <div class="gallery-card" data-caption="Classic Mode — Top tab strip with balanced two-column widgets">
+                        <img src="img/classic_main.png" alt="NextLevel Classic Mode Main tab preview" loading="lazy" />
+                        <div class="gallery-caption">
+                            <strong>Classic Mode (Main)</strong>
+                            <span>Top tab bar layout with compact header search</span>
+                        </div>
+                    </div>
+                    <div class="gallery-card" data-caption="Classic Mode — Dropdowns, PlayerDropdown, SearchableDropdown & TagInput">
+                        <img src="img/classic_input.png" alt="NextLevel Classic Mode Input tab preview" loading="lazy" />
+                        <div class="gallery-caption">
+                            <strong>Classic Mode (Inputs)</strong>
+                            <span>Text inputs, dropdown variants &amp; tag chips</span>
+                        </div>
+                    </div>
+                    <div class="gallery-card" data-caption="Built-in Settings Tab — Config persistence, autoload, watermark & safety toggles">
+                        <img src="img/settings.png" alt="NextLevel Settings tab preview" loading="lazy" />
+                        <div class="gallery-caption">
+                            <strong>Settings &amp; Configs</strong>
+                            <span>JSON config profiles, autoload &amp; telemetry HUD controls</span>
+                        </div>
+                    </div>
+                    <div class="gallery-card" data-caption="InitLoad — Animated glitch-typewriter terminal splash & segmented progress">
+                        <img src="img/loader.png" alt="NextLevel InitLoad loader preview" loading="lazy" />
+                        <div class="gallery-caption">
+                            <strong>InitLoad Splash</strong>
+                            <span>Glitch-typewriter header, particles &amp; step bar</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+
             <!-- ─── INSTALLATION ────────────────────────────────────── -->
             <section id="install">
                 <h2>Installation</h2>
-                <p class="section-desc">Load the library from the CDN with a single <code>loadstring</code> call. The
+                <p class="section-desc">Load v0.07 directly from GitHub with a single <code>loadstring</code> call. The
                     return value is your <code>Library</code> module.</p>
 
                 <div class="code-wrap">
-                    <div class="code-header"><span>CDN Loadstring</span><span class="code-lang">lua</span></div>
-                    <pre><code class="language-lua">local Library = loadstring(game:HttpGet("https://gist.githubusercontent.com/Acidgorgon/2c0654b99a77b27e801ca6eb952a1e6c/raw/33f0a4f978d700fab58fd2b4374004cf7a87e560/UILib"))()</code></pre>
+                    <div class="code-header"><span>GitHub Raw Loadstring (v0.07)</span><span class="code-lang">lua</span></div>
+                    <pre><code class="language-lua">local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Acidgorgon/NewLibrary/main/versions/0.07/Lib.lua"))()</code></pre>
                 </div>
 
                 <div class="callout callout-info">
                     <div class="callout-icon">ℹ</div>
                     <div class="callout-body">
-                        The returned <strong>Library</strong> table exposes <code>Library.new()</code>,
-                        <code>Library:InitLoad()</code>, <code>Library:Notify()</code>, and
-                        <code>Library:SetTheme()</code> at the global level.
+                        The returned <strong>Library</strong> table exposes <code>Library.Version</code> (<code>"0.07"</code>),
+                        <code>Library.Presets</code>, <code>Library.new()</code>, <code>Library:InitLoad()</code>,
+                        <code>Library:Notify()</code>, <code>Library:SetTheme()</code>, and
+                        <code>Library:CheckForUpdate()</code> / <code>Library:AutoUpdate()</code> at the global level.
                     </div>
                 </div>
             </section>
@@ -961,7 +1255,7 @@
                         <div class="code-header"><span>Example</span><span class="code-lang">lua</span></div>
                         <pre><code class="language-lua">Library:InitLoad({
     Title       = "NEXUS HUB",
-    SubTitle    = "v0.06 — by acidg",
+    SubTitle    = "v0.07 — by acidg",
     Icon        = 10734914443,
     Duration    = 5,
     AccentColor = Color3.fromRGB(0, 200, 255),
@@ -992,15 +1286,16 @@
             <section id="window">
                 <h2>Library.new</h2>
                 <p class="section-desc">Creates and returns a <strong>Window</strong> — the root container for all tabs
-                    and widgets. Registers cleanup automatically via <code>getgenv()._NextLevel_Garbage</code>.</p>
+                    and widgets. Supports either positional arguments or a single <code>options</code> table, and
+                    registers cleanup automatically via <code>getgenv()._NextLevel_Garbage</code>.</p>
 
                 <div class="card">
                     <div class="sig">
                         <span class="kw">local</span> <span class="param">Window</span> <span class="op">=</span> <span
                             class="obj">Library</span><span class="op">.</span><span class="fn">new</span>(<span
-                            class="param">Name</span>, <span class="param">Size</span>, <span
-                            class="param">ToggleKey</span>, <span class="param">Mode</span>, <span
-                            class="param">Icon</span>)
+                            class="param">NameOrOptions</span>, <span class="param">Size</span><span class="op">?</span>, <span
+                            class="param">ToggleKey</span><span class="op">?</span>, <span class="param">Mode</span><span class="op">?</span>, <span
+                            class="param">Icon</span><span class="op">?</span>)
                     </div>
 
                     <table class="params">
@@ -1010,10 +1305,11 @@
                             <th>Description</th>
                         </tr>
                         <tr>
-                            <td>Name</td>
-                            <td>string</td>
-                            <td>Window title shown in the header. Also used as the GC namespace and config folder
-                                prefix.</td>
+                            <td>NameOrOptions</td>
+                            <td>string | table</td>
+                            <td>Window title string, or an options table accepting <code>Title</code>/<code>Name</code>,
+                                <code>Size</code>, <code>Key</code>/<code>ToggleKey</code>, <code>Mode</code>, and
+                                <code>Icon</code>.</td>
                         </tr>
                         <tr>
                             <td>Size</td>
@@ -1031,32 +1327,34 @@
                         <tr>
                             <td>Mode</td>
                             <td>string</td>
-                            <td><code>"Sidebar"</code> — icon sidebar with two-column sections. <code>"Classic"</code> —
-                                top tab bar with single column. Default: <code>"Classic"</code></td>
+                            <td><code>"Sidebar"</code> — vertical icon rail with two-column sections.
+                                <code>"Classic"</code> — horizontal top tab bar with two-column sections. Default:
+                                <code>"Classic"</code></td>
                         </tr>
                         <tr>
                             <td>Icon</td>
                             <td>number|string</td>
-                            <td>Asset ID for the logo shown next to the title. Optional.</td>
+                            <td>Asset ID (numeric ID or <code>rbxassetid://...</code>) shown next to the title.
+                                Optional.</td>
                         </tr>
                     </table>
 
                     <div class="code-wrap">
-                        <div class="code-header"><span>Sidebar Mode</span><span class="code-lang">lua</span></div>
-                        <pre><code class="language-lua">local Window = Library.new(
-    "My Hub",
-    UDim2.new(0, 560, 0, 580),
-    Enum.KeyCode.RightControl,
-    "Sidebar",
-    10734914443
-)</code></pre>
+                        <div class="code-header"><span>Options Table (v0.07+)</span><span class="code-lang">lua</span></div>
+                        <pre><code class="language-lua">local Window = Library.new({
+    Title = "My Hub",
+    Size  = UDim2.fromOffset(740, 520),
+    Key   = Enum.KeyCode.RightControl,
+    Mode  = "Sidebar",
+    Icon  = 10734914443
+})</code></pre>
                     </div>
 
                     <div class="code-wrap">
-                        <div class="code-header"><span>Classic Mode</span><span class="code-lang">lua</span></div>
+                        <div class="code-header"><span>Positional Arguments</span><span class="code-lang">lua</span></div>
                         <pre><code class="language-lua">local Window = Library.new(
     "My Hub",
-    UDim2.new(0, 520, 0, 480),
+    UDim2.fromOffset(520, 560),
     Enum.KeyCode.Insert,
     "Classic"
 )</code></pre>
@@ -1066,10 +1364,10 @@
                         <div class="callout-icon">ℹ</div>
                         <div class="callout-body">
                             <strong>Window properties accessible after creation:</strong>
-                            <code>Window.Name</code>, <code>Window.Size</code>, <code>Window.KeyBind</code>,
-                            <code>Window.Flags</code>, <code>Window.Setters</code>, <code>Window.ConfigFolder</code>,
-                            <code>Window.Presets</code>, <code>Window.NotificationHistory</code>,
-                            <code>Window.IsSilent</code>.
+                            <code>Window.Name</code>, <code>Window.Version</code>, <code>Window.Size</code>,
+                            <code>Window.KeyBind</code>, <code>Window.Flags</code>, <code>Window.Setters</code>,
+                            <code>Window.ConfigFolder</code>, <code>Window.Presets</code>,
+                            <code>Window.NotificationHistory</code>, <code>Window.IsSilent</code>.
                         </div>
                     </div>
                 </div>
@@ -1099,9 +1397,8 @@
                     <div class="code-wrap">
                         <div class="code-header"><span>Example</span><span class="code-lang">lua</span></div>
                         <pre><code class="language-lua">Window:Notify("Success", "Operation completed.", 3)
- Window:Notify("Warning", "Rate limit approaching.", 5)
- Window:Notify("Error",   "Connection timed out.",   8)
-</code></pre>
+Window:Notify("Warning", "Rate limit approaching.", 5)
+Window:Notify("Error",   "Connection timed out.",   8)</code></pre>
                     </div>
                 </div>
 
@@ -1209,7 +1506,7 @@ end)</code></pre>
                     </p>
                     <div class="code-wrap">
                         <div class="code-header"><span>Example</span><span class="code-lang">lua</span></div>
-                        <pre><code class="language-lua">Window:SetPanicKey(Enum.KeyCode.End)  -- DELETE key unloads everything</code></pre>
+                        <pre><code class="language-lua">Window:SetPanicKey(Enum.KeyCode.End)  -- End key unloads everything</code></pre>
                     </div>
                 </div>
 
@@ -1320,7 +1617,7 @@ Window:ApplyPreset("Cyberpunk") -- or "Midnight", "Toxic", "Ocean", "Classic", "
                     elements.</p>
 
                 <div class="card">
-                    <h3>THEMES Keys</h3>
+                    <h3>THEMES Keys <span class="method-tag tag-returns">click row to copy</span></h3>
                     <div class="theme-grid">
                         <div class="theme-row">
                             <div class="theme-swatch" style="background:rgb(15,15,15);"></div><span
@@ -1351,6 +1648,10 @@ Window:ApplyPreset("Cyberpunk") -- or "Midnight", "Toxic", "Ocean", "Classic", "
                                 class="theme-key">DarkColor</span><span class="theme-default">10,10,10</span>
                         </div>
                         <div class="theme-row">
+                            <div class="theme-swatch" style="background:rgb(78,78,78);"></div><span
+                                class="theme-key">SelectedTab</span><span class="theme-default">78,78,78</span>
+                        </div>
+                        <div class="theme-row">
                             <div class="theme-swatch" style="background:rgb(245,245,245);"></div><span
                                 class="theme-key">TextColor</span><span class="theme-default">245,245,245</span>
                         </div>
@@ -1379,8 +1680,10 @@ Window:ApplyPreset("Cyberpunk") -- or "Midnight", "Toxic", "Ocean", "Classic", "
                                 class="theme-key">InfoColor</span><span class="theme-default">255,255,255</span>
                         </div>
                     </div>
-                    <p style="font-size:13px;color:var(--sub);margin-top:8px;">Integer keys: <code>TextSize = 13</code>
-                        and <code>BaseHeight = 26</code> control global font size and widget row height.</p>
+                    <p style="font-size:13px;color:var(--sub);margin-top:8px;"><strong>17 keys total:</strong> 15
+                        <code>Color3</code> keys above plus 2 integer keys (<code>TextSize = 13</code> and
+                        <code>BaseHeight = 26</code>). Click any color row to copy its <code>Color3.fromRGB(...)</code>
+                        snippet.</p>
                 </div>
 
                 <div class="card">
@@ -1540,8 +1843,9 @@ local SettingsTab = Window:Tab("Settings", 3926307971)</code></pre>
             <!-- ─── SECTIONS ─────────────────────────────────────────── -->
             <section id="sections">
                 <h2>Sections</h2>
-                <p class="section-desc">Sections are bordered containers that hold widgets. In Sidebar mode, sections
-                    alternate between the left and right columns automatically for a two-column grid layout.</p>
+                <p class="section-desc">Sections are bordered containers that hold widgets. Both Sidebar and Classic
+                    modes alternate sections between the left and right columns automatically for a two-column grid
+                    layout.</p>
 
                 <div class="card">
                     <div class="sig">
@@ -1551,7 +1855,9 @@ local SettingsTab = Window:Tab("Settings", 3926307971)</code></pre>
                     </div>
                     <p style="font-size:14px;color:var(--sub);margin-bottom:12px;">Creates a bordered section with a
                         floating title label. Section height is automatically driven by its content via
-                        <code>UIListLayout.AbsoluteContentSize</code>.
+                        <code>UIListLayout.AbsoluteContentSize</code>. Call <code>Section:Clear()</code> to destroy
+                        all existing widget children and rebuild dynamic lists (used internally by
+                        <code>BuildNotificationLogTab</code>).
                     </p>
                     <div class="code-wrap">
                         <div class="code-header"><span>Example</span><span class="code-lang">lua</span></div>
@@ -1560,7 +1866,11 @@ local ESPSection   = VisualTab:Section("ESP Settings")
 local MiscSection  = MiscTab:Section("Miscellaneous")
 
 -- All widgets go into a Section:
-AimSection:Toggle("Enable Aimbot", false, "AimFlag", function(state) end)</code></pre>
+AimSection:Toggle("Enable Aimbot", false, "AimFlag", function(state) end)
+
+-- Dynamically reset & rebuild a section:
+MiscSection:Clear()
+MiscSection:Label("Rebuilt dynamically!")</code></pre>
                     </div>
                 </div>
             </section>
@@ -2287,7 +2597,7 @@ Section:Image("rbxassetid://123456789", 80)</code></pre>
     {"Ping",    "0 ms"},
     {"FPS",     "0"},
     {"Players", tostring(#game.Players:GetPlayers())},
-    {"Version", "v0.06"},
+    {"Version", "v0.07"},
 })
 
 -- Update live:
@@ -2443,8 +2753,10 @@ breakTimer:Set(120)     -- change duration to 2 minutes</code></pre>
                             class="param">flag</span><span class="op">?</span>, <span class="param">callback</span><span
                             class="op">?</span>)</div>
                     <p style="font-size:14px;color:var(--sub);margin-bottom:12px;">Discord webhook URL input with an
-                        integrated <strong>Test</strong> button. Clicking Test POSTs a confirmation message to the URL
-                        using <code>request()</code>. The URL is persisted via the flag on every edit.</p>
+                        integrated <strong>Test</strong> button. Clicking Test validates that a non-empty URL is set and
+                        POSTs a confirmation payload using the unified <code>HttpRequest</code> executor shim
+                        (<code>syn.request</code> / <code>http.request</code> / <code>http_request</code> /
+                        <code>request</code>). The URL is persisted and restorable via the flag.</p>
                     <div class="code-wrap">
                         <div class="code-header"><span>Example</span><span class="code-lang">lua</span></div>
                         <pre><code class="language-lua">Section:Webhook("Kill Logger", "KillLoggerWebhookF", function(url)
@@ -2459,12 +2771,13 @@ end)</code></pre>
                     <div class="sig"><span class="obj">Section</span><span class="op">:</span><span
                             class="fn">Grid</span>(<span class="param">text</span>, <span class="param">items</span>,
                         <span class="param">columns</span><span class="op">?:</span><span class="type">number</span>,
-                        <span class="param">callback</span><span class="op">?</span>)
+                        <span class="param">callback</span><span class="op">?</span>, <span class="param">btnH</span><span class="op">?:</span><span class="type">number</span>)
                     </div>
                     <p style="font-size:14px;color:var(--sub);margin-bottom:12px;">Arranges buttons in an evenly-spaced
                         grid layout. Each item can be a plain string or a table <code>{text = "...", id = "..."}</code>.
                         The callback receives the item's <code>id</code> (or the string itself if no id). Default
-                        columns: <code>3</code>.</p>
+                        columns: <code>3</code>; optional <code>btnH</code> defaults to <code>22</code> px.
+                        Backward-compatible with the legacy <code>(text, columns, items, callback)</code> argument order.</p>
                     <div class="code-wrap">
                         <div class="code-header"><span>String items</span><span class="code-lang">lua</span></div>
                         <pre><code class="language-lua">Section:Grid("Teleport Locations", {
@@ -2677,6 +2990,51 @@ Window:LoadConfig("pvp")
             </section>
 
 
+            <!-- ─── AUTO-UPDATE ──────────────────────────────────────── -->
+            <section id="auto-update">
+                <h2>Auto-Update</h2>
+                <p class="section-desc">Version comparison, hot-reload updating, and a ready-made Updates tab powered by
+                    <code>Library.Version</code> and the unified <code>HttpRequest</code> shim.</p>
+
+                <div class="card">
+                    <h3>Library.Version <span class="method-tag tag-returns">string</span></h3>
+                    <div class="sig"><span class="obj">Library</span><span class="op">.</span><span class="fn">Version</span> <span class="op">=</span> <span class="str">"0.07"</span></div>
+                    <p style="font-size:14px;color:var(--sub);">Semantic version string (also replicated on each
+                        <code>Window.Version</code>). Used as the default <code>currentVersion</code> in update checks.</p>
+                </div>
+
+                <div class="card">
+                    <h3>CheckForUpdate <span class="method-tag tag-window">global / window</span></h3>
+                    <div class="sig">
+                        <span class="kw">local</span> <span class="param">hasUpdate</span>, <span class="param">latest</span>, <span class="param">ok</span> <span class="op">=</span>
+                        <span class="obj">Library</span><span class="op">:</span><span class="fn">CheckForUpdate</span>(<span class="param">remoteUrl</span><span class="op">:</span> <span class="type">string</span>, <span class="param">currentVersion</span><span class="op">?:</span> <span class="type">string</span>)
+                    </div>
+                    <p style="font-size:14px;color:var(--sub);margin-bottom:12px;">Fetches <code>remoteUrl</code> (plain
+                        version text like <code>"0.08"</code> or JSON <code>{"version":"0.08"}</code>), compares via
+                        <code>ParseVersion</code>, fires a notification banner, and returns <code>(hasUpdate, latestVersion, ok)</code>.
+                        When offline or HTTP fails, returns <code>(false, currentVersion, false)</code>.</p>
+                    <div class="code-wrap">
+                        <div class="code-header"><span>Example</span><span class="code-lang">lua</span></div>
+                        <pre><code class="language-lua">local hasUpdate, latest, ok = Library:CheckForUpdate("https://example.com/version.txt")
+if ok and hasUpdate then
+    print("New version available:", latest)
+end</code></pre>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>AutoUpdate <span class="method-tag tag-window">global / window</span></h3>
+                    <div class="sig">
+                        <span class="obj">Window</span><span class="op">:</span><span class="fn">AutoUpdate</span>(<span class="param">sourceUrl</span><span class="op">:</span> <span class="type">string</span>, <span class="param">currentVersion</span><span class="op">?:</span> <span class="type">string</span>, <span class="param">onUpdated</span><span class="op">?:</span> <span class="type">() -&gt; ()</span>)
+                    </div>
+                    <p style="font-size:14px;color:var(--sub);margin-bottom:12px;">Downloads Luau source from
+                        <code>sourceUrl</code>, reads any <code>-- version: X.Y.Z</code> or <code>Library.Version = "..."</code>
+                        header, compiles via <code>loadstring</code>, unloads the old Window, executes the new chunk, and
+                        invokes <code>onUpdated()</code>.</p>
+                </div>
+            </section>
+
+
             <!-- ─── PRE-BUILT TABS ───────────────────────────────────── -->
             <section id="prebuilt">
                 <h2>Pre-built Tabs</h2>
@@ -2700,10 +3058,9 @@ Window:LoadConfig("pvp")
                             class="fn">BuildThemeTab</span>(<span class="param">iconId</span><span class="op">?</span>)
                     </div>
                     <p style="font-size:14px;color:var(--sub);margin-bottom:12px;">Generates a <strong>Theme</strong>
-                        tab with a preset button row (Cyberpunk, Midnight, Toxic, Ocean, Classic, Ghost) and individual
-                        <code>ColorPicker</code> widgets for every Color3 key in <code>THEMES</code>. Includes a Reset
-                        to Default button.
-                    </p>
+                        tab with preset buttons (Cyberpunk, Midnight, Toxic, Ocean, Classic, Ghost) and sorted
+                        <code>ColorPicker</code> widgets for all 15 <code>Color3</code> keys in <code>THEMES</code>.
+                        Includes a Reset to Default button.</p>
                 </div>
 
                 <div class="card">
@@ -2723,7 +3080,7 @@ Window:LoadConfig("pvp")
                             class="op">?</span>)</div>
                     <p style="font-size:14px;color:var(--sub);margin-bottom:12px;">Generates an
                         <strong>Executor</strong> tab with a 10-line multiline input and Execute / Clear buttons. Uses
-                        <code>loadstring</code> + <code>task.spawn</code> internally.
+                        <code>loadstring</code> + <code>task.spawn</code> with runtime error notifications.
                     </p>
                 </div>
 
@@ -2734,27 +3091,39 @@ Window:LoadConfig("pvp")
                             class="op">?</span>)</div>
                     <p style="font-size:14px;color:var(--sub);margin-bottom:12px;">Generates a
                         <strong>Notifications</strong> tab showing the full <code>Window.NotificationHistory</code> with
-                        timestamps. Includes Refresh and Clear History buttons. History cap: 100 entries.
+                        timestamps. Includes Refresh and Clear History controls backed by <code>Section:Clear()</code>. History cap: 100 entries.
                     </p>
+                </div>
+
+                <div class="card">
+                    <h3>BuildUpdateTab <span class="method-tag tag-new">v0.07</span></h3>
+                    <div class="sig"><span class="obj">Window</span><span class="op">:</span><span
+                            class="fn">BuildUpdateTab</span>(<span class="param">options</span><span
+                            class="op">:</span> <span class="type">{VersionUrl?: string, SourceUrl?: string, Version?: string}</span>, <span class="param">iconId</span><span
+                            class="op">?</span>)</div>
+                    <p style="font-size:14px;color:var(--sub);margin-bottom:12px;">Generates an
+                        <strong>Updates</strong> tab showing the current version, game Place ID, live update status
+                        indicator, <strong>Check for Update</strong> button, and <strong>Apply Update (Auto)</strong>
+                        hot-reload button.</p>
                 </div>
 
                 <div class="card">
                     <h3>BuildChangelogTab</h3>
                     <div class="sig"><span class="obj">Window</span><span class="op">:</span><span
                             class="fn">BuildChangelogTab</span>(<span class="param">data</span><span
-                            class="op">:</span><span class="type">table</span>, <span class="param">iconId</span><span
+                            class="op">:</span> <span class="type">table</span>, <span class="param">iconId</span><span
                             class="op">?</span>)</div>
                     <p style="font-size:14px;color:var(--sub);margin-bottom:12px;">Generates a
-                        <strong>Changelog</strong> tab. Pass a table where keys are version strings and values are note
-                        strings. Optionally include an <code>Icon</code> key in the table instead of passing
-                        <code>iconId</code> separately.
+                        <strong>Changelog</strong> tab sorted automatically in descending version order. Pass a table
+                        where keys are version strings and values are note strings. Optionally include an
+                        <code>Icon</code> key in the table instead of passing <code>iconId</code> separately.
                     </p>
                     <div class="code-wrap">
                         <div class="code-header"><span>Example</span><span class="code-lang">lua</span></div>
                         <pre><code class="language-lua">Window:BuildChangelogTab({
-    ["v0.06"] = "Redesigned InitLoad sequence. Added TagInput, Timer, Chart, Grid, Dialog.",
-    ["v0.05"] = "Added SearchableDropdown and PlayerDropdown. Improved config system.",
-    ["v0.04"] = "Theme system overhaul with reactive ThemeEvent. Added 6 presets.",
+    ["0.07"] = "Dropdown cleanup, ColorPicker HSV fixes, Classic Webhook visibility, Section:Clear(), AutoUpdate.",
+    ["0.06"] = "Redesigned InitLoad sequence. Added TagInput, Timer, Chart, Grid, Dialog.",
+    ["0.05"] = "Added SearchableDropdown and PlayerDropdown. Improved config system.",
     Icon = 11419714317  -- optional icon for the tab
 })</code></pre>
                     </div>
@@ -2772,22 +3141,22 @@ Window:LoadConfig("pvp")
                 <div class="code-wrap">
                     <div class="code-header"><span>Complete recommended setup</span><span class="code-lang">lua</span>
                     </div>
-                    <pre><code class="language-lua">local Library = loadstring(game:HttpGet("https://gist.githubusercontent.com/Acidgorgon/2c0654b99a77b27e801ca6eb952a1e6c/raw/33f0a4f978d700fab58fd2b4374004cf7a87e560/UILib"))()
+                    <pre><code class="language-lua">local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/Acidgorgon/NewLibrary/main/versions/0.07/Lib.lua"))()
 
 Library:InitLoad({
     Title    = "MY HUB",
-    SubTitle = "v1.0.0",
-    Duration = 4,
+    SubTitle = "v0.07",
+    Duration = 2.5,
     Statuses = {"Loading modules...", "Checking version...", "Done."}
 })
 
-local Window = Library.new(
-    "My Hub",
-    UDim2.new(0, 560, 0, 580),
-    Enum.KeyCode.RightControl,
-    "Sidebar",
-    10734914443
-)
+local Window = Library.new({
+    Title = "My Hub",
+    Size  = UDim2.fromOffset(740, 520),
+    Key   = Enum.KeyCode.RightControl,
+    Mode  = "Sidebar",
+    Icon  = 10734914443
+})
 
 -- Your custom tabs first:
 local CombatTab = Window:Tab("Combat", 10734914443)
@@ -2799,8 +3168,13 @@ Window:BuildThemeTab()
 Window:BuildUtilityTab()
 Window:BuildExecutorTab()
 Window:BuildNotificationLogTab()
+Window:BuildUpdateTab({
+    VersionUrl = "https://example.com/version.txt",
+    SourceUrl  = "https://raw.githubusercontent.com/Acidgorgon/NewLibrary/main/versions/0.07/Lib.lua",
+    Version    = "0.07"
+})
 Window:BuildChangelogTab({
-    ["v1.0.0"] = "Initial release."
+    ["0.07"] = "Initial v0.07 hub release."
 })
 
 -- Panic key:
@@ -2817,41 +3191,193 @@ end)</code></pre>
 
             <footer>
                 <div class="logo" style="justify-content:center;margin-bottom:8px;">
-                    NextLevel <div class="logo-badge">0.06</div>
+                    NextLevel <div class="logo-badge">0.07</div>
                 </div>
-                <p>NextLevel UI Framework &copy; 2026 &mdash; Complete API Reference</p>
+                <p>NextLevel UI Framework &copy; 2026 &mdash; Complete API Reference &middot;
+                    <a href="https://github.com/Acidgorgon/NewLibrary" target="_blank" rel="noopener" style="color:var(--sub);text-decoration:underline;">GitHub</a>
+                </p>
             </footer>
 
         </div>
     </main>
 
+    <div id="lightbox" role="dialog" aria-modal="true" aria-label="Image preview">
+        <img id="lightboxImg" src="" alt="" />
+        <div id="lightboxCaption"></div>
+    </div>
+
     <!-- ═══════════════════════════════════════════════════════ JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-lua.min.js"></script>
     <script>
-        // Active nav link on scroll
-        const sections = document.querySelectorAll('section[id]');
-        const links = document.querySelectorAll('.nav-link');
-        const scroll = document.getElementById('mainScroll');
+        (function () {
+            const sections = document.querySelectorAll('section[id]');
+            const links = document.querySelectorAll('.nav-link');
+            const groups = document.querySelectorAll('.nav-group');
+            const scroll = document.getElementById('mainScroll');
+            const navSearch = document.getElementById('navSearch');
+            const navEmpty = document.getElementById('navEmpty');
+            const sidebar = document.getElementById('sidebar');
+            const menuToggle = document.getElementById('menuToggle');
+            const backdrop = document.getElementById('sidebarBackdrop');
+            const lightbox = document.getElementById('lightbox');
+            const lightboxImg = document.getElementById('lightboxImg');
+            const lightboxCaption = document.getElementById('lightboxCaption');
 
-        scroll.addEventListener('scroll', () => {
-            let cur = '';
-            sections.forEach(s => {
-                if (scroll.scrollTop >= s.offsetTop - 120) cur = s.id;
-            });
-            links.forEach(l => {
-                l.classList.toggle('active', l.getAttribute('href') === '#' + cur);
-            });
-        });
+            function closeDrawer() {
+                if (sidebar) sidebar.classList.remove('open');
+                if (backdrop) backdrop.classList.remove('open');
+            }
 
-        // Sidebar search
-        document.getElementById('navSearch').addEventListener('input', function () {
-            const q = this.value.toLowerCase().trim();
-            links.forEach(l => {
-                const text = l.textContent.toLowerCase();
-                l.classList.toggle('hidden', q !== '' && !text.includes(q));
+            if (menuToggle) {
+                menuToggle.addEventListener('click', () => {
+                    const isOpen = sidebar.classList.toggle('open');
+                    if (backdrop) backdrop.classList.toggle('open', isOpen);
+                });
+            }
+            if (backdrop) backdrop.addEventListener('click', closeDrawer);
+
+            links.forEach(l => l.addEventListener('click', closeDrawer));
+
+            if (scroll) {
+                scroll.addEventListener('scroll', () => {
+                    let cur = '';
+                    sections.forEach(s => {
+                        if (scroll.scrollTop >= s.offsetTop - 120) cur = s.id;
+                    });
+                    links.forEach(l => {
+                        l.classList.toggle('active', l.getAttribute('href') === '#' + cur);
+                    });
+                });
+            }
+
+            function filterNav(query) {
+                const q = (query || '').toLowerCase().trim();
+                let visibleGroups = 0;
+                groups.forEach(group => {
+                    let anyVisible = false;
+                    group.querySelectorAll('.nav-link').forEach(l => {
+                        const match = q === '' || l.textContent.toLowerCase().includes(q);
+                        l.classList.toggle('hidden', !match);
+                        if (match) anyVisible = true;
+                    });
+                    group.classList.toggle('hidden', !anyVisible);
+                    if (anyVisible) visibleGroups += 1;
+                });
+                if (navEmpty) navEmpty.classList.toggle('visible', visibleGroups === 0);
+            }
+
+            if (navSearch) {
+                navSearch.addEventListener('input', function () {
+                    filterNav(this.value);
+                });
+            }
+
+            function copyText(text, onDone) {
+                if (navigator.clipboard && window.isSecureContext) {
+                    navigator.clipboard.writeText(text).then(onDone).catch(() => fallbackCopy(text, onDone));
+                } else {
+                    fallbackCopy(text, onDone);
+                }
+            }
+
+            function fallbackCopy(text, onDone) {
+                const ta = document.createElement('textarea');
+                ta.value = text;
+                ta.style.position = 'fixed';
+                ta.style.opacity = '0';
+                document.body.appendChild(ta);
+                ta.focus();
+                ta.select();
+                try { document.execCommand('copy'); } catch (e) {}
+                document.body.removeChild(ta);
+                onDone();
+            }
+
+            // Copy buttons on every code block
+            document.querySelectorAll('.code-wrap').forEach(wrap => {
+                const header = wrap.querySelector('.code-header');
+                const code = wrap.querySelector('pre code');
+                if (!header || !code) return;
+                const langSpan = header.querySelector('.code-lang');
+                const right = document.createElement('div');
+                right.className = 'code-header-right';
+                if (langSpan) right.appendChild(langSpan);
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'copy-btn';
+                btn.textContent = 'Copy';
+                btn.addEventListener('click', () => {
+                    copyText(code.textContent, () => {
+                        btn.textContent = 'Copied!';
+                        btn.classList.add('copied');
+                        setTimeout(() => {
+                            btn.textContent = 'Copy';
+                            btn.classList.remove('copied');
+                        }, 1500);
+                    });
+                });
+                right.appendChild(btn);
+                header.appendChild(right);
             });
-        });
+
+            // Clickable theme rows to copy Color3.fromRGB(...)
+            document.querySelectorAll('.theme-row').forEach(row => {
+                row.addEventListener('click', () => {
+                    const defEl = row.querySelector('.theme-default');
+                    const keyEl = row.querySelector('.theme-key');
+                    if (!defEl || !keyEl) return;
+                    const rgb = defEl.textContent.trim();
+                    const snippet = keyEl.textContent.trim() + ' = Color3.fromRGB(' + rgb + ')';
+                    copyText(snippet, () => {
+                        const prev = defEl.textContent;
+                        row.classList.add('copied');
+                        defEl.textContent = 'Copied!';
+                        setTimeout(() => {
+                            row.classList.remove('copied');
+                            defEl.textContent = prev;
+                        }, 1100);
+                    });
+                });
+            });
+
+            // Gallery lightbox
+            document.querySelectorAll('.gallery-card').forEach(card => {
+                card.addEventListener('click', () => {
+                    const img = card.querySelector('img');
+                    if (!img || !lightbox) return;
+                    lightboxImg.src = img.getAttribute('src');
+                    lightboxImg.alt = img.getAttribute('alt') || '';
+                    lightboxCaption.textContent = card.getAttribute('data-caption') || '';
+                    lightbox.classList.add('open');
+                });
+            });
+
+            if (lightbox) {
+                lightbox.addEventListener('click', () => lightbox.classList.remove('open'));
+            }
+
+            // Keyboard shortcuts: / or Ctrl+K to search, Escape to close overlays/clear search
+            document.addEventListener('keydown', e => {
+                if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+                    e.preventDefault();
+                    if (navSearch) navSearch.focus();
+                } else if (e.key === '/' && document.activeElement !== navSearch && !/INPUT|TEXTAREA/.test(document.activeElement.tagName)) {
+                    e.preventDefault();
+                    if (navSearch) navSearch.focus();
+                } else if (e.key === 'Escape') {
+                    if (lightbox && lightbox.classList.contains('open')) {
+                        lightbox.classList.remove('open');
+                    } else if (sidebar && sidebar.classList.contains('open')) {
+                        closeDrawer();
+                    } else if (navSearch && navSearch.value !== '') {
+                        navSearch.value = '';
+                        filterNav('');
+                        navSearch.blur();
+                    }
+                }
+            });
+        })();
     </script>
 </body>
 
